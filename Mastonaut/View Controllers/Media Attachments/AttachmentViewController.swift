@@ -127,6 +127,10 @@ class AttachmentViewController: NSViewController
 		}
 	}
 
+	@objc func toggleMediaVisibility() {
+		setMediaHidden(!isMediaHidden)
+	}
+	
 	func setMediaHidden(_ hideMedia: Bool, animated: Bool = true)
 	{
 		let imageViews = [firstImageView, secondImageView, thirdImageView, fourthImageView].compacted()
@@ -138,6 +142,9 @@ class AttachmentViewController: NSViewController
 	private func setupCoverView()
 	{
 		view.addSubview(coverView)
+		coverView.target = self
+		coverView.action = #selector(toggleMediaVisibility)
+		// FIXME: Fast double-clicks can cause the view to re-hide.
 
 		NSLayoutConstraint.activate([
 			view.leftAnchor.constraint(equalTo: coverView.leftAnchor),
