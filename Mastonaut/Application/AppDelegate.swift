@@ -30,7 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate
 
 	lazy private(set) var authController = AuthController(keychainController: keychainController, delegate: self)
 	lazy private(set) var customEmojiCache = CustomEmojiCache(delegate: self)
-	lazy private(set) var statusComposerWindowController = StatusComposerWindowController()
+	lazy private(set) var statusComposerWindowControllers = [StatusComposerWindowController]()
 	lazy private(set) var aboutWindowController = AboutWindowController()
 	lazy private(set) var attachmentWindowController = AttachmentWindowController()
 	lazy private(set) var notificationAgent = UserNotificationAgent()
@@ -100,6 +100,10 @@ class AppDelegate: NSObject, NSApplicationDelegate
 			{
 				[unowned self] (_, _) in self.updateAccountsMenu()
 			}
+	}
+	
+	func removeStatusComposerWindowController(_ obj: StatusComposerWindowController) {
+		statusComposerWindowControllers.removeAll { $0 == obj }
 	}
 	
 	// MARK: App Lifecycle
@@ -526,8 +530,10 @@ extension AppDelegate
 {
 	@IBAction func composeStatus(_ sender: Any?)
 	{
-		statusComposerWindowController.showWindow(sender)
-		statusComposerWindowController.currentAccount = nil
+		let newComposerWindow = StatusComposerWindowController()
+		statusComposerWindowControllers.append(newComposerWindow)
+		newComposerWindow.showWindow(sender)
+		newComposerWindow.currentAccount = nil
 
 		if !NSApp.isActive
 		{

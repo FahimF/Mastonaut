@@ -1017,6 +1017,10 @@ extension StatusComposerWindowController: NSWindowDelegate
 
 		return true
 	}
+	
+	func windowWillClose(_ notification: Foundation.Notification) {
+		AppDelegate.shared.removeStatusComposerWindowController(self)
+	}
 }
 
 extension StatusComposerWindowController: AttributedLabelLinkHandler
@@ -1134,6 +1138,13 @@ extension StatusComposerWindowController: AccountsMenuProvider
 
 extension StatusComposerWindowController
 {
+	@IBAction func composeStatus(_ sender: Any?)
+	{
+		AppDelegate.shared.composeStatus(sender)
+		guard let newComposerWindow = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		newComposerWindow.currentAccount = self.currentAccount
+	}
+	
 	@IBAction func sendStatus(_ sender: Any?)
 	{
 		validateAndSendStatus()
