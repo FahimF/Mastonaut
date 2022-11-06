@@ -77,8 +77,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	private lazy var spoilerCoverView: NSView =
 		{
-			return CoverView(backgroundColor: NSColor(named: "SpoilerCoverBackground")!,
+			let coverView = CoverView(backgroundColor: NSColor(named: "SpoilerCoverBackground")!,
 							 message: 🔠("Content Hidden: Click warning button below to toggle display."))
+			coverView.target = self
+			coverView.action = #selector(toggleContentVisibility)
+			return coverView
 		}()
 
 	private static let _authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
@@ -439,7 +442,8 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		case (warningButton, .on):
 			userDidInteractWithVisibilityControls = true
 			setContentHidden(false)
-			
+			setMediaHidden(false)
+
 		case (warningButton, .off):
 			userDidInteractWithVisibilityControls = true
 			setContentHidden(true)
@@ -457,10 +461,13 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		}
 	}
 	
-	func toggleContentVisibility() {
+	@objc func toggleContentVisibility() {
 		guard hasSpoiler else { return }
 		
 		setContentHidden(!isContentHidden)
+		if (isMediaHidden && !isContentHidden) {
+			setMediaHidden(isContentHidden)
+		}
 		
 		userDidInteractWithVisibilityControls = true
 	}

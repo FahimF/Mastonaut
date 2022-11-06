@@ -23,6 +23,9 @@ import CoreTootin
 class CoverView: BorderView
 {
 	private var didInstallLabel: Bool = false
+	
+	var target: Any? = nil
+	var action: Selector? = nil
 
 	init(backgroundColor: NSColor, textColor: NSColor = .labelColor, message: String)
 	{
@@ -76,5 +79,11 @@ class CoverView: BorderView
 			bottomAnchor.constraint(greaterThanOrEqualTo: label.bottomAnchor),
 			label.topAnchor.constraint(greaterThanOrEqualTo: topAnchor)
 		])
+	}
+	
+	override func mouseDown(with event: NSEvent) {
+		if let target = self.target as? NSObjectProtocol, let action = self.action {
+			target.perform(action, with: self)
+		}
 	}
 }
