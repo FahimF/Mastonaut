@@ -309,19 +309,22 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 	}
 
 	func redraft(status: Status) {
-		let composerWindowController = AppDelegate.shared.statusComposerWindowController
+		AppDelegate.shared.composeStatus(self)
+		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		composerWindowController.showWindow(nil)
 		composerWindowController.setUpAsRedraft(of: status, using: currentAccount)
 	}
 
 	func composeReply(for status: Status, sender: Any?) {
-		let composerWindowController = AppDelegate.shared.statusComposerWindowController
+		AppDelegate.shared.composeStatus(self)
+		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		composerWindowController.showWindow(sender)
 		composerWindowController.setupAsReply(to: status, using: currentAccount, senderWindowController: self)
 	}
 
 	func composeMention(userHandle: String, directMessage: Bool) {
-		let composerWindowController = AppDelegate.shared.statusComposerWindowController
+		AppDelegate.shared.composeStatus(self)
+		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		composerWindowController.showWindow(nil)
 
 		composerWindowController.setupAsMention(handle: userHandle, using: currentAccount, directMessage: directMessage)
@@ -896,8 +899,8 @@ extension TimelinesWindowController: AuthorizedAccountProviding
 extension TimelinesWindowController // IBActions
 {
 	@IBAction func composeStatus(_ sender: Any?) {
-		let composerWindowController = AppDelegate.shared.statusComposerWindowController
-
+		AppDelegate.shared.composeStatus(sender)
+		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		guard let composerWindow = composerWindowController.window else { return }
 
 		if let composerScreen = composerWindow.screen, let timelinesScreen = window?.screen,
