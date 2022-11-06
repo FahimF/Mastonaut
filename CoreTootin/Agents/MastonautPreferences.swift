@@ -27,8 +27,7 @@ public class MastonautPreferences: PreferencesController
 
 	override var suiteName: String?
 	{
-		return Bundle.main.object(forInfoDictionaryKey: "MTNAppGroupIdentifier") as! String
-
+		return Bundle.main.object(forInfoDictionaryKey: "MTNAppGroupIdentifier") as? String
 	}
 
 	/// Initializer declared as private to avoid accidental creation of new instances.
