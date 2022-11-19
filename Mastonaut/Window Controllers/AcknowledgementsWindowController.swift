@@ -36,7 +36,7 @@ class AcknowledgementsWindowController: NSWindowController
 		{
 			[weak textView] in
 
-			let acknowledgements = Acknowledgements.load(plist: "Pods-Mastonaut-acknowledgements")
+			let acknowledgements = Acknowledgements.load(plist: "Mastonaut-acknowledgements")
 			let acknowledgementsString = acknowledgements?.makeAttributedString()
 
 			DispatchQueue.main.async

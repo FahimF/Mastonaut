@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 enum AvatarImageCacheResult {

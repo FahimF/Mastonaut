@@ -17,8 +17,6 @@
 //  GNU General Public License for more details.
 //
 
-import MastodonKit
-
 public extension Account
 {
 	var bestDisplayName: String

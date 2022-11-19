@@ -18,7 +18,6 @@
 //
 
 import AppKit
-import MastodonKit
 import CoreTootin
 
 class AccountsPreferencesController: BaseAccountsPreferencesViewController

@@ -18,7 +18,6 @@
 //
 
 import AppKit
-import MastodonKit
 
 @objc public protocol StatusComposerController: AnyObject
 {

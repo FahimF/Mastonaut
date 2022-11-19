@@ -18,7 +18,6 @@
 //
 
 import AppKit
-import MastodonKit
 
 public extension Visibility
 {

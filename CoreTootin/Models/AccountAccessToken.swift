@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 
 /// Stores the authorization key for a given used at an individual instance.
 public struct AccountAccessToken: KeychainStorable

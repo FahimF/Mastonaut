@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 class SearchResultsViewController<Element: AnyObject>: NSViewController, NSTableViewDataSource, NSTableViewDelegate, SearchResultsPresenter

@@ -18,7 +18,6 @@
 //
 
 import CoreData
-import MastodonKit
 
 public extension AuthorizedAccount
 {

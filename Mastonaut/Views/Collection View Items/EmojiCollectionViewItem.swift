@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 
 class EmojiCollectionViewItem: NSCollectionViewItem
 {

@@ -18,10 +18,9 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
-typealias MastodonNotification = MastodonKit.Notification
+typealias MastodonNotification = MKNotification
 
 extension ClientType
 {

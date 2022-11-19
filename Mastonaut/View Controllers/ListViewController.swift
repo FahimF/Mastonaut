@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 import CoreTootin
 
 let ListViewControllerMinimumWidth: CGFloat = 280

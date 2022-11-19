@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable

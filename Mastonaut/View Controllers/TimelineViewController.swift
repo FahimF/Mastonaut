@@ -18,7 +18,7 @@
 //
 
 import Cocoa
-import MastodonKit
+import CoreTootin
 
 class TimelineViewController: StatusListViewController
 {

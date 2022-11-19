@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 
 protocol AttributedStringCapable: NSView
 {

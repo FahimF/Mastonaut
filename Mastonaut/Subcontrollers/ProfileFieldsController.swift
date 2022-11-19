@@ -17,8 +17,7 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
-import MastodonKit
+import AppKit
 import CoreTootin
 
 class ProfileFieldsController: NSObject

@@ -18,8 +18,7 @@
 //
 
 import Foundation
-import Starscream
-import MastodonKit
+import CoreTootin
 
 class RemoteEventsListener: NSObject
 {
@@ -295,7 +294,7 @@ private struct StreamPayload: Decodable
 			return .update(try decoder.decode(Status.self, from: Data(payload.utf8)))
 
 		case (.notification, .some(let payload)):
-			return .notification(try decoder.decode(MastodonKit.Notification.self, from: Data(payload.utf8)))
+			return .notification(try decoder.decode(MKNotification.self, from: Data(payload.utf8)))
 
 		case (.delete, .some(let payload)):
 			return .delete(statusID: payload)
@@ -326,7 +325,7 @@ private struct StreamPayload: Decodable
 enum ClientEvent
 {
 	case update(Status)
-	case notification(MastodonKit.Notification)
+	case notification(MKNotification)
 	case delete(statusID: String)
 	case keywordFiltersChanged
 }

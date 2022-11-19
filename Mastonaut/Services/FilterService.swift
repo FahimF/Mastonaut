@@ -19,7 +19,6 @@
 
 import Foundation
 import CoreTootin
-import MastodonKit
 
 class FilterService: NSObject, RemoteEventsReceiver {
 	// MARK: - Static Logic
@@ -236,7 +235,7 @@ struct UserFilter {
 		return false
 	}
 
-	func checkMatch(notification: MastodonKit.Notification) -> Bool {
+	func checkMatch(notification: MKNotification) -> Bool {
 		guard isValid else { return false }
 
 		if let status = notification.status {

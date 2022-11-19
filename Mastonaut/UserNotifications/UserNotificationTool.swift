@@ -19,7 +19,6 @@
 
 import Foundation
 import UserNotifications
-import MastodonKit
 import CoreTootin
 
 class UserNotificationTool

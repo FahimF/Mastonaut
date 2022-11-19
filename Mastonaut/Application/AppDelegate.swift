@@ -18,11 +18,9 @@
 //
 
 import Cocoa
-import MastodonKit
 import CoreTootin
 
-class AppDelegate: NSObject, NSApplicationDelegate
-{
+class AppDelegate: NSObject, NSApplicationDelegate {
 	@IBOutlet private weak var windowMenu: NSMenu!
 	@IBOutlet private weak var accountsMenu: NSMenu!
 
@@ -41,14 +39,11 @@ class AppDelegate: NSObject, NSApplicationDelegate
 															accountsService: accountsService)
 
 	private var _preferencesWindowController: PreferencesWindowController? = nil
-	var preferencesWindowController: PreferencesWindowController
-	{
-		if let controller = _preferencesWindowController
-		{
+	
+	var preferencesWindowController: PreferencesWindowController {
+		if let controller = _preferencesWindowController {
 			return controller
-		}
-		else
-		{
+		} else {
 			let storyboard = NSStoryboard(name: "Preferences", bundle: .main)
 			let controller = storyboard.instantiateInitialController()! as! PreferencesWindowController
 			_preferencesWindowController = controller
@@ -65,8 +60,7 @@ class AppDelegate: NSObject, NSApplicationDelegate
 	private var migrationErrorPresenter: (() -> Void)?
 
 	@objc private(set) dynamic var appIsReady: Bool = false
-	private var didUpdateAllAccounts = false
-	{
+	private var didUpdateAllAccounts = false {
 		didSet { updateAppIsReady() }
 	}
 
@@ -79,27 +73,21 @@ class AppDelegate: NSObject, NSApplicationDelegate
 
 	lazy var avatarImageCache = AvatarImageCache(resourceURLSession: resourcesUrlSession)
 
-	var keychainController: KeychainController
-	{
+	var keychainController: KeychainController {
 		return keychain.keychainController
 	}
 
-	static var shared: AppDelegate
-	{
+	static var shared: AppDelegate {
 		// If these force-unwrap fails, there's something terribly wrong with the application already.
 		return NSApplication.shared.delegate! as! AppDelegate
 	}
 
-	override init()
-	{
+	override init() {
 		super.init()
-
 		migrateToSharedLocalKeychainIfNeeded()
-
-		observations.observe(NSApp, \NSApplication.keyWindow)
-			{
-				[unowned self] (_, _) in self.updateAccountsMenu()
-			}
+		observations.observe(NSApp, \NSApplication.keyWindow) {
+			[unowned self] (_, _) in self.updateAccountsMenu()
+		}
 	}
 	
 	func removeStatusComposerWindowController(_ obj: StatusComposerWindowController) {
@@ -108,114 +96,90 @@ class AppDelegate: NSObject, NSApplicationDelegate
 	
 	// MARK: App Lifecycle
 
-	func applicationDidFinishLaunching(_ notification: Foundation.Notification)
-	{
-		if accountsService.authorizedAccounts.isEmpty
-		{
+	func applicationDidFinishLaunching(_ notification: Foundation.Notification) {
+		if accountsService.authorizedAccounts.isEmpty {
 			authController.removeAllAuthorizationArtifacts()
 		}
 
-		reauthNotificationObserver = NotificationCenter.default.addObserver(forName: .accountNeedsNewClientToken,
-																			object: nil, queue: .main)
-		{
+		reauthNotificationObserver = NotificationCenter.default.addObserver(forName: .accountNeedsNewClientToken, object: nil, queue: .main) {
 			[unowned self] notification in
 
 			guard let account = (notification.object as? ReauthorizationAgent)?.account else { return }
 
-			if NSAlert.accountNeedsAuthorizationDialog(account: account).runModal() == .alertFirstButtonReturn
-			{
+			if NSAlert.accountNeedsAuthorizationDialog(account: account).runModal() == .alertFirstButtonReturn {
 				self.showAccountsPreferences()
 			}
 		}
 
 		// Make a timeline window if there is none
-		if timelineWindowControllers.isEmpty
-		{
+		if timelineWindowControllers.isEmpty {
 			makeNewTimelinesWindow(forDecoder: false)
 		}
 
 		if let userInfoDict = notification.userInfo,
-			let userNotification = userInfoDict[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification,
-			let payload = userNotification.payload
-		{
+			let userNotification =  userInfoDict[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification,
+			let payload = userNotification.payload {
 			showTimelinesWindow(for: payload)
 			NSUserNotificationCenter.default.removeDeliveredNotification(userNotification)
 		}
-
 		// Refresh our local cache of the authorized users info
 		authController.updateAllAccountsLocalInfo()
-
 		NSUserNotificationCenter.default.delegate = self
-
 		#if DEBUG
 		windowMenu.addItem(.separator())
 		windowMenu.addItem(withTitle: "Debug Info", action: #selector(showDebugInfoWindow(_:)), keyEquivalent: "")
 		#endif
 
-		if let errorPresenter = migrationErrorPresenter
-		{
+		if let errorPresenter = migrationErrorPresenter {
 			migrationErrorPresenter = nil
 			errorPresenter()
 		}
 	}
 
-	func applicationWillBecomeActive(_ notification: Foundation.Notification)
-	{
+	func applicationWillBecomeActive(_ notification: Foundation.Notification) {
 		notificationAgent.notificationTool.resetDockTileBadge()
 	}
 
-	func applicationWillTerminate(_ aNotification: Foundation.Notification)
-	{
+	func applicationWillTerminate(_ aNotification: Foundation.Notification) {
 		// Ensure any pending writes finish before quitting the app.
 		customEmojiCache.prepareForTermination()
 	}
 
-	func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool
-	{
-		if !hasVisibleWindows
-		{
-			makeNewTimelinesWindow(forDecoder: false)
+	func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+		if !hasVisibleWindows {
+			for window in sender.windows {
+				window.makeKeyAndOrderFront(self)
+			}
+//			makeNewTimelinesWindow(forDecoder: false)
 		}
-
 		return true
 	}
 	
 	// MARK: Timeline Windows Handling
 
 	@discardableResult
-	internal func makeNewTimelinesWindow(forDecoder: Bool) -> TimelinesWindowController?
-	{
+	internal func makeNewTimelinesWindow(forDecoder: Bool) -> TimelinesWindowController? {
 		let timelinesStoryboard = NSStoryboard(name: "Timelines", bundle: .main)
 
-		guard let controller = timelinesStoryboard.instantiateInitialController() as? TimelinesWindowController else
-		{
+		guard let controller = timelinesStoryboard.instantiateInitialController() as? TimelinesWindowController else {
 			return nil
 		}
-
-		if let windowFrame = Preferences.storedFrame(forTimelineWindowIndex: timelineWindowControllers.count)
-		{
+		if let windowFrame = Preferences.storedFrame(forTimelineWindowIndex: timelineWindowControllers.count) {
 			controller.window?.setFrame(windowFrame, display: false)
 		}
-
 		timelineWindowControllers.insert(controller)
-
-		if !forDecoder
-		{
+		if !forDecoder {
 			controller.prepareAsEmptyWindow()
 		}
-
 		controller.showWindow(self)
-
 		return controller
 	}
 
-	func detachTimelinesWindow(for controller: TimelinesWindowController)
-	{
+	func detachTimelinesWindow(for controller: TimelinesWindowController) {
 		timelineWindowControllers.remove(controller)
 		controller.handleDetach()
 
-		if let windowFrame = controller.window?.frame
-		{
+		if let windowFrame = controller.window?.frame {
 			Preferences.set(frame: windowFrame, forTimelineWindowIndex: timelineWindowControllers.count)
 		}
 	}

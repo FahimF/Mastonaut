@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 
 @objc protocol CustomEmojiSelectionHandler: AnyObject
 {

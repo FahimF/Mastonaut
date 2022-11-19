@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 class StatusListViewController: ListViewController<Status>, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver

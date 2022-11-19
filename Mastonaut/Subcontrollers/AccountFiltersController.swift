@@ -19,7 +19,6 @@
 
 import Cocoa
 import CoreTootin
-import MastodonKit
 
 class AccountFiltersController: NSObject {
 

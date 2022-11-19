@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 protocol SidebarContainer: AnyObject
@@ -91,23 +90,18 @@ class SidebarSubcontroller
 		sidebarMode = mode
 	}
 
-	func uninstallSidebar()
-	{
+	func uninstallSidebar() {
 		navigationStack = nil
 		sidebarMode = nil
 	}
 
-	private func setSidebarController(from sidebarMode: SidebarMode?)
-	{
+	private func setSidebarController(from sidebarMode: SidebarMode?) {
 		updateNavigationSegmentedControlState()
 
-		guard self.sidebarMode != sidebarMode else
-		{
+		guard self.sidebarMode != sidebarMode else {
 			return
 		}
-
-		guard let sidebarMode = sidebarMode else
-		{
+		guard let sidebarMode = sidebarMode else {
 			let viewController = sidebarContainer.sidebarViewController
 
 			viewController.map { sidebarContainer.willUninstallSidebar(viewController: $0) }
@@ -117,8 +111,7 @@ class SidebarSubcontroller
 			return
 		}
 
-		guard let client = sidebarContainer.client, let instance = sidebarContainer.currentInstance else
-		{
+		guard let client = sidebarContainer.client, let instance = sidebarContainer.currentInstance else {
 			return
 		}
 
@@ -132,30 +125,20 @@ class SidebarSubcontroller
 
 		sidebarContainer.sidebarViewController = viewController
 
-		if oldValue == nil
-		{
+		if oldValue == nil {
 			sidebarContainer.willInstallSidebar(viewController: viewController)
 		}
-
-		if AppDelegate.shared.appIsReady
-		{
+		if AppDelegate.shared.appIsReady {
 			sidebarContainer.sidebarViewController?.client = client
 		}
-
-		if oldValue == nil
-		{
+		if oldValue == nil {
 			sidebarContainer.didInstallSidebar(viewController: viewController, with: sidebarMode)
-		}
-		else if let oldViewController = oldViewController
-		{
-			sidebarContainer.didUpdateSidebar(viewController: viewController,
-											  previousViewController: oldViewController,
-											  with: sidebarMode)
+		} else if let oldViewController = oldViewController {
+			sidebarContainer.didUpdateSidebar(viewController: viewController, previousViewController: oldViewController, with: sidebarMode)
 		}
 	}
 
-	private func updateNavigationSegmentedControlState()
-	{
+	private func updateNavigationSegmentedControlState() {
 		navigationControl.setEnabled(navigationStack?.canGoBackward ?? false, forSegment: 0)
 		navigationControl.setEnabled(navigationStack?.canGoForward ?? false, forSegment: 1)
 	}

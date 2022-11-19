@@ -19,7 +19,6 @@
 
 import Cocoa
 import AVKit
-import MastodonKit
 import CoreTootin
 
 class AttachmentWindowController: NSWindowController, NSMenuItemValidation

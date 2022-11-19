@@ -17,7 +17,7 @@
 //  GNU General Public License for more details.
 //
 
-import MastodonKit
+import CoreTootin
 
 class MockClient: ClientType
 {

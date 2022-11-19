@@ -18,8 +18,6 @@
 //
 
 import AppKit
-import MastodonKit
-import SVGKit
 import CoreTootin
 
 class CustomEmojiCache: NSObject, Cache

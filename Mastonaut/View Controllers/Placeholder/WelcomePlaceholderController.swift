@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import SVGKit
 
 class WelcomePlaceholderController: NSViewController
 {

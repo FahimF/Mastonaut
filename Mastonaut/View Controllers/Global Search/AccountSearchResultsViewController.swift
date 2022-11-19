@@ -18,7 +18,7 @@
 //
 
 import Cocoa
-import MastodonKit
+import CoreTootin
 
 class AccountSearchResultsViewController: SearchResultsViewController<Account>
 {

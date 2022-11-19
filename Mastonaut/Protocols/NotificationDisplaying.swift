@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import CoreTootin
 
 protocol NotificationDisplaying

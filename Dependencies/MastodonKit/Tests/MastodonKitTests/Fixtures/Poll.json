@@ -1,0 +1,18 @@
+{
+    "id": "6",
+    "expires_at": "2019-03-11T18:33:37.947Z",
+    "expired": false,
+    "multiple": false,
+    "votes_count": 63,
+    "voted": false,
+    "options": [
+        {
+            "title": "Alpha",
+            "votes_count": 26
+        },
+        {
+            "title": "Beta",
+            "votes_count": 37
+        }
+    ]
+}

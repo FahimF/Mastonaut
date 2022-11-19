@@ -17,8 +17,6 @@
 //  GNU General Public License for more details.
 //
 
-import MastodonKit
-
 public extension Client
 {
 	static func create(for account: AuthorizedAccount,

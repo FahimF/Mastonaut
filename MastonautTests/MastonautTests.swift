@@ -19,8 +19,7 @@
 
 import XCTest
 import CoreTootin
-import MastodonKit
-@testable import Mastonaut
+//@testable import Mastonaut
 
 class MastonautTests: XCTestCase {
 

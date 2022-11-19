@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 import CoreTootin
 
 typealias ColumnViewController = NSViewController & ColumnPresentable

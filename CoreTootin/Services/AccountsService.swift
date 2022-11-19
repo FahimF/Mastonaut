@@ -19,7 +19,6 @@
 
 import Foundation
 import CoreData
-import MastodonKit
 
 public class AccountsService: NSObject
 {

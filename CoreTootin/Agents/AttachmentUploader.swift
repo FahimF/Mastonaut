@@ -18,7 +18,6 @@
 //
 
 import Foundation
-import MastodonKit
 import AVFoundation
 
 let kUTTypeHEIC = "public.heic" as CFString

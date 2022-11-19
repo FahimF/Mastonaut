@@ -18,7 +18,7 @@
 //
 
 import Foundation
-import MastodonKit
+import CoreTootin
 
 class FocusedStatusTableCellView: StatusTableCellView
 {

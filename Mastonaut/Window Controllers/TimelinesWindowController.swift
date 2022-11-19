@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 import CoreTootin
 
 class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, ToolbarWindowController
@@ -123,8 +122,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 				accountObservations.observe(currentAccount, \.bookmarkedTags) {
 					(_, _) in AppDelegate.shared.updateAccountsMenu()
 				}
-			}
-			else {
+			} else {
 				hasUser = false
 				client = nil
 				currentInstance = nil
@@ -477,7 +475,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 	}
 
 	// MARK: Internal helper methods
-
 	private func revalidateSidebarAccountReference() {
 		if let accountBoundSidebar = timelinesSplitViewController.sidebarViewController as? AccountBound,
 			let currentAccount = accountBoundSidebar.account,
@@ -817,16 +814,15 @@ extension TimelinesWindowController
 	}
 }
 
-extension TimelinesWindowController: NSWindowDelegate
-{
+extension TimelinesWindowController: NSWindowDelegate {
 	func windowDidChangeOcclusionState(_ notification: Foundation.Notification) {
 		guard let occlusionState = window?.occlusionState else { return }
 		timelinesViewController.columnViewControllers.forEach({ $0.containerWindowOcclusionStateDidChange(occlusionState)})
 	}
 
 	func windowWillClose(_ notification: Foundation.Notification) {
-		sidebarSubcontroller.uninstallSidebar()
-		AppDelegate.shared.detachTimelinesWindow(for: self)
+//		sidebarSubcontroller.uninstallSidebar()
+//		AppDelegate.shared.detachTimelinesWindow(for: self)
 	}
 }
 

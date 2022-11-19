@@ -1,0 +1,10 @@
+{
+    "id": "42",
+    "following": false,
+    "followed_by": false,
+    "blocking": true,
+    "muting": false,
+    "muting_notifications": true,
+    "requested": false,
+    "domain_blocking": true
+}

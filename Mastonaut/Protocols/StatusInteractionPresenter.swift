@@ -19,7 +19,6 @@
 
 import AppKit
 import CoreTootin
-import MastodonKit
 
 protocol StatusInteractionPresenter {
 

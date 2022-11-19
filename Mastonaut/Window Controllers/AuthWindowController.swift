@@ -19,7 +19,6 @@
 
 import Cocoa
 import WebKit
-import MastodonKit
 
 class AuthWindowController: NSWindowController
 {

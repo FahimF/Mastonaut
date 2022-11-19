@@ -17,8 +17,7 @@
 //  GNU General Public License for more details.
 //
 
-import Cocoa
-import MastodonKit
+import AppKit
 import CoreTootin
 
 class FollowCellView: MastonautTableCellView, NotificationDisplaying

@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import MastodonKit
 import CoreTootin
 
 class NotificationListViewController: ListViewController<MastodonNotification>, NotificationInteractionHandling, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver
@@ -427,7 +426,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 
 	// MARK: - Keyboard Navigation
 
-	override func showPreview(for notification: MastodonKit.Notification, atRow row: Int) {
+	override func showPreview(for notification: MKNotification, atRow row: Int) {
 		guard let cellView = tableView.rowView(atRow: row, makeIfNecessary: false)?.view(atColumn: 0),
 			  let mediaPresenterCell = cellView as? MediaPresenting else {
 			return

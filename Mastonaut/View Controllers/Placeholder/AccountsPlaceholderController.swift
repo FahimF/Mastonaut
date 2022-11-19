@@ -18,7 +18,6 @@
 //
 
 import Cocoa
-import SVGKit
 import CoreTootin
 
 class AccountsPlaceholderController: NSViewController

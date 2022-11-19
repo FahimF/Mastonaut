@@ -10,3 +10,4 @@
 #import "NSURL+Sanitization.h"
 #import "AnnotatedURL.h"
 #import "NSView+EmojiSubviews.h"
+#import "SVGKit.h"
