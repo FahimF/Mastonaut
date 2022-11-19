@@ -147,8 +147,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 	func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
 		if !hasVisibleWindows {
-			for window in sender.windows {
-				window.makeKeyAndOrderFront(self)
+			if let w = sender.windows.first {
+				w.makeKeyAndOrderFront(self)
 			}
 //			makeNewTimelinesWindow(forDecoder: false)
 		}
