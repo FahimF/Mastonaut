@@ -23,17 +23,16 @@ import CoreTootin
 typealias SidebarViewController = NSViewController & SidebarPresentable
 
 class TimelinesSplitViewController: NSSplitViewController {
-
 	private var didInitialize = false
 
 	var preserveSplitViewSizeForNextSidebarInstall = false
 
-	var sidebarViewController: SidebarViewController? = nil {
+	var sidebarViewController: SidebarViewController? {
 		didSet {
 			switch (oldValue, sidebarViewController) {
-			case (.none, .some(let viewController)):
+			case let (.none, .some(viewController)):
 				showSidebar(viewController)
-			case (.some, .some(let viewController)):
+			case let (.some, .some(viewController)):
 				replaceSidebar(viewController)
 			case (.some, .none):
 				hideSidebar()
@@ -53,12 +52,12 @@ class TimelinesSplitViewController: NSSplitViewController {
 			return .preferResizingSiblingsWithFixedSplitView
 		}
 
-        guard isWindowFullScreen == false else {
-            return .preferResizingSiblingsWithFixedSplitView
-        }
+		guard isWindowFullScreen == false else {
+			return .preferResizingSiblingsWithFixedSplitView
+		}
 
 		return Preferences.timelinesResizeMode == .expandWindowFirst ? .preferResizingSplitViewWithFixedSiblings
-																	 : .preferResizingSiblingsWithFixedSplitView
+			: .preferResizingSiblingsWithFixedSplitView
 	}
 
 	override func viewDidLoad() {
@@ -115,7 +114,7 @@ class TimelinesSplitViewController: NSSplitViewController {
 			return
 		}
 
-		NSAnimationContext.runAnimationGroup { (context) in
+		NSAnimationContext.runAnimationGroup { _ in
 			splitViewItem.animator().isCollapsed = true
 		} completionHandler: { [weak self] in
 			guard let self = self else { return }
@@ -132,13 +131,12 @@ class TimelinesSplitViewController: NSSplitViewController {
 		return splitViewItem
 	}
 
-	override func splitView(_ splitView: NSSplitView, shouldHideDividerAt dividerIndex: Int) -> Bool {
+	override func splitView(_: NSSplitView, shouldHideDividerAt _: Int) -> Bool {
 		return splitViewItems.count == 1
 	}
 }
 
 private extension NSSplitViewItem {
-
 	func with(holdingPriority: NSLayoutConstraint.Priority) -> NSSplitViewItem {
 		self.holdingPriority = holdingPriority
 		return self
@@ -146,7 +144,6 @@ private extension NSSplitViewItem {
 }
 
 private class EmptyViewController: NSViewController {
-
 	init() {
 		super.init(nibName: nil, bundle: nil)
 	}

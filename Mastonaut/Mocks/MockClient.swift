@@ -19,22 +19,19 @@
 
 import CoreTootin
 
-class MockClient: ClientType
-{
+class MockClient: ClientType {
 	let baseURL: String
 	let session: URLSession
 
 	let observers = ClientObserverList()
 
 	weak var delegate: ClientDelegate?
-	public var accessToken: String?
-	{
-		didSet
-		{
+	public var accessToken: String? {
+		didSet {
 			realClient.accessToken = accessToken
 
 			if let accessToken = accessToken {
-				observers.allObservers.forEach({ $0.client(self, didUpdate: accessToken) })
+				observers.allObservers.forEach { $0.client(self, didUpdate: accessToken) }
 			}
 		}
 	}
@@ -45,7 +42,7 @@ class MockClient: ClientType
 
 	var mockCalls = true
 
-	required public init(baseURL: String, accessToken: String? = nil, session: URLSession = .shared, delegate: ClientDelegate?)
+	public required init(baseURL: String, accessToken: String? = nil, session: URLSession = .shared, delegate: ClientDelegate?)
 	{
 		self.baseURL = baseURL
 		self.session = session
@@ -55,26 +52,24 @@ class MockClient: ClientType
 		realClient = Client(baseURL: baseURL, accessToken: accessToken, session: session)
 	}
 
-	func set<Model>(response: Data, for request: Request<Model>) throws
-	{
+	func set<Model>(response: Data, for request: Request<Model>) throws {
 		responseMap[try JSONEncoder().encode(request).hashValue] = response
 	}
 
-	private let mastodonFormatter: DateFormatter =
-		{
-			let dateFormatter = DateFormatter()
+	private let mastodonFormatter: DateFormatter = {
+		let dateFormatter = DateFormatter()
 
-			dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SZ"
-			dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-			dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SZ"
+		dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+		dateFormatter.locale = Locale(identifier: "en_US_POSIX")
 
-			return dateFormatter
-		}()
+		return dateFormatter
+	}()
 
 	@discardableResult
 	func run<Model: Codable>(_ request: Request<Model>,
-							 resumeImmediately: Bool,
-							 completion: @escaping (Result<Model>) -> Void) -> FutureTask?
+	                         resumeImmediately: Bool,
+	                         completion: @escaping (Result<Model>) -> Void) -> FutureTask?
 	{
 		if mockCalls, let hash = try? JSONEncoder().encode(request).hashValue, let response = responseMap[hash]
 		{
@@ -83,23 +78,20 @@ class MockClient: ClientType
 
 			guard
 				let model = try? decoder.decode(Model.self, from: response)
-			else
-			{
+			else {
 				completion(.failure(ClientError.invalidModel))
 				return nil
 			}
 
 			completion(.success(model, nil))
 			return nil
-		}
-		else
-		{
+		} else {
 			return realClient.run(request, resumeImmediately: resumeImmediately, completion: completion)
 		}
 	}
 
 	func runAndAggregateAllPages<Model: Codable>(requestProvider: @escaping (Pagination) -> Request<[Model]>,
-												 completion: @escaping (Result<[Model]>) -> Void)
+	                                             completion: @escaping (Result<[Model]>) -> Void)
 	{
 		realClient.runAndAggregateAllPages(requestProvider: requestProvider, completion: completion)
 	}

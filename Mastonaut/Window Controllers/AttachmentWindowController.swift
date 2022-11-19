@@ -17,12 +17,11 @@
 //  GNU General Public License for more details.
 //
 
-import Cocoa
 import AVKit
+import Cocoa
 import CoreTootin
 
-class AttachmentWindowController: NSWindowController, NSMenuItemValidation
-{
+class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 	@IBOutlet private unowned var imageView: NSImageView!
 	@IBOutlet private unowned var videoPlayerView: AVPlayerView!
 	@IBOutlet private unowned var progressIndicator: NSProgressIndicator!
@@ -35,53 +34,44 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation
 
 	private let resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
-	private var loadingTask: URLSessionTask? = nil
-	private var attachmentGroup: IndexedAttachmentGroup? = nil
+	private var loadingTask: URLSessionTask?
+	private var attachmentGroup: IndexedAttachmentGroup?
 
-	private var playerLooper: AVPlayerLooper? = nil
-	private var currentAttachment: (attachment: Attachment, image: NSImage)? = nil
-	{
+	private var playerLooper: AVPlayerLooper?
+	private var currentAttachment: (attachment: Attachment, image: NSImage)? {
 		didSet { playerLooper = nil }
 	}
 
-	private var attachmentsPendingWindowLoad: (Attachment, AttachmentGroup, NSWindow)? = nil
+	private var attachmentsPendingWindowLoad: (Attachment, AttachmentGroup, NSWindow)?
 
-	override var windowNibName: NSNib.Name?
-	{
+	override var windowNibName: NSNib.Name? {
 		return "AttachmentWindowController"
 	}
 
-	override func windowDidLoad()
-	{
+	override func windowDidLoad() {
 		super.windowDidLoad()
 
-		hoverView.mouseEntered =
-			{
-				[unowned self] in self.setControlsHidden(false)
-			}
+		hoverView.mouseEntered = {
+			[unowned self] in self.setControlsHidden(false)
+		}
 
-		hoverView.mouseExited =
-			{
-				[unowned self] in self.setControlsHidden(true)
-			}
+		hoverView.mouseExited = {
+			[unowned self] in self.setControlsHidden(true)
+		}
 
-		if let (attachment, attachmentGroup, senderWindow) = attachmentsPendingWindowLoad
-		{
+		if let (attachment, attachmentGroup, senderWindow) = attachmentsPendingWindowLoad {
 			attachmentsPendingWindowLoad = nil
 			set(attachment: attachment, attachmentGroup: attachmentGroup, senderWindow: senderWindow)
 		}
 	}
 
-	func set(attachment: Attachment, attachmentGroup: AttachmentGroup, senderWindow: NSWindow)
-	{
-		guard isWindowLoaded else
-		{
+	func set(attachment: Attachment, attachmentGroup: AttachmentGroup, senderWindow: NSWindow) {
+		guard isWindowLoaded else {
 			attachmentsPendingWindowLoad = (attachment, attachmentGroup, senderWindow)
 			return
 		}
 
-		guard let currentIndex = attachmentGroup.attachments.firstIndex(of: attachment) else
-		{
+		guard let currentIndex = attachmentGroup.attachments.firstIndex(of: attachment) else {
 			return
 		}
 
@@ -98,13 +88,13 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation
 			return true
 
 		case #selector(nextAttachment(_:)),
-			 #selector(previousAttachment(_:)),
-			 #selector(share(_:)),
-			 #selector(saveToDownloads(_:)),
-			 #selector(saveToLocation(_:)),
-			 #selector(copyImage(_:)),
-			 #selector(copyImageAddress(_:)),
-			 #selector(openInBrowser(_:)):
+		     #selector(previousAttachment(_:)),
+		     #selector(share(_:)),
+		     #selector(saveToDownloads(_:)),
+		     #selector(saveToLocation(_:)),
+		     #selector(copyImage(_:)),
+		     #selector(copyImageAddress(_:)),
+		     #selector(openInBrowser(_:)):
 			return true
 
 		default:
@@ -113,18 +103,15 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation
 	}
 
 	@IBAction
-	func togglePresentableMediaVisible(_ sender: Any?) {
+	func togglePresentableMediaVisible(_: Any?) {
 		close()
 	}
 }
 
-private extension AttachmentWindowController
-{
-	func setControlsHidden(_ shouldHide: Bool)
-	{
+private extension AttachmentWindowController {
+	func setControlsHidden(_ shouldHide: Bool) {
 		let windowButtons = [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton]
-		for buttonType in windowButtons
-		{
+		for buttonType in windowButtons {
 			guard let button = window?.standardWindowButton(buttonType) else { continue }
 			button.setInvisible(shouldHide, animated: true)
 			button.isEnabled = true
@@ -136,17 +123,14 @@ private extension AttachmentWindowController
 		setNextPreviousButtonsHidden(shouldHide)
 	}
 
-	func setNextPreviousButtonsHidden(_ shouldHide: Bool)
-	{
-		guard !shouldHide else
-		{
+	func setNextPreviousButtonsHidden(_ shouldHide: Bool) {
+		guard !shouldHide else {
 			buttonPrevious.setInvisible(true, animated: true)
 			buttonNext.setInvisible(true, animated: true)
 			return
 		}
 
-		guard let attachmentGroup = self.attachmentGroup else
-		{
+		guard let attachmentGroup = attachmentGroup else {
 			return
 		}
 
@@ -158,15 +142,13 @@ private extension AttachmentWindowController
 		buttonNext.setInvisible(currentIsLast, animated: true)
 	}
 
-	func repositionWindow(for attachment: Attachment, senderWindow: NSWindow)
-	{
+	func repositionWindow(for attachment: Attachment, senderWindow: NSWindow) {
 		guard
 			let window = window,
 			let screen = senderWindow.screen,
 			let imageSize = attachment.meta?.original?.size ?? attachmentGroup?.preview(for: attachment)?.size,
 			imageSize.area > 0
-		else
-		{
+		else {
 			return
 		}
 
@@ -175,22 +157,20 @@ private extension AttachmentWindowController
 		let finalSize = imageSize.area < maxFrame.size.area ? imageSize : imageSize.fitting(on: maxFrame.size)
 
 		let finalFrame = NSRect(x: screen.frame.origin.x + (screen.frame.width - finalSize.width) * 0.5,
-								y: screen.frame.origin.y + (screen.frame.height - finalSize.height) * 0.5,
+		                        y: screen.frame.origin.y + (screen.frame.height - finalSize.height) * 0.5,
 
-								width: finalSize.width, height: finalSize.height)
+		                        width: finalSize.width, height: finalSize.height)
 
 		window.setFrame(finalFrame, display: true, animate: true)
 	}
 
-	func setCurrentAttachment(_ attachment: Attachment, currentPreview: NSImage?)
-	{
+	func setCurrentAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		setNextPreviousButtonsHidden(false)
 
-		currentAttachment = currentPreview.map({ (attachment, $0) })
+		currentAttachment = currentPreview.map { (attachment, $0) }
 		updateShareMenu(with: attachment, image: currentPreview)
 
-		switch attachment.type
-		{
+		switch attachment.type {
 		case .image:
 			setImageAttachment(attachment, currentPreview: currentPreview)
 
@@ -202,17 +182,14 @@ private extension AttachmentWindowController
 
 		case .unknown:
 			setFailedLoadingContent()
-			break
 		}
 	}
 
-	func setImageAttachment(_ attachment: Attachment, currentPreview: NSImage?)
-	{
+	func setImageAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
 
-		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else
-		{
+		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
 			imageView.image = #imageLiteral(resourceName: "missing")
 			return
 		}
@@ -220,25 +197,19 @@ private extension AttachmentWindowController
 		imageView.image = currentPreview ?? #imageLiteral(resourceName: "missing")
 		imageView.toolTip = attachment.description
 
-		let progressHandler: (Double) -> Void =
-		{
+		let progressHandler: (Double) -> Void = {
 			[weak progressIndicator] ratio in
 
-			DispatchQueue.main.async
-				{
-					guard let indicator = progressIndicator else
-					{
-						return
-					}
+			DispatchQueue.main.async {
+				guard let indicator = progressIndicator else {
+					return
+				}
 
-					if ratio >= 1
-					{
-						indicator.animator().isHidden = true
-					}
-					else
-					{
-						indicator.animator().doubleValue = ratio * 100
-					}
+				if ratio >= 1 {
+					indicator.animator().isHidden = true
+				} else {
+					indicator.animator().doubleValue = ratio * 100
+				}
 			}
 		}
 
@@ -247,38 +218,33 @@ private extension AttachmentWindowController
 
 		let taskPromise = Promise<URLSessionTask>()
 
-		let task = resourcesFetcher.fetchImage(with: url, progress: progressHandler)
-		{
+		let task = resourcesFetcher.fetchImage(with: url, progress: progressHandler) {
 			[weak self] result in
 
-			DispatchQueue.main.async
-				{
-					// Check if we're still interested in the loaded image
-					guard self?.loadingTask == taskPromise.value, let imageView = self?.imageView else
-					{
-						return
+			DispatchQueue.main.async {
+				// Check if we're still interested in the loaded image
+				guard self?.loadingTask == taskPromise.value, let imageView = self?.imageView else {
+					return
+				}
+
+				self?.loadingTask = nil
+
+				switch result {
+				case let .success(image):
+					imageView.image = image
+					self?.currentAttachment = (attachment, image)
+					self?.updateShareMenu(with: attachment, image: image)
+
+				case let .failure(error):
+					guard (error as NSError).code != NSURLErrorCancelled else {
+						break
 					}
 
-					self?.loadingTask = nil
+					fallthrough
 
-					switch result
-					{
-					case .success(let image):
-						imageView.image = image
-						self?.currentAttachment = (attachment, image)
-						self?.updateShareMenu(with: attachment, image: image)
-
-					case .failure(let error):
-						guard (error as NSError).code != NSURLErrorCancelled else
-						{
-							break
-						}
-
-						fallthrough
-
-					case .emptyResponse:
-						imageView.image = #imageLiteral(resourceName: "missing")
-					}
+				case .emptyResponse:
+					imageView.image = #imageLiteral(resourceName: "missing")
+				}
 			}
 		}
 
@@ -286,50 +252,41 @@ private extension AttachmentWindowController
 		loadingTask = task
 	}
 
-	func setVideoAttachment(_ attachment: Attachment, currentPreview: NSImage?, shouldLoop: Bool)
-	{
+	func setVideoAttachment(_ attachment: Attachment, currentPreview _: NSImage?, shouldLoop: Bool) {
 		videoPlayerView.isHidden = false
 		imageView.isHidden = true
 
-		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else
-		{
+		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
 			setFailedLoadingContent()
 			return
 		}
 
 		let player: AVPlayer
 
-		if shouldLoop
-		{
+		if shouldLoop {
 			let queuePlayer = AVQueuePlayer()
 			playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: AVPlayerItem(url: url))
 			player = queuePlayer
-		}
-		else
-		{
+		} else {
 			player = AVPlayer(playerItem: AVPlayerItem(url: url))
 		}
 
 		videoPlayerView.player = player
 
-		if Preferences.autoplayVideos
-		{
+		if Preferences.autoplayVideos {
 			player.play()
 		}
 	}
 
-	func setFailedLoadingContent()
-	{
+	func setFailedLoadingContent() {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
 
 		imageView.image = NSImage.previewErrorImage
 	}
 
-	func updateShareMenu(with attachment: Attachment, image: NSImage?)
-	{
-		guard let shareItem = shareMenu.item(withTag: 1000) else
-		{
+	func updateShareMenu(with attachment: Attachment, image: NSImage?) {
+		guard let shareItem = shareMenu.item(withTag: 1000) else {
 			return
 		}
 
@@ -337,36 +294,28 @@ private extension AttachmentWindowController
 		shareMenu.setSubmenu(ShareMenuFactory.shareMenu(for: bestUrl, previewImage: image), for: shareItem)
 	}
 
-	func writeImage(to url: URL)
-	{
+	func writeImage(to url: URL) {
 		guard
 			let image = currentAttachment?.image,
 			let fileType = currentAttachment?.attachment.parsedUrl.fileUTI
 		else { return }
 
-		do
-		{
+		do {
 			try image.dataUsingRepresentation(for: fileType as CFString).write(to: url)
-		}
-		catch
-		{
+		} catch {
 			presentError(error, modalFor: window!, delegate: nil, didPresent: nil, contextInfo: nil)
 		}
 	}
 }
 
-extension AttachmentWindowController
-{
-	@IBAction private func nextAttachment(_ sender: Any?)
-	{
+extension AttachmentWindowController {
+	@IBAction private func nextAttachment(_: Any?) {
 		guard
-			let attachmentGroup = self.attachmentGroup,
+			let attachmentGroup = attachmentGroup,
 			attachmentGroup.attachments.index(after: attachmentGroup.currentIndex) != attachmentGroup.attachments.endIndex
-		else
-		{
+		else {
 			return
 		}
-
 
 		let nextIndex = attachmentGroup.attachments.index(after: attachmentGroup.currentIndex)
 		let nextAttachment = attachmentGroup.attachments[nextIndex]
@@ -375,13 +324,11 @@ extension AttachmentWindowController
 		setCurrentAttachment(nextAttachment, currentPreview: attachmentGroup.preview(for: nextAttachment))
 	}
 
-	@IBAction private func previousAttachment(_ sender: Any?)
-	{
+	@IBAction private func previousAttachment(_: Any?) {
 		guard
-			let attachmentGroup = self.attachmentGroup,
+			let attachmentGroup = attachmentGroup,
 			attachmentGroup.currentIndex != attachmentGroup.attachments.startIndex
-			else
-		{
+		else {
 			return
 		}
 
@@ -392,36 +339,30 @@ extension AttachmentWindowController
 		setCurrentAttachment(previousAttachment, currentPreview: attachmentGroup.preview(for: previousAttachment))
 	}
 
-	@IBAction private func share(_ sender: Any?)
-	{
+	@IBAction private func share(_: Any?) {
 		let frame = shareButton.frame
 		shareMenu.popUp(positioning: nil, at: NSPoint(x: frame.maxX, y: frame.midY), in: shareButton)
 	}
 
-	@IBAction private func saveToDownloads(_ sender: Any?)
-	{
-		guard let window = self.window, let fileName = currentAttachment?.attachment.parsedUrl.lastPathComponent else
-		{
+	@IBAction private func saveToDownloads(_: Any?) {
+		guard let window = window, let fileName = currentAttachment?.attachment.parsedUrl.lastPathComponent
+		else {
 			return
 		}
 
-		do
-		{
+		do {
 			let url = try FileManager.default.url(for: .downloadsDirectory, in: .userDomainMask,
-												  appropriateFor: nil, create: true)
+			                                      appropriateFor: nil, create: true)
 
 			writeImage(to: url.appendingPathComponent(fileName))
-		}
-		catch
-		{
+		} catch {
 			presentError(error, modalFor: window, delegate: nil, didPresent: nil, contextInfo: nil)
 		}
 	}
 
-	@IBAction private func saveToLocation(_ sender: Any?)
-	{
+	@IBAction private func saveToLocation(_: Any?) {
 		guard
-			let window = self.window,
+			let window = window,
 			let attachment = currentAttachment?.attachment,
 			let fileType = attachment.parsedUrl.fileUTI
 		else { return }
@@ -429,58 +370,46 @@ extension AttachmentWindowController
 		let savePanel = NSSavePanel()
 		savePanel.allowedFileTypes = [fileType]
 		savePanel.nameFieldStringValue = attachment.parsedUrl.lastPathComponent
-		savePanel.beginSheetModal(for: window)
-		{
-			[unowned self] (response) in
+		savePanel.beginSheetModal(for: window) {
+			[unowned self] response in
 
-			if response == NSApplication.ModalResponse.OK, let url = savePanel.url
-			{
+			if response == NSApplication.ModalResponse.OK, let url = savePanel.url {
 				self.writeImage(to: url)
 			}
 		}
 	}
 
-	@IBAction private func copyImage(_ sender: Any?)
-	{
-		if let image = currentAttachment?.image
-		{
+	@IBAction private func copyImage(_: Any?) {
+		if let image = currentAttachment?.image {
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([image])
 		}
 	}
 
-	@IBAction private func copyImageAddress(_ sender: Any?)
-	{
-		if let attachment = currentAttachment?.attachment
-		{
+	@IBAction private func copyImageAddress(_: Any?) {
+		if let attachment = currentAttachment?.attachment {
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([attachment.bestUrl.absoluteString as NSString])
 		}
 	}
 
-	@IBAction private func openInBrowser(_ sender: Any?)
-	{
-		if let attachment = currentAttachment?.attachment
-		{
+	@IBAction private func openInBrowser(_: Any?) {
+		if let attachment = currentAttachment?.attachment {
 			NSPasteboard.general.clearContents()
 			NSWorkspace.shared.open(attachment.bestUrl)
 		}
 	}
 }
 
-extension AttachmentWindowController: NSWindowDelegate
-{
-	func windowWillClose(_ notification: Foundation.Notification)
-	{
+extension AttachmentWindowController: NSWindowDelegate {
+	func windowWillClose(_: Foundation.Notification) {
 		videoPlayerView.player?.pause()
 		loadingTask?.cancel()
 	}
 }
 
-class DraggingImageView: NSImageView
-{
-	override var mouseDownCanMoveWindow: Bool
-	{
+class DraggingImageView: NSImageView {
+	override var mouseDownCanMoveWindow: Bool {
 		return true
 	}
 }

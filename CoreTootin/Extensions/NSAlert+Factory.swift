@@ -19,20 +19,17 @@
 
 import Cocoa
 
-public extension NSAlert
-{
-	static func confirmReuploadAttachmentsDialog() -> NSAlert
-	{
+public extension NSAlert {
+	static func confirmReuploadAttachmentsDialog() -> NSAlert {
 		return NSAlert.makeAlert(title: 🔠("dialog.reupload.title"), message: 🔠("dialog.reupload.message"),
-								 dialogMode: .custom(proceed: 🔠("dialog.reupload.proceed"),
-													 dismiss: 🔠("dialog.reupload.cancel")))
+		                         dialogMode: .custom(proceed: 🔠("dialog.reupload.proceed"),
+		                                             dismiss: 🔠("dialog.reupload.cancel")))
 	}
 
-	static func accountNeedsAuthorizationDialog(account: AuthorizedAccount) -> NSAlert
-	{
+	static func accountNeedsAuthorizationDialog(account: AuthorizedAccount) -> NSAlert {
 		return NSAlert.makeAlert(style: .warning, title: 🔠("dialog.reauth.title"),
-								 message: 🔠("dialog.reauth.message", account.uri ?? account.bestDisplayName),
-								 dialogMode: .custom(proceed: 🔠("dialog.reauth.proceed"),
-													 dismiss: 🔠("dialog.reauth.cancel")))
+		                         message: 🔠("dialog.reauth.message", account.uri ?? account.bestDisplayName),
+		                         dialogMode: .custom(proceed: 🔠("dialog.reauth.proceed"),
+		                                             dismiss: 🔠("dialog.reauth.cancel")))
 	}
 }

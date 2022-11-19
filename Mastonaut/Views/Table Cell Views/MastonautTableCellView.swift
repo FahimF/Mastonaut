@@ -19,13 +19,11 @@
 
 import Cocoa
 
-protocol LazyMenuProviding
-{
+protocol LazyMenuProviding {
 	var menuItemsProvider: (() -> [NSMenuItem]?)? { get set }
 }
 
-class MastonautTableCellView: NSTableCellView, LazyMenuProviding, Selectable
-{
+class MastonautTableCellView: NSTableCellView, LazyMenuProviding, Selectable {
 	@IBInspectable
 	var backgroundColor = NSColor(named: "TableCellBackground")!
 	var selectedBackgroundColor = NSColor(named: "SelectedTableCellBackground")!
@@ -39,22 +37,19 @@ class MastonautTableCellView: NSTableCellView, LazyMenuProviding, Selectable
 		}
 	}
 
-	override func updateLayer()
-	{
+	override func updateLayer() {
 		super.updateLayer()
 
-		if backgroundLayer.superlayer == nil
-		{
+		if backgroundLayer.superlayer == nil {
 			layer?.insertSublayer(backgroundLayer, at: 0)
 		}
 
 		updateEffectiveBackgroundColor()
 	}
 
-	private lazy var backgroundLayer: CALayer = CALayer()
+	private lazy var backgroundLayer: CALayer = .init()
 
-	override func layout()
-	{
+	override func layout() {
 		super.layout()
 		CATransaction.begin()
 		CATransaction.setDisableActions(true)
@@ -62,21 +57,17 @@ class MastonautTableCellView: NSTableCellView, LazyMenuProviding, Selectable
 		CATransaction.commit()
 	}
 
-	private func updateEffectiveBackgroundColor()
-	{
+	private func updateEffectiveBackgroundColor() {
 		let color = isSelected ? selectedBackgroundColor : backgroundColor
 		backgroundLayer.backgroundColor = color.cgColor
 	}
 
-	override var menu: NSMenu?
-	{
-		set(menu)
-		{
+	override var menu: NSMenu? {
+		set(menu) {
 			super.menu = menu
 		}
 
-		get
-		{
+		get {
 			guard let menuItems = menuItemsProvider?() else { return super.menu }
 
 			let menu = NSMenu(title: "")

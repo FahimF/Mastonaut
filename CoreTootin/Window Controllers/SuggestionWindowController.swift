@@ -19,38 +19,32 @@
 
 import Cocoa
 
-public class SuggestionWindowController: NSWindowController
-{
+public class SuggestionWindowController: NSWindowController {
 	@IBOutlet private(set) unowned var tableView: NSTableView!
 
-	private var suggestions: [Suggestion]? = nil
+	private var suggestions: [Suggestion]?
 
-	public weak var imagesProvider: SuggestionWindowImagesProvider? = nil
+	public weak var imagesProvider: SuggestionWindowImagesProvider?
 
-	public var isWindowVisible: Bool
-	{
+	public var isWindowVisible: Bool {
 		return window?.isVisible ?? false
 	}
 
-	public var insertSuggestionBlock: ((Suggestion) -> Void)? = nil
+	public var insertSuggestionBlock: ((Suggestion) -> Void)?
 
-	public convenience init()
-	{
+	public convenience init() {
 		self.init(windowNibName: NSNib.Name("SuggestionWindowController"))
 	}
 
-	public override func windowDidLoad()
-	{
+	override public func windowDidLoad() {
 		super.windowDidLoad()
 
 		tableView.target = self
 		tableView.doubleAction = #selector(didDoubleClickTableView(_:))
 	}
 
-	public func positionWindow(under textRect: NSRect)
-	{
-		if let suggestionsCount = suggestions?.count
-		{
+	public func positionWindow(under textRect: NSRect) {
+		if let suggestionsCount = suggestions?.count {
 			let visibleCount = CGFloat(min(suggestionsCount, 8))
 			let bestHeight = visibleCount * (tableView.rowHeight + tableView.intercellSpacing.height)
 			window?.setContentSize(NSSize(width: 482, height: bestHeight))
@@ -59,38 +53,33 @@ public class SuggestionWindowController: NSWindowController
 		window?.setFrameTopLeftPoint(NSPoint(x: textRect.minX - 30, y: textRect.minY))
 	}
 
-	public func set(suggestions: [Suggestion])
-	{
+	public func set(suggestions: [Suggestion]) {
 		self.suggestions = suggestions
 		tableView?.reloadData()
 		tableView?.selectRowAndScrollToVisible(0)
 	}
 
-	public func insertSelectedSuggestion()
-	{
+	public func insertSelectedSuggestion() {
 		let currentSelection = tableView.selectedRow
 
 		guard
-			let suggestions = self.suggestions,
-			(0..<suggestions.count).contains(currentSelection),
+			let suggestions = suggestions,
+			(0 ..< suggestions.count).contains(currentSelection),
 			let block = insertSuggestionBlock
 		else { return }
 
 		block(suggestions[currentSelection])
 	}
 
-	@objc func didDoubleClickTableView(_ sender: Any)
-	{
+	@objc func didDoubleClickTableView(_: Any) {
 		insertSelectedSuggestion()
 	}
 
-	@IBAction func selectNext(_ sender: Any?)
-	{
-		guard let suggestions = self.suggestions else { return }
+	@IBAction func selectNext(_: Any?) {
+		guard let suggestions = suggestions else { return }
 		let currentSelection = tableView.selectedRow
 
-		guard (0..<suggestions.count).contains(currentSelection + 1) else
-		{
+		guard (0 ..< suggestions.count).contains(currentSelection + 1) else {
 			tableView.selectRowAndScrollToVisible(0)
 			return
 		}
@@ -98,13 +87,11 @@ public class SuggestionWindowController: NSWindowController
 		tableView.selectRowAndScrollToVisible(currentSelection + 1)
 	}
 
-	@IBAction func selectPrevious(_ sender: Any?)
-	{
-		guard let suggestions = self.suggestions else { return }
+	@IBAction func selectPrevious(_: Any?) {
+		guard let suggestions = suggestions else { return }
 		let currentSelection = tableView.selectedRow
 
-		guard currentSelection > 0 else
-		{
+		guard currentSelection > 0 else {
 			tableView.selectRowAndScrollToVisible(suggestions.count - 1)
 			return
 		}
@@ -113,38 +100,31 @@ public class SuggestionWindowController: NSWindowController
 	}
 }
 
-extension SuggestionWindowController: NSTableViewDataSource
-{
-	public func numberOfRows(in tableView: NSTableView) -> Int
-	{
+extension SuggestionWindowController: NSTableViewDataSource {
+	public func numberOfRows(in _: NSTableView) -> Int {
 		return suggestions?.count ?? 0
 	}
 }
 
-extension SuggestionWindowController: NSTableViewDelegate
-{
+extension SuggestionWindowController: NSTableViewDelegate {
 	public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView?
 	{
 		guard let identifier = tableColumn?.identifier else { return nil }
 
 		let view = tableView.makeView(withIdentifier: identifier, owner: nil)
 
-		if let suggestion = suggestions?[row], let cellView = view as? NSTableCellView
-		{
-			switch identifier.rawValue
-			{
+		if let suggestion = suggestions?[row], let cellView = view as? NSTableCellView {
+			switch identifier.rawValue {
 			case "avatar":
 				cellView.imageView?.image = #imageLiteral(resourceName: "missing.png")
 				guard let imageURL = suggestion.imageUrl else { break }
-				imagesProvider?.suggestionWindow(self, imageForSuggestionUsingURL: imageURL)
-					{
-						[weak self] image in
-						guard let image = image else { return }
-						DispatchQueue.main.async
-							{
-								self?.updateImage(for: suggestion, originalIndex: row, image: image)
-							}
+				imagesProvider?.suggestionWindow(self, imageForSuggestionUsingURL: imageURL) {
+					[weak self] image in
+					guard let image = image else { return }
+					DispatchQueue.main.async {
+						self?.updateImage(for: suggestion, originalIndex: row, image: image)
 					}
+				}
 
 			case "suggestion":
 				cellView.textField?.stringValue = suggestion.text
@@ -160,35 +140,30 @@ extension SuggestionWindowController: NSTableViewDelegate
 		return view
 	}
 
-	private func updateImage(for suggestion: Suggestion, originalIndex: Int, image: NSImage)
-	{
+	private func updateImage(for suggestion: Suggestion, originalIndex: Int, image: NSImage) {
 		guard
-			let suggestions = self.suggestions,
+			let suggestions = suggestions,
 			originalIndex < suggestions.count,
 			suggestions[originalIndex].imageUrl == suggestion.imageUrl
 		else { return }
 
 		let view = tableView.view(atColumn: 0, row: originalIndex, makeIfNecessary: false)
 
-		if let cellView = view as? NSTableCellView
-		{
+		if let cellView = view as? NSTableCellView {
 			cellView.imageView?.image = image
 		}
 	}
 }
 
-private extension NSTableView
-{
-	func selectRowAndScrollToVisible(_ row: Int)
-	{
+private extension NSTableView {
+	func selectRowAndScrollToVisible(_ row: Int) {
 		selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
 		scrollRowToVisible(row)
 	}
 }
 
-@objc public protocol SuggestionWindowImagesProvider: AnyObject
-{
+@objc public protocol SuggestionWindowImagesProvider: AnyObject {
 	func suggestionWindow(_ windowController: SuggestionWindowController,
-						  imageForSuggestionUsingURL: URL,
-						  completion: @escaping (NSImage?) -> Void)
+	                      imageForSuggestionUsingURL: URL,
+	                      completion: @escaping (NSImage?) -> Void)
 }

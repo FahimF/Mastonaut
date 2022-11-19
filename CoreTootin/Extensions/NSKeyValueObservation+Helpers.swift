@@ -19,60 +19,50 @@
 
 import Foundation
 
-public extension Array where Element == NSKeyValueObservation
-{
+public extension Array where Element == NSKeyValueObservation {
 	mutating func observePreference<Value>(on queue: DispatchQueue? = nil,
-										   _ keyPath: KeyPath<MastonautPreferences, Value>,
-										   changeHandler: @escaping (MastonautPreferences, NSKeyValueObservedChange<Value>) -> Void)
+	                                       _ keyPath: KeyPath<MastonautPreferences, Value>,
+	                                       changeHandler: @escaping (MastonautPreferences, NSKeyValueObservedChange<Value>) -> Void)
 	{
-		guard let queue = queue else
-		{
+		guard let queue = queue else {
 			append(Preferences.observe(keyPath, changeHandler: changeHandler))
 			return
 		}
 
-		append(Preferences.observe(keyPath)
-			{
-				preferences, change in
+		append(Preferences.observe(keyPath) {
+			preferences, change in
 
-				queue.async
-					{
-						changeHandler(preferences, change)
-					}
-			})
+			queue.async {
+				changeHandler(preferences, change)
+			}
+		})
 	}
 
 	mutating func observe<Object: NSObject, Value>(on queue: DispatchQueue? = nil,
-												   _ object: Object,
-												   _ keyPath: KeyPath<Object, Value>,
-												   sendInitial: Bool = false,
-												   changeHandler: @escaping (Object, NSKeyValueObservedChange<Value>) -> Void)
+	                                               _ object: Object,
+	                                               _ keyPath: KeyPath<Object, Value>,
+	                                               sendInitial: Bool = false,
+	                                               changeHandler: @escaping (Object, NSKeyValueObservedChange<Value>) -> Void)
 	{
 		let options: NSKeyValueObservingOptions
 
-		if sendInitial
-		{
+		if sendInitial {
 			options = [.old, .new, .initial]
-		}
-		else
-		{
+		} else {
 			options = [.old, .new]
 		}
 
-		guard let queue = queue else
-		{
+		guard let queue = queue else {
 			append(object.observe(keyPath, options: options, changeHandler: changeHandler))
 			return
 		}
 
-		append(object.observe(keyPath, options: options)
-			{
-				object, change in
+		append(object.observe(keyPath, options: options) {
+			object, change in
 
-				queue.async
-					{
-						changeHandler(object, change)
-					}
-			})
+			queue.async {
+				changeHandler(object, change)
+			}
+		})
 	}
 }

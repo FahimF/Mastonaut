@@ -19,10 +19,8 @@
 
 import Cocoa
 
-class TransientWindow: NSPanel
-{
-	override func cancelOperation(_ sender: Any?)
-	{
+class TransientWindow: NSPanel {
+	override func cancelOperation(_: Any?) {
 		close()
 	}
 }

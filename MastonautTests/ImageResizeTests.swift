@@ -17,14 +17,12 @@
 //  GNU General Public License for more details.
 //
 
-import XCTest
 @testable import Mastonaut
+import XCTest
 
-class ImageResizeTests: XCTestCase
-{
-	func testResizeGrayscaleImage()
-	{
-		let imageUrl = Bundle.init(for: ImageResizeTests.self).urlForImageResource("grayscale")!
+class ImageResizeTests: XCTestCase {
+	func testResizeGrayscaleImage() {
+		let imageUrl = Bundle(for: ImageResizeTests.self).urlForImageResource("grayscale")!
 		let imageSource = CGImageSourceCreateWithURL(imageUrl as CFURL, nil)!
 		let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)!
 
@@ -35,9 +33,8 @@ class ImageResizeTests: XCTestCase
 		XCTAssertNotNil(image.resizedImage(newSize: CGSize(width: 25, height: 25), scale: 2.0))
 	}
 
-	func testResizeSRGBImage()
-	{
-		let imageUrl = Bundle.init(for: ImageResizeTests.self).urlForImageResource("sRGB")!
+	func testResizeSRGBImage() {
+		let imageUrl = Bundle(for: ImageResizeTests.self).urlForImageResource("sRGB")!
 		let imageSource = CGImageSourceCreateWithURL(imageUrl as CFURL, nil)!
 		let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)!
 
@@ -46,9 +43,8 @@ class ImageResizeTests: XCTestCase
 		XCTAssertNotNil(image.resizedImage(newSize: CGSize(width: 25, height: 25), scale: 2.0))
 	}
 
-	func testResizeARGBImage()
-	{
-		let imageUrl = Bundle.init(for: ImageResizeTests.self).urlForImageResource("aRGB")!
+	func testResizeARGBImage() {
+		let imageUrl = Bundle(for: ImageResizeTests.self).urlForImageResource("aRGB")!
 		let imageSource = CGImageSourceCreateWithURL(imageUrl as CFURL, nil)!
 		let image = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)!
 

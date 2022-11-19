@@ -19,50 +19,42 @@
 
 import Cocoa
 
-class RefreshingFormattedTextField: NSTextField
-{
+class RefreshingFormattedTextField: NSTextField {
 	static let refreshNotificationName = NSNotification.Name(rawValue: "RefreshingTextFieldRefreshNotificationName")
 
-	private static var updateTimer: Timer? = nil
+	private static var updateTimer: Timer?
 
-	private var notificationObserver: NSObjectProtocol? = nil
-	private var lastObjectValue: Any? = nil
+	private var notificationObserver: NSObjectProtocol?
+	private var lastObjectValue: Any?
 
-	override init(frame frameRect: NSRect)
-	{
+	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		setupTimerIfNeeded()
 		setupNotificationObserver()
 	}
 
-	required init?(coder: NSCoder)
-	{
+	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		setupTimerIfNeeded()
 		setupNotificationObserver()
 	}
 
-	override var objectValue: Any?
-	{
-		didSet
-		{
+	override var objectValue: Any? {
+		didSet {
 			lastObjectValue = objectValue
 		}
 	}
 
-	deinit
-	{
+	deinit {
 		if let observer = notificationObserver {
 			NotificationCenter.default.removeObserver(observer)
 		}
 	}
 
-	private func setupNotificationObserver()
-	{
+	private func setupNotificationObserver() {
 		notificationObserver = NotificationCenter.observer(for: RefreshingFormattedTextField.refreshNotificationName,
-														   object: nil,
-														   queue: OperationQueue.main)
-		{
+		                                                   object: nil,
+		                                                   queue: OperationQueue.main) {
 			[weak self] _ in
 
 			if let formatter = self?.formatter, let stringValue = formatter.string(for: self?.lastObjectValue)
@@ -72,17 +64,15 @@ class RefreshingFormattedTextField: NSTextField
 		}
 	}
 
-	private func setupTimerIfNeeded()
-	{
-		if RefreshingFormattedTextField.updateTimer == nil
-		{
+	private func setupTimerIfNeeded() {
+		if RefreshingFormattedTextField.updateTimer == nil {
 			RefreshingFormattedTextField.updateTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true)
-			{
-				_ in
+				{
+					_ in
 
-				NotificationCenter.default.post(name: RefreshingFormattedTextField.refreshNotificationName,
-												object: RefreshingFormattedTextField.self)
-			}
+					NotificationCenter.default.post(name: RefreshingFormattedTextField.refreshNotificationName,
+					                                object: RefreshingFormattedTextField.self)
+				}
 		}
 	}
 }

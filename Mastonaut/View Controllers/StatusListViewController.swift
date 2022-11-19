@@ -17,8 +17,8 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 class StatusListViewController: ListViewController<Status>, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver
 {
@@ -30,42 +30,36 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	private lazy var cellMenuItemHandler: CellMenuItemHandler = .init(tableView: tableView, interactionHandler: self)
 
-	init()
-	{
+	init() {
 		super.init(nibName: "ListViewController", bundle: .main)
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		observations.observePreference(\MastonautPreferences.mediaDisplayMode)
-		{
-			[unowned self] (preferences, change) in self.refreshVisibleCellViews()
+		observations.observePreference(\MastonautPreferences.mediaDisplayMode) {
+			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
 
-		observations.observePreference(\MastonautPreferences.spoilerDisplayMode)
-		{
-			[unowned self] (preferences, change) in self.refreshVisibleCellViews()
+		observations.observePreference(\MastonautPreferences.spoilerDisplayMode) {
+			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
 	}
 
-	override func containerWindowOcclusionStateDidChange(_ occlusionState: NSWindow.OcclusionState)
-	{
+	override func containerWindowOcclusionStateDidChange(_: NSWindow.OcclusionState) {
 		refreshVisibleCellViews()
 	}
 
-	override func registerCells()
-	{
+	override func registerCells() {
 		super.registerCells()
 
 		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main),
-						   forIdentifier: CellViewIdentifier.status)
+		                   forIdentifier: CellViewIdentifier.status)
 	}
 
 	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
@@ -77,92 +71,76 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		filterService?.register(observer: self)
 	}
 
-	func handle(updatedStatus: Status)
-	{
-		self.handle(updatedEntry: updatedStatus)
+	func handle(updatedStatus: Status) {
+		handle(updatedEntry: updatedStatus)
 	}
 
-	func handle<T: UserDescriptionError>(interactionError error: T)
-	{
-		DispatchQueue.main.async
-			{
-				[weak self] in self?.view.window?.windowController?.displayError(error,
-																				 title: 🔠("interaction.status"))
-			}
+	func handle<T: UserDescriptionError>(interactionError error: T) {
+		DispatchQueue.main.async {
+			[weak self] in self?.view.window?.windowController?.displayError(error,
+			                                                                 title: 🔠("interaction.status"))
+		}
 	}
 
-	func handle(linkURL: URL, knownTags: [Tag]?)
-	{
+	func handle(linkURL: URL, knownTags: [Tag]?) {
 		authorizedAccountProvider?.handle(linkURL: linkURL, knownTags: knownTags)
 	}
 
-	func reply(to statusID: String)
-	{
+	func reply(to statusID: String) {
 		entry(for: statusID).map { authorizedAccountProvider?.composeReply(for: $0, sender: nil) }
 	}
 
-	func mention(userHandle: String, directMessage: Bool)
-	{
+	func mention(userHandle: String, directMessage: Bool) {
 		authorizedAccountProvider?.composeMention(userHandle: userHandle, directMessage: directMessage)
 	}
 
-	func show(account: Account)
-	{
+	func show(account: Account) {
 		guard let instance = authorizedAccountProvider?.currentInstance else { return }
 		let profileModel = SidebarMode.profile(uri: account.uri(in: instance), account: account)
 		authorizedAccountProvider?.presentInSidebar(profileModel)
 	}
 
-	func show(status: Status)
-	{
+	func show(status: Status) {
 		authorizedAccountProvider?.presentInSidebar(SidebarMode.status(uri: status.resolvableURI, status: status))
 	}
 
-	func show(tag: Tag)
-	{
+	func show(tag: Tag) {
 		authorizedAccountProvider?.presentInSidebar(SidebarMode.tag(tag.name))
 	}
 
-	func canDelete(status: Status) -> Bool
-	{
+	func canDelete(status: Status) -> Bool {
 		return currentUserIsAuthor(of: status)
 	}
 
-	func canPin(status: Status) -> Bool
-	{
+	func canPin(status: Status) -> Bool {
 		return currentUserIsAuthor(of: status)
 	}
 
-	func confirmDelete(status: Status, isRedrafting: Bool, completion: @escaping (Bool) -> Void)
-	{
+	func confirmDelete(status _: Status, isRedrafting: Bool, completion: @escaping (Bool) -> Void) {
 		let message: String = isRedrafting ? "The contents of this toot will be copied over to the composer, and you'll be able to make changes to it before re-submitting it." : "This action can not be undone."
 
 		let dialogMode: DialogMode = isRedrafting ? .custom(proceed: "Delete and Redraft", dismiss: "Cancel")
-												  : .custom(proceed: "Delete Toot", dismiss: "Cancel")
+			: .custom(proceed: "Delete Toot", dismiss: "Cancel")
 
 		view.window?.windowController?.showAlert(style: .informational,
-												 title: "Are you sure you want to delete this toot?",
-												 message: message,
-												 dialogMode: dialogMode)
-			{
-				response in
-				completion(response == .alertFirstButtonReturn)
-			}
+		                                         title: "Are you sure you want to delete this toot?",
+		                                         message: message,
+		                                         dialogMode: dialogMode) {
+			response in
+			completion(response == .alertFirstButtonReturn)
+		}
 	}
 
-	func redraft(status: Status)
-	{
+	func redraft(status: Status) {
 		authorizedAccountProvider?.redraft(status: status)
 	}
 
-	override func menuItems(for entryReference: EntryReference) -> [NSMenuItem]
-	{
+	override func menuItems(for entryReference: EntryReference) -> [NSMenuItem] {
 		guard let status = entry(for: entryReference) else { return [] }
 		return menuItems(for: status)
 	}
 
-	func menuItems(for status: Status) -> [NSMenuItem]
-	{
+	func menuItems(for status: Status) -> [NSMenuItem] {
 		guard entryMatchesAnyFilter(status) == false else {
 			return StatusMenuItemsController.shared.menuItems(forFilteredStatus: status, interactionHandler: self)
 		}
@@ -170,51 +148,43 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		return StatusMenuItemsController.shared.menuItems(for: status, interactionHandler: self)
 	}
 
-	override func cellViewIdentifier(for status: Status) -> NSUserInterfaceItemIdentifier
-	{
+	override func cellViewIdentifier(for _: Status) -> NSUserInterfaceItemIdentifier {
 		return StatusListViewController.CellViewIdentifier.status
 	}
 
-	override func populate(cell: NSTableCellView, for status: Status)
-	{
+	override func populate(cell: NSTableCellView, for status: Status) {
 		guard
 			let attachmentPresenter = authorizedAccountProvider?.attachmentPresenter,
 			let instance = authorizedAccountProvider?.currentInstance,
 			let statusCell = cell as? StatusDisplaying
-		else
-		{
+		else {
 			return
 		}
 
-		if let poll = status.poll
-		{
+		if let poll = status.poll {
 			setupRefreshTimer(for: poll, statusID: status.id)
 		}
 
 		statusCell.set(displayedStatus: status,
-					   poll: status.poll.flatMap { updatedPolls[$0.id] },
-					   attachmentPresenter: attachmentPresenter,
-					   interactionHandler: self,
-					   activeInstance: instance)
+		               poll: status.poll.flatMap { updatedPolls[$0.id] },
+		               attachmentPresenter: attachmentPresenter,
+		               interactionHandler: self,
+		               activeInstance: instance)
 	}
 
-	func set(hasActivePollTask: Bool, for statusID: String)
-	{
+	func set(hasActivePollTask: Bool, for statusID: String) {
 		guard
 			let index = entryList.firstIndex(where: { $0.entryKey == statusID }),
 			let statusCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? StatusTableCellView
-		else
-		{
+		else {
 			return
 		}
 
 		statusCell.setHasActivePollTask(hasActivePollTask)
 	}
 
-	func handle(updatedPoll poll: Poll, statusID: String)
-	{
-		guard let index = entryList.firstIndex(where: { $0.entryKey == statusID }) else
-		{
+	func handle(updatedPoll poll: Poll, statusID: String) {
+		guard let index = entryList.firstIndex(where: { $0.entryKey == statusID }) else {
 			return
 		}
 
@@ -222,31 +192,26 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 		guard
 			let statusCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? StatusTableCellView
-		else
-		{
+		else {
 			return
 		}
 
 		statusCell.set(updatedPoll: poll)
 	}
 
-	override func prepareToDisplay(cellView: NSTableCellView, at row: Int)
-	{
+	override func prepareToDisplay(cellView: NSTableCellView, at row: Int) {
 		super.prepareToDisplay(cellView: cellView, at: row)
 
-		if let statusCellView = cellView as? StatusTableCellView
-		{
+		if let statusCellView = cellView as? StatusTableCellView {
 			statusCellView.updateContentsVisibility()
 		}
 	}
 
-	override func didDoubleClickRow(for status: Status)
-	{
+	override func didDoubleClickRow(for status: Status) {
 		show(status: status.reblog ?? status)
 	}
 
-	private func currentUserIsAuthor(of status: Status) -> Bool
-	{
+	private func currentUserIsAuthor(of status: Status) -> Bool {
 		guard status.reblog == nil, let currentAccount = authorizedAccountProvider?.currentAccount else { return false }
 		return currentAccount.isSameUser(as: status.account)
 	}
@@ -261,22 +226,22 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		return filter.checkMatch(status: status)
 	}
 
-	func filterServiceDidUpdateFilters(_ service: FilterService) {
+	func filterServiceDidUpdateFilters(_: FilterService) {
 		validFiltersDidChange()
 	}
 
 	// MARK: - Reuse Identifiers
 
-	struct CellViewIdentifier
-	{
+	enum CellViewIdentifier {
 		static let status = NSUserInterfaceItemIdentifier("status")
 	}
 
 	// MARK: - Keyboard Navigation
 
-	override func showPreview(for status: Status, atRow row: Int) {
+	override func showPreview(for _: Status, atRow row: Int) {
 		guard let cellView = tableView.rowView(atRow: row, makeIfNecessary: false)?.view(atColumn: 0),
-			  let mediaPresenterCell = cellView as? MediaPresenting else {
+		      let mediaPresenterCell = cellView as? MediaPresenting
+		else {
 			return
 		}
 
@@ -285,31 +250,30 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 }
 
 extension StatusListViewController: NSMenuItemValidation {
-
 	func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
 		return cellMenuItemHandler.validateMenuItem(menuItem)
 	}
-	
+
 	@IBAction func favoriteSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.favoriteSelectedStatus(sender)
 	}
-	
+
 	@IBAction func reblogSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.reblogSelectedStatus(sender)
 	}
-	
+
 	@IBAction func replyToSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.replyToSelectedStatus(sender)
 	}
-	
+
 	@IBAction func toggleMediaVisibilityOfSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.toggleMediaVisibilityOfSelectedStatus(sender)
 	}
-	
+
 	@IBAction func toggleContentVisibilityOfSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.toggleContentVisibilityOfSelectedStatus(sender)
 	}
-	
+
 	@IBAction func showDetailsOfSelectedStatus(_ sender: Any?) {
 		cellMenuItemHandler.showDetailsOfSelectedStatus(sender)
 	}
@@ -319,10 +283,8 @@ extension StatusListViewController: NSMenuItemValidation {
 	}
 }
 
-extension Status: ListViewPresentable
-{
-	var key: String
-	{
+extension Status: ListViewPresentable {
+	var key: String {
 		return id
 	}
 }

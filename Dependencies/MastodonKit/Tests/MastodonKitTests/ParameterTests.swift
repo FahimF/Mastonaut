@@ -6,35 +6,35 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class ParameterTests: XCTestCase {
-    func testParameterWithNameAndValue() {
-        let parameter = Parameter(name: "name", value: "value")
+	func testParameterWithNameAndValue() {
+		let parameter = Parameter(name: "name", value: "value")
 
-        XCTAssertEqual(parameter.name, "name")
-        XCTAssertEqual(parameter.value, "value")
-    }
+		XCTAssertEqual(parameter.name, "name")
+		XCTAssertEqual(parameter.value, "value")
+	}
 
-    func testParameterWithNameOnly() {
-        let parameter = Parameter(name: "name", value: nil)
+	func testParameterWithNameOnly() {
+		let parameter = Parameter(name: "name", value: nil)
 
-        XCTAssertEqual(parameter.name, "name")
-        XCTAssertNil(parameter.value)
-    }
+		XCTAssertEqual(parameter.name, "name")
+		XCTAssertNil(parameter.value)
+	}
 
-    func testEqualWithNilValue() {
-        let parameterOne = Parameter(name: "foo", value: nil)
-        let parameterTwo = Parameter(name: "foo", value: nil)
+	func testEqualWithNilValue() {
+		let parameterOne = Parameter(name: "foo", value: nil)
+		let parameterTwo = Parameter(name: "foo", value: nil)
 
-        XCTAssertEqual(parameterOne, parameterTwo)
-    }
+		XCTAssertEqual(parameterOne, parameterTwo)
+	}
 
-    func testEqualWithValue() {
-        let parameterOne = Parameter(name: "foo", value: "bar")
-        let parameterTwo = Parameter(name: "foo", value: "bar")
+	func testEqualWithValue() {
+		let parameterOne = Parameter(name: "foo", value: "bar")
+		let parameterTwo = Parameter(name: "foo", value: "bar")
 
-        XCTAssertEqual(parameterOne, parameterTwo)
-    }
+		XCTAssertEqual(parameterOne, parameterTwo)
+	}
 }

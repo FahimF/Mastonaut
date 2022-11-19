@@ -17,29 +17,25 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class MenuItemsController: NSObject
-{
-	fileprivate func makeActionItem(title: String, _ block: @escaping () -> Void) -> NSMenuItem
-	{
+class MenuItemsController: NSObject {
+	fileprivate func makeActionItem(title: String, _ block: @escaping () -> Void) -> NSMenuItem {
 		let item = NSMenuItem(title: title, action: #selector(evaluateRepresentedObject(_:)), keyEquivalent: "")
 		item.target = self
 		item.representedObject = LazyEvaluationAdapter<Void>(block)
 		return item
 	}
 
-	fileprivate func makeCopyItem(title: String, _ object: Any) -> NSMenuItem
-	{
+	fileprivate func makeCopyItem(title: String, _ object: Any) -> NSMenuItem {
 		let item = NSMenuItem(title: title, action: #selector(copyRepresentedObject(_:)), keyEquivalent: "")
 		item.target = self
 		item.representedObject = object
 		return item
 	}
 
-	fileprivate func makeStringCopyItem(title: String, _ string: String) -> NSMenuItem
-	{
+	fileprivate func makeStringCopyItem(title: String, _ string: String) -> NSMenuItem {
 		return makeCopyItem(title: title, string)
 	}
 
@@ -48,35 +44,28 @@ class MenuItemsController: NSObject
 		return makeCopyItem(title: title, LazyEvaluationAdapter(block))
 	}
 
-	fileprivate func makeOpenURLInBrowser(title: String, url: URL) -> NSMenuItem
-	{
-		return makeActionItem(title: title, { NSWorkspace.shared.open(url) })
+	fileprivate func makeOpenURLInBrowser(title: String, url: URL) -> NSMenuItem {
+		return makeActionItem(title: title) { NSWorkspace.shared.open(url) }
 	}
 
-	fileprivate func makeShareItem(url: URL) -> NSMenuItem
-	{
+	fileprivate func makeShareItem(url: URL) -> NSMenuItem {
 		let shareMenuItem = NSMenuItem(title: 🔠("Share"), submenu: NSMenu(title: ""))
 
-		DispatchQueue.global(qos: .background).async
-			{
-				let shareMenuItems = ShareMenuFactory.shareMenuItems(for: url)
+		DispatchQueue.global(qos: .background).async {
+			let shareMenuItems = ShareMenuFactory.shareMenuItems(for: url)
 
-				if shareMenuItems.isEmpty
-				{
-					shareMenuItem.isHidden = true
-				}
-				else
-				{
-					shareMenuItem.submenu?.setItems(shareMenuItems)
-				}
+			if shareMenuItems.isEmpty {
+				shareMenuItem.isHidden = true
+			} else {
+				shareMenuItem.submenu?.setItems(shareMenuItems)
 			}
+		}
 
 		return shareMenuItem
 	}
 }
 
-class StatusMenuItemsController: MenuItemsController
-{
+class StatusMenuItemsController: MenuItemsController {
 	static let shared = StatusMenuItemsController()
 
 	func menuItems(forFilteredStatus status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem] {
@@ -101,51 +90,44 @@ class StatusMenuItemsController: MenuItemsController
 				{ handler.mention(userHandle: "@\(author.acct)", directMessage: true) },
 		].compacted()
 
-		if handler.canDelete(status: status)
-		{
+		if handler.canDelete(status: status) {
 			items.append(.separator())
 			items.append(contentsOf: makeDeleteStatusItems(status: status, interactionHandler: handler))
 		}
 
-		if handler.canPin(status: status)
-		{
+		if handler.canPin(status: status) {
 			items.append(.separator())
 			items.append(makePinOrUnpinStatusItem(status: status, interactionHandler: handler))
 		}
 
 		var mentions = status.reblog?.mentions ?? status.mentions
-		if !mentions.isEmpty
-		{
+		if !mentions.isEmpty {
 			// Avoid showing the author handle twice
 			mentions.removeAll(where: { $0.acct == status.account.acct })
 
 			items.append(.separator())
 			items.append(contentsOf: mentions.map { makeShowMentionItem(mention: $0,
-																		interactionHandler: handler) })
+			                                                            interactionHandler: handler) })
 		}
 
 		let tags = status.reblog?.tags ?? status.tags
-		if !tags.isEmpty
-		{
+		if !tags.isEmpty {
 			items.append(.separator())
 			items.append(contentsOf: tags.map { makeShowTagItem(tag: $0, interactionHandler: handler) })
 		}
 
 		let links = status.reblog?.links ?? status.links
-		if !links.isEmpty
-		{
+		if !links.isEmpty {
 			items.append(.separator())
 			items.append(contentsOf: links.map { makeOpenURLInBrowser(title: $0.value, url: $0.key) })
 		}
 
-		if let poll = (status.reblog?.poll ?? status.poll), poll.expired || poll.voted == true
-		{
+		if let poll = (status.reblog?.poll ?? status.poll), poll.expired || poll.voted == true {
 			items.append(.separator())
 			items.append(makeReloadPollItem(poll: poll, status: status, interactionHandler: handler))
 		}
 
-		if let url = status.reblog?.url ?? status.url
-		{
+		if let url = status.reblog?.url ?? status.url {
 			items.append(.separator())
 			items.append(makeOpenURLInBrowser(title: 🔠("Open toot in Browser"), url: url))
 
@@ -156,129 +138,115 @@ class StatusMenuItemsController: MenuItemsController
 		return items
 	}
 
-	private func makeItemCopyStatusTextContents(_ status: Status) -> NSMenuItem
-	{
+	private func makeItemCopyStatusTextContents(_ status: Status) -> NSMenuItem {
 		return makeLazyCopyItem(title: 🔠("Copy toot text")) { status.attributedContent.string as NSString }
 	}
 
-	private func makeItemCopyLinkToStatus(_ status: Status) -> NSMenuItem
-	{
+	private func makeItemCopyLinkToStatus(_ status: Status) -> NSMenuItem {
 		let finalStatus = status.reblog ?? status
 		return makeStringCopyItem(title: 🔠("Copy link to toot"), finalStatus.url?.absoluteString ?? finalStatus.uri)
 	}
 
 	private func makeShowDetailsItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: 🔠("Show toot details"), { interactionHandler.show(status: status) })
+		return makeActionItem(title: 🔠("Show toot details")) { interactionHandler.show(status: status) }
 	}
 
 	private func makeDeleteStatusItems(status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem]
 	{
 		return [
-			makeActionItem(title: 🔠("Delete"), { interactionHandler.delete(status: status, redraft: false) }),
-			makeActionItem(title: 🔠("Delete & Re-draft"), { interactionHandler.delete(status: status, redraft: true) })
+			makeActionItem(title: 🔠("Delete")) { interactionHandler.delete(status: status, redraft: false) },
+			makeActionItem(title: 🔠("Delete & Re-draft")) { interactionHandler.delete(status: status, redraft: true) },
 		]
 	}
 
 	private func makePinOrUnpinStatusItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		if status.pinned != true
-		{
-			return makeActionItem(title: 🔠("Pin to Profile"), { interactionHandler.pin(status: status) })
-		}
-		else
-		{
-			return makeActionItem(title: 🔠("Unpin from Profile"), { interactionHandler.unpin(status: status) })
+		if status.pinned != true {
+			return makeActionItem(title: 🔠("Pin to Profile")) { interactionHandler.pin(status: status) }
+		} else {
+			return makeActionItem(title: 🔠("Unpin from Profile")) { interactionHandler.unpin(status: status) }
 		}
 	}
 
 	private func makeShowAccountItem(account: Account, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: "@\(account.acct)", { interactionHandler.show(account: account) })
+		return makeActionItem(title: "@\(account.acct)") { interactionHandler.show(account: account) }
 	}
 
 	private func makeShowMentionItem(mention: Mention, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: "@\(mention.acct)", { interactionHandler.handle(linkURL: mention.url,
-																					 knownTags: nil) })
+		return makeActionItem(title: "@\(mention.acct)") { interactionHandler.handle(linkURL: mention.url,
+		                                                                             knownTags: nil) }
 	}
 
 	private func makeShowTagItem(tag: Tag, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: "#\(tag.name)", { interactionHandler.show(tag: tag) })
+		return makeActionItem(title: "#\(tag.name)") { interactionHandler.show(tag: tag) }
 	}
 
 	private func makeReloadPollItem(poll: Poll, status: Status,
-									interactionHandler: StatusInteractionHandling) -> NSMenuItem
+	                                interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: 🔠("Reload poll results"))
-			{
-				interactionHandler.refreshPoll(statusID: status.id, pollID: poll.id)
-			}
+		return makeActionItem(title: 🔠("Reload poll results")) {
+			interactionHandler.refreshPoll(statusID: status.id, pollID: poll.id)
+		}
 	}
 }
 
-class NotificationMenuItemsController: MenuItemsController
-{
+class NotificationMenuItemsController: MenuItemsController {
 	static let shared = NotificationMenuItemsController()
 
 	func menuItems(for notification: MastodonNotification,
-				   interactionHandler: NotificationInteractionHandling) -> [NSMenuItem]
+	               interactionHandler: NotificationInteractionHandling) -> [NSMenuItem]
 	{
 		return [
-			makeShowAccountItem(account: notification.account, interactionHandler: interactionHandler)
+			makeShowAccountItem(account: notification.account, interactionHandler: interactionHandler),
 		]
 	}
 
 	private func makeShowAccountItem(account: Account, interactionHandler: NotificationInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: "@\(account.acct)", { interactionHandler.show(account: account) })
+		return makeActionItem(title: "@\(account.acct)") { interactionHandler.show(account: account) }
 	}
 }
 
-class AccountMenuItemsController: MenuItemsController
-{
+class AccountMenuItemsController: MenuItemsController {
 	static let shared = AccountMenuItemsController()
 
 	func menuItems(for account: Account, interactionHandler handler: StatusInteractionHandling) -> [NSMenuItem]
 	{
 		return [
-			makeActionItem(title: 🔠("Mention @\(account.username)…"), {
+			makeActionItem(title: 🔠("Mention @\(account.username)…")) {
 				handler.mention(userHandle: "@\(account.acct)", directMessage: false)
-			}),
-			makeActionItem(title: 🔠("Direct message @\(account.username)…"), {
+			},
+			makeActionItem(title: 🔠("Direct message @\(account.username)…")) {
 				handler.mention(userHandle: "@\(account.acct)", directMessage: true)
-			}),
+			},
 			.separator(),
 			makeOpenURLInBrowser(title: 🔠("Open profile in Browser"), url: account.url),
 			makeStringCopyItem(title: 🔠("Copy link to profile"), account.url.absoluteString),
 			makeStringCopyItem(title: 🔠("Copy profile handle"), account.acct),
 			.separator(),
-			makeShareItem(url: account.url)
+			makeShareItem(url: account.url),
 		]
 	}
 }
 
-private extension MenuItemsController
-{
-	@objc func copyRepresentedObject(_ sender: NSMenuItem)
-	{
-		if let pasteboardWritable = sender.representedObject as? NSPasteboardWriting
-		{
+private extension MenuItemsController {
+	@objc func copyRepresentedObject(_ sender: NSMenuItem) {
+		if let pasteboardWritable = sender.representedObject as? NSPasteboardWriting {
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([pasteboardWritable])
-		}
-		else if let lazyPasteboardWritable = sender.representedObject as? LazyEvaluationAdapter<NSPasteboardWriting>
+		} else if let lazyPasteboardWritable = sender.representedObject as? LazyEvaluationAdapter<NSPasteboardWriting>
 		{
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([lazyPasteboardWritable.evaluate()])
 		}
 	}
 
-	@objc func evaluateRepresentedObject(_ sender: NSMenuItem)
-	{
-		if let adapter = sender.representedObject as? LazyEvaluationAdapter<Void>
-		{
+	@objc func evaluateRepresentedObject(_ sender: NSMenuItem) {
+		if let adapter = sender.representedObject as? LazyEvaluationAdapter<Void> {
 			adapter.evaluate()
 		}
 	}

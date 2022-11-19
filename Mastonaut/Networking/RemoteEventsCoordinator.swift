@@ -18,38 +18,33 @@
 //
 
 import Foundation
+import Starscream
 
-protocol ReceiverRef
-{
+protocol ReceiverRef {
 	var streamIdentifier: RemoteEventsCoordinator.StreamIdentifier { get }
 }
 
-class RemoteEventsCoordinator: NSObject
-{
+class RemoteEventsCoordinator: NSObject {
 	static let shared = RemoteEventsCoordinator()
 
 	private let operationQueue = DispatchQueue(label: "remote-events-coordinator-queue")
 
-	private var streamReceiverMap: [StreamIdentifier: Set<AnyRemoteEventsReceiver>] = [:]
-	{
+	private var streamReceiverMap: [StreamIdentifier: Set<AnyRemoteEventsReceiver>] = [:] {
 		willSet { willChangeValue(for: \.totalReceiverCount) }
 		didSet { didChangeValue(for: \.totalReceiverCount) }
 	}
 
-	private var streamListenerMap: [StreamIdentifier: TaggedRemoteEventsListener] = [:]
-	{
+	private var streamListenerMap: [StreamIdentifier: TaggedRemoteEventsListener] = [:] {
 		willSet { willChangeValue(for: \.listenerCount) }
 		didSet { didChangeValue(for: \.listenerCount) }
 	}
 
-	@objc dynamic var listenerCount: Int
-	{
+	@objc dynamic var listenerCount: Int {
 		return streamListenerMap.count
 	}
 
-	@objc dynamic var totalReceiverCount: Int
-	{
-		return streamReceiverMap.values.reduce(0, { $0 + $1.count })
+	@objc dynamic var totalReceiverCount: Int {
+		return streamReceiverMap.values.reduce(0) { $0 + $1.count }
 	}
 
 	func add<T: RemoteEventsReceiver>(receiver: T, for streamIdentifier: StreamIdentifier) -> ReceiverRef
@@ -65,13 +60,11 @@ class RemoteEventsCoordinator: NSObject
 		}
 	}
 
-	func addExisting(receiver receiverReference: ReceiverRef)
-	{
+	func addExisting(receiver receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
 
 		operationQueue.async {
-			if self.streamReceiverMap[receiver.streamIdentifier]?.contains(receiver) != true
-			{
+			if self.streamReceiverMap[receiver.streamIdentifier]?.contains(receiver) != true {
 				var receivers = self.streamReceiverMap[receiver.streamIdentifier] ?? []
 				receivers.insert(receiver)
 				debugLog("Re-adding receiver: \(receiver.hashValue) \(receiver.description)")
@@ -86,8 +79,7 @@ class RemoteEventsCoordinator: NSObject
 		}
 	}
 
-	func remove(receiver receiverReference: ReceiverRef)
-	{
+	func remove(receiver receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
 
 		operationQueue.sync {
@@ -99,32 +91,26 @@ class RemoteEventsCoordinator: NSObject
 		}
 	}
 
-	func reconnectListener(for receiverReference: ReceiverRef)
-	{
+	func reconnectListener(for receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
 
-		if let listener = self.streamListenerMap[receiver.streamIdentifier], !listener.isSocketConnected
-		{
+		if let listener = streamListenerMap[receiver.streamIdentifier], !listener.isSocketConnected {
 			listener.reconnect()
 		}
 	}
 
 	private func createListenerIfNeeded(for streamIdentifier: StreamIdentifier,
-										notifyingReceiverOtherwise receiver: AnyRemoteEventsReceiver)
+	                                    notifyingReceiverOtherwise receiver: AnyRemoteEventsReceiver)
 	{
-		if let listener = streamListenerMap[streamIdentifier]
-		{
-			if listener.isSocketConnected
-			{
+		if let listener = streamListenerMap[streamIdentifier] {
+			if listener.isSocketConnected {
 				receiver.remoteEventsCoordinator(streamIdentifierDidConnect: streamIdentifier)
 			}
-		}
-		else
-		{
+		} else {
 			let listener = TaggedRemoteEventsListener(baseUrl: streamIdentifier.baseURL,
-													  accessToken: streamIdentifier.accessToken,
-													  streamIdentifier: streamIdentifier,
-													  delegate: self)
+			                                          accessToken: streamIdentifier.accessToken,
+			                                          streamIdentifier: streamIdentifier,
+			                                          delegate: self)
 
 			streamListenerMap[streamIdentifier] = listener
 
@@ -132,25 +118,21 @@ class RemoteEventsCoordinator: NSObject
 		}
 	}
 
-	private func removeListenerIfNeeded(for streamIdentifier: StreamIdentifier)
-	{
-		if streamReceiverMap[streamIdentifier] == nil || streamReceiverMap[streamIdentifier]?.count == 0
-		{
+	private func removeListenerIfNeeded(for streamIdentifier: StreamIdentifier) {
+		if streamReceiverMap[streamIdentifier] == nil || streamReceiverMap[streamIdentifier]?.count == 0 {
 			streamListenerMap[streamIdentifier]?.disconnect()
 			streamListenerMap.removeValue(forKey: streamIdentifier)
 		}
 	}
 
-	struct StreamIdentifier: Hashable
-	{
+	struct StreamIdentifier: Hashable {
 		let baseURL: URL
 		let accessToken: String
-		let stream: RemoteEventsListener.Stream
+		let stream: RemoteEventStream
 	}
 }
 
-protocol RemoteEventsReceiver: AnyObject, Hashable
-{
+protocol RemoteEventsReceiver: AnyObject, Hashable {
 	typealias StreamIdentifier = RemoteEventsCoordinator.StreamIdentifier
 
 	func remoteEventsCoordinator(streamIdentifierDidConnect: StreamIdentifier)
@@ -159,65 +141,54 @@ protocol RemoteEventsReceiver: AnyObject, Hashable
 	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, parserProducedError: Error)
 }
 
-extension RemoteEventsCoordinator: RemoteEventsListenerDelegate
-{
-	func remoteEventsListenerDidConnect(_ remoteEventsListener: RemoteEventsListener)
-	{
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else
-		{
+extension RemoteEventsCoordinator: RemoteEventsListenerDelegate {
+	func remoteEventsListenerDidConnect(_ remoteEventsListener: RemoteEventsListener) {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
+		else {
 			return
 		}
 
-		streamReceiverMap[streamIdentifier]?.forEach({
+		streamReceiverMap[streamIdentifier]?.forEach {
 			$0.remoteEventsCoordinator(streamIdentifierDidConnect: streamIdentifier)
-		})
+		}
 	}
 
-	func remoteEventsListenerDidDisconnect(_ remoteEventsListener: RemoteEventsListener, error: Error?)
-	{
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else
-		{
+	func remoteEventsListenerDidDisconnect(_ remoteEventsListener: RemoteEventsListener, code: UInt16) {
+		guard let streamIdentifier = (remoteEventsListener as?  TaggedRemoteEventsListener)?.streamIdentifier
+		else {
 			return
 		}
-
-		if let webSocketError = error as? WSError, webSocketError.code == 404
-		{
+		if code == 404 {
 			// Not found. Means the instance doesn't support streaming.
 			return
 		}
-
-		streamReceiverMap[streamIdentifier]?.forEach({
+		streamReceiverMap[streamIdentifier]?.forEach {
 			$0.remoteEventsCoordinator(streamIdentifierDidDisconnect: streamIdentifier)
-		})
+		}
 	}
 
-	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, didHandleEvent event: ClientEvent)
-	{
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else
-		{
+	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, didHandleEvent event: ClientEvent) {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
+		else {
 			return
 		}
-
-		streamReceiverMap[streamIdentifier]?.forEach({
+		streamReceiverMap[streamIdentifier]?.forEach {
 			$0.remoteEventsCoordinator(streamIdentifier: streamIdentifier, didHandleEvent: event)
-		})
+		}
 	}
 
-	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, parserProducedError error: Error)
-	{
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else
-		{
+	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, parserProducedError error: Error) {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
+		else {
 			return
 		}
-
-		streamReceiverMap[streamIdentifier]?.forEach({
+		streamReceiverMap[streamIdentifier]?.forEach {
 			$0.remoteEventsCoordinator(streamIdentifier: streamIdentifier, didProduceError: error)
-		})
+		}
 	}
 }
 
-private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef
-{
+private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef {
 	typealias StreamIdentifier = RemoteEventsCoordinator.StreamIdentifier
 
 	let streamIdentifier: StreamIdentifier
@@ -229,67 +200,60 @@ private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef
 	private let didDisconnectHandler: (StreamIdentifier) -> Void
 	private let subjectHashValueHandler: (inout Hasher) -> Void
 
-	init<T: RemoteEventsReceiver>(_ receiver: T, stream: StreamIdentifier)
-	{
-		self.streamIdentifier = stream
-		self.description = (receiver as? NSObject)?.description ?? String(describing: receiver)
+	init<T: RemoteEventsReceiver>(_ receiver: T, stream: StreamIdentifier) {
+		streamIdentifier = stream
+		description = (receiver as? NSObject)?.description ?? String(describing: receiver)
 
-		self.eventHandler = { [weak receiver] in
+		eventHandler = { [weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifier: $0, didHandleEvent: $1)
 		}
-		self.errorHandler = { [weak receiver] in
+		errorHandler = { [weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifier: $0, parserProducedError: $1)
 		}
-		self.didConnectHandler = { [weak receiver] in
+		didConnectHandler = { [weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifierDidConnect: $0)
 		}
-		self.didDisconnectHandler = { [weak receiver] in
+		didDisconnectHandler = { [weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifierDidDisconnect: $0)
 		}
-		self.subjectHashValueHandler = { [weak receiver] hasher in
+		subjectHashValueHandler = { [weak receiver] hasher in
 			assert(receiver != nil)
 			receiver.map { hasher.combine($0) }
 		}
 	}
 
-	func hash(into hasher: inout Hasher)
-	{
+	func hash(into hasher: inout Hasher) {
 		subjectHashValueHandler(&hasher)
 	}
 
-	static func == (lhs: AnyRemoteEventsReceiver, rhs: AnyRemoteEventsReceiver) -> Bool
-	{
+	static func == (lhs: AnyRemoteEventsReceiver, rhs: AnyRemoteEventsReceiver) -> Bool {
 		/// We are too far removed from the actual type to do anything more useful here.
 		return lhs.hashValue == rhs.hashValue
 	}
 
-	func remoteEventsCoordinator(streamIdentifierDidConnect streamIdentifier: StreamIdentifier)
-	{
-		self.didConnectHandler(streamIdentifier)
+	func remoteEventsCoordinator(streamIdentifierDidConnect streamIdentifier: StreamIdentifier) {
+		didConnectHandler(streamIdentifier)
 	}
 
-	func remoteEventsCoordinator(streamIdentifierDidDisconnect streamIdentifier: StreamIdentifier)
-	{
-		self.didDisconnectHandler(streamIdentifier)
+	func remoteEventsCoordinator(streamIdentifierDidDisconnect streamIdentifier: StreamIdentifier) {
+		didDisconnectHandler(streamIdentifier)
 	}
 
 	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didHandleEvent event: ClientEvent)
 	{
-		self.eventHandler(streamIdentifier, event)
+		eventHandler(streamIdentifier, event)
 	}
 
-	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didProduceError error: Error)
-	{
-		self.errorHandler(streamIdentifier, error)
+	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didProduceError error: Error) {
+		errorHandler(streamIdentifier, error)
 	}
 }
 
-private class TaggedRemoteEventsListener: RemoteEventsListener
-{
+private class TaggedRemoteEventsListener: RemoteEventsListener {
 	typealias StreamIdentifier = RemoteEventsCoordinator.StreamIdentifier
 
 	let streamIdentifier: StreamIdentifier
@@ -301,9 +265,8 @@ private class TaggedRemoteEventsListener: RemoteEventsListener
 	}
 }
 
-private func debugLog(_ message: String)
-{
+private func debugLog(_ message: String) {
 	#if DEBUG
-	NSLog(message)
+		NSLog(message)
 	#endif
 }

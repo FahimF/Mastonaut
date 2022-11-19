@@ -19,8 +19,7 @@
 
 import AppKit
 
-public protocol MenuItemRepresentable
-{
+public protocol MenuItemRepresentable {
 	var localizedTitle: String { get }
 	var icon: NSImage? { get }
 }

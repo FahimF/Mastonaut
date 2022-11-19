@@ -17,31 +17,26 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
+import AppKit
 import CoreTootin
 
 typealias MastodonNotification = MKNotification
 
-extension ClientType
-{
-	var parsedBaseUrl: URL?
-	{
+extension ClientType {
+	var parsedBaseUrl: URL? {
 		return URL(string: baseURL)
 	}
 }
 
-extension Client
-{
-	static func create(for account: AuthorizedAccount) -> ClientType?
-	{
+extension Client {
+	static func create(for account: AuthorizedAccount) -> ClientType? {
 		return Client.create(for: account,
-							 keychainController: AppDelegate.shared.keychainController,
-							 reauthAgent: AppDelegate.shared.accountsService.reauthorizationAgent(for: account),
-							 urlSession: AppDelegate.shared.clientsUrlSession)
+		                     keychainController: AppDelegate.shared.keychainController,
+		                     reauthAgent: AppDelegate.shared.accountsService.reauthorizationAgent(for: account),
+		                     urlSession: AppDelegate.shared.clientsUrlSession)
 	}
 
-	static func registerMockResponses(for client: MockClient)
-	{
+	static func registerMockResponses(for client: MockClient) {
 		let timelineUrl = Bundle.main.url(forResource: "mock_data_timeline_home", withExtension: "json")!
 		try! client.set(response: try! Data(contentsOf: timelineUrl), for: Timelines.home(range: .default))
 
@@ -56,85 +51,67 @@ extension Client
 	}
 }
 
-extension Status
-{
-	var authorName: String
-	{
+extension Status {
+	var authorName: String {
 		return account.bestDisplayName
 	}
-	
-	var authorAccount: String
-	{
+
+	var authorAccount: String {
 		return account.acct
 	}
-	
-	var attributedContent: NSAttributedString
-	{
+
+	var attributedContent: NSAttributedString {
 		return HTMLParsingService.shared.parse(HTML: content, removingTrailingUrl: card?.url,
-											   removingInvisibleSpans: true)
+		                                       removingInvisibleSpans: true)
 	}
 
-	var fullAttributedContent: NSAttributedString
-	{
+	var fullAttributedContent: NSAttributedString {
 		return HTMLParsingService.shared.parse(HTML: content, removingTrailingUrl: nil, removingInvisibleSpans: false)
 	}
 
-	var attributedSpoiler: NSAttributedString
-	{
+	var attributedSpoiler: NSAttributedString {
 		return HTMLParsingService.shared.parse(HTML: spoilerText).removingLinks
 	}
 
-	var resolvableURI: String
-	{
-		if uri.hasSuffix("/activity")
-		{
+	var resolvableURI: String {
+		if uri.hasSuffix("/activity") {
 			return String(uri.prefix(uri.count - "/activity".count))
-		}
-		else
-		{
+		} else {
 			return uri
 		}
 	}
 
-	var links: [URL: String]
-	{
+	var links: [URL: String] {
 		let attributedContent = self.attributedContent
 		let range = NSMakeRange(0, attributedContent.length)
 		var links: [URL: String] = [:]
 
-		attributedContent.enumerateAttribute(.link, in: range, options: [])
-			{
-				(value, linkRange, _) in
+		attributedContent.enumerateAttribute(.link, in: range, options: []) {
+			value, linkRange, _ in
 
-				if let url = value as? URL
-				{
-					let title = attributedContent.attributedSubstring(from: linkRange).string
-					guard !title.hasPrefix("#") && !title.hasPrefix("@") else { return }
-					links[url] = title
-				}
+			if let url = value as? URL {
+				let title = attributedContent.attributedSubstring(from: linkRange).string
+				guard !title.hasPrefix("#"), !title.hasPrefix("@") else { return }
+				links[url] = title
 			}
+		}
 
 		return links
 	}
 }
 
-extension Instance
-{
-	var attributedDescription: NSAttributedString
-	{
+extension Instance {
+	var attributedDescription: NSAttributedString {
 		return HTMLParsingService.shared.parse(HTML: description)
 	}
 }
 
-extension ClientType
-{
-	func makeStreamIdentifier(for stream: RemoteEventsListener.Stream) -> RemoteEventsCoordinator.StreamIdentifier? {
-
+extension ClientType {
+	func makeStreamIdentifier(for stream: RemoteEventStream) -> RemoteEventsCoordinator.StreamIdentifier? {
 		guard
 			let baseUrl = URL(string: baseURL),
 			let accessToken = accessToken
-		else
-		{
+		else {
 			return nil
 		}
 
@@ -142,23 +119,18 @@ extension ClientType
 	}
 }
 
-extension MastodonNotification
-{
-	var authorName: String
-	{
+extension MastodonNotification {
+	var authorName: String {
 		let displayName = account.displayName
 		return displayName.isEmpty ? account.username : displayName
 	}
 
-	var authorAccount: String
-	{
+	var authorAccount: String {
 		return account.acct
 	}
 
-	var isClean: Bool
-	{
-		if let status = self.status
-		{
+	var isClean: Bool {
+		if let status = status {
 			if status.spoilerText.isEmpty == false { return false }
 			if status.sensitive == true { return false }
 			if status.tags.contains(where: { $0.name.lowercased() == "nsfw" }) { return false }
@@ -172,29 +144,24 @@ extension MastodonNotification
 	}
 }
 
-extension Account
-{
-	var attributedNote: NSAttributedString
-	{
+extension Account {
+	var attributedNote: NSAttributedString {
 		return HTMLParsingService.shared.parse(HTML: note)
 	}
 }
 
-extension Card
-{
+extension Card {
 	private static let cardResourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
-	func fetchImage(completion: @escaping (NSImage?) -> Void)
-	{
-		guard let cardImageUrl = self.imageUrl else
-		{
+	func fetchImage(completion: @escaping (NSImage?) -> Void) {
+		guard let cardImageUrl = imageUrl else {
 			completion(nil)
 			return
 		}
 
 		Card.cardResourcesFetcher.fetchImage(with: cardImageUrl) { result in
 			switch result {
-			case .success(let image):
+			case let .success(image):
 				completion(image)
 			case .failure:
 				// FIXME: pass along error
@@ -206,21 +173,16 @@ extension Card
 	}
 }
 
-extension AttachmentMetadata
-{
-	var size: NSSize?
-	{
-		guard let width = self.width, let height = self.height else { return nil }
+extension AttachmentMetadata {
+	var size: NSSize? {
+		guard let width = width, let height = height else { return nil }
 		return NSSize(width: width, height: height)
 	}
 }
 
-extension Visibility
-{
-	var allowsReblog: Bool
-	{
-		switch self
-		{
+extension Visibility {
+	var allowsReblog: Bool {
+		switch self {
 		case .public, .unlisted:
 			return true
 
@@ -229,24 +191,20 @@ extension Visibility
 		}
 	}
 
-	var reblogIcon: NSImage
-	{
-		switch self
-		{
-		case .public, .unlisted:	return #imageLiteral(resourceName: "retoot")
-		case .private:				return #imageLiteral(resourceName: "private")
-		case .direct:				return #imageLiteral(resourceName: "direct")
+	var reblogIcon: NSImage {
+		switch self {
+		case .public, .unlisted: return #imageLiteral(resourceName: "retoot")
+		case .private: return #imageLiteral(resourceName: "private")
+		case .direct: return #imageLiteral(resourceName: "direct")
 		}
 	}
 
-	func reblogToolTip(didReblog: Bool) -> String
-	{
+	func reblogToolTip(didReblog: Bool) -> String {
 		guard didReblog == false else {
 			return 🔠("Unboost this toot")
 		}
 
-		switch self
-		{
+		switch self {
 		case .public, .unlisted:
 			return 🔠("Boost this toot")
 
@@ -259,36 +217,29 @@ extension Visibility
 	}
 }
 
-extension Attachment: Equatable
-{
-	public static func ==(lhs: Attachment, rhs: Attachment) -> Bool
-	{
+extension Attachment: Equatable {
+	public static func == (lhs: Attachment, rhs: Attachment) -> Bool {
 		return lhs.id == rhs.id
 	}
 
-	public var hashValue: Int
-	{
+	public var hashValue: Int {
 		return id.hashValue
 	}
 }
 
-extension ClientError: UserDescriptionError
-{
-	public var userDescription: String
-	{
+extension ClientError: UserDescriptionError {
+	public var userDescription: String {
 		return localizedDescription
 	}
 }
 
-extension NSAttributedString
-{
-	func replacingMentionsWithURIs(mentions: [Mention]) -> String
-	{
+extension NSAttributedString {
+	func replacingMentionsWithURIs(mentions: [Mention]) -> String {
 		var composedString = String()
 
-		enumerateAttribute(.link, in: NSMakeRange(0, length), options: []) { (value, effectiveRange, _) in
-			guard let linkURL = value as? URL, let mention = mentions.first(where: { $0.url == linkURL }) else
-			{
+		enumerateAttribute(.link, in: NSMakeRange(0, length), options: []) { value, effectiveRange, _ in
+			guard let linkURL = value as? URL, let mention = mentions.first(where: { $0.url == linkURL })
+			else {
 				composedString.append(self.attributedSubstring(from: effectiveRange).string)
 				return
 			}

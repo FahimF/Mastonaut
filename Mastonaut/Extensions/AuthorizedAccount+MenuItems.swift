@@ -17,43 +17,40 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-extension Array where Element == AuthorizedAccount
-{
+extension Array where Element == AuthorizedAccount {
 	func makeMenuItems(currentUser: UUID?,
-					   action: Selector,
-					   target: AnyObject,
-					   emojiContainer: NSView?,
-					   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
+	                   action: Selector,
+	                   target: AnyObject,
+	                   emojiContainer: NSView?,
+	                   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
 	{
 		var menuItems = [NSMenuItem]()
-		var selectedItem: NSMenuItem? = nil
+		var selectedItem: NSMenuItem?
 
 		let displayNames = Set(map(\.bestDisplayName))
 
-		for (index, account) in enumerated()
-		{
+		for (index, account) in enumerated() {
 			let emoji = account.baseDomain.map { AppDelegate.shared.customEmojiCache.cachedEmoji(forInstance: $0) }
 
 			let itemHasKeyEquivalent = setKeyEquivalents && index < 9
 			let itemTitle = account.bestDisplayName
 			let menuItem = NSMenuItem(title: itemTitle,
-									  action: action,
-									  keyEquivalent: itemHasKeyEquivalent ? "\(index + 1)" : "")
+			                          action: action,
+			                          keyEquivalent: itemHasKeyEquivalent ? "\(index + 1)" : "")
 
 			let attributedTitle = itemTitle.applyingEmojiAttachments(emoji ?? [],
-																	 staticOnly: true,
-																	 font: NSFont.menuFont(ofSize: NSFont.systemFontSize),
-																	 containerView: emojiContainer)
-											.mutableCopy() as! NSMutableAttributedString
+			                                                         staticOnly: true,
+			                                                         font: NSFont.menuFont(ofSize: NSFont.systemFontSize),
+			                                                         containerView: emojiContainer)
+				.mutableCopy() as! NSMutableAttributedString
 
-			if attributedTitle.length != (itemTitle as NSString).length
-			{
+			if attributedTitle.length != (itemTitle as NSString).length {
 				attributedTitle.addAttribute(.font,
-											 value: NSFont.menuFont(ofSize: 13),
-											 range: NSMakeRange(0, attributedTitle.length))
+				                             value: NSFont.menuFont(ofSize: 13),
+				                             range: NSMakeRange(0, attributedTitle.length))
 
 				menuItem.attributedTitle = attributedTitle
 			}
@@ -61,10 +58,10 @@ extension Array where Element == AuthorizedAccount
 			if displayNames.count != count, let domain = account.baseDomain {
 				attributedTitle.append(NSAttributedString(string: "\n"))
 				attributedTitle.setAttributes([.font: NSFont.menuFont(ofSize: 13)],
-													 range: NSMakeRange(0, attributedTitle.length))
+				                              range: NSMakeRange(0, attributedTitle.length))
 
 				let instanceAttributedString = NSAttributedString(string: domain,
-																  attributes: [.font: NSFont.menuFont(ofSize: 9)])
+				                                                  attributes: [.font: NSFont.menuFont(ofSize: 9)])
 				attributedTitle.append(instanceAttributedString)
 				menuItem.attributedTitle = attributedTitle
 			}
@@ -75,15 +72,13 @@ extension Array where Element == AuthorizedAccount
 			menuItem.image = account.avatarImage
 			menuItems.append(menuItem)
 
-			if currentUser == account.uuid
-			{
+			if currentUser == account.uuid {
 				selectedItem = menuItem
 				menuItem.state = .on
 			}
 		}
 
-		if selectedItem == nil
-		{
+		if selectedItem == nil {
 			let menuItem = NSMenuItem(title: 🔠("Please Select…"), action: nil, keyEquivalent: "")
 			menuItem.isEnabled = false
 			menuItems.insert(menuItem, at: 0)
@@ -93,8 +88,8 @@ extension Array where Element == AuthorizedAccount
 		menuItems.append(.separator())
 
 		let addUserItem = NSMenuItem(title: 🔠("Add Account…"),
-									 action: #selector(AppDelegate.newAuthorization(_:)),
-									 keyEquivalent: setKeyEquivalents ? "A" : "")
+		                             action: #selector(AppDelegate.newAuthorization(_:)),
+		                             keyEquivalent: setKeyEquivalents ? "A" : "")
 		addUserItem.keyEquivalentModifierMask = setKeyEquivalents ? [.command, .shift] : []
 		addUserItem.target = AppDelegate.shared
 

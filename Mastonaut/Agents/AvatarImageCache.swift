@@ -16,8 +16,8 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 enum AvatarImageCacheResult {
 	case inCache(NSImage)
@@ -29,21 +29,18 @@ enum AvatarImageCacheError: Error {
 	case emptyResponse
 }
 
-final class AvatarImageCache
-{
+final class AvatarImageCache {
 	private let resourcesFetcher: ResourcesFetcher
 	private let cache = NSCache<NSString, NSImage>()
 
-	init(resourceURLSession: URLSession)
-	{
+	init(resourceURLSession: URLSession) {
 		resourcesFetcher = ResourcesFetcher(urlSession: resourceURLSession)
 	}
 
 	/// To be used from UI on the main thread.
 	/// Invoking the completion handler immediately when an image is already
 	/// in the cache and not ping ponging between queues saves us layout passes during scrolling.
-	func fetchImage(account: Account, completionHandler: @escaping (AvatarImageCacheResult) -> ())
-	{
+	func fetchImage(account: Account, completionHandler: @escaping (AvatarImageCacheResult) -> Void) {
 		guard let imageURL = account.avatarURL else {
 			completionHandler(.noImage(AvatarImageCacheError.emptyResponse))
 			return
@@ -54,40 +51,37 @@ final class AvatarImageCache
 	/// To be used from UI on the main thread.
 	/// Invoking the completion handler immediately when an image is already
 	/// in the cache and not ping ponging between queues saves us layout passes during scrolling.
-	func fetchImage(account: AuthorizedAccount, completionHandler: @escaping (AvatarImageCacheResult) -> ())
+	func fetchImage(account: AuthorizedAccount, completionHandler: @escaping (AvatarImageCacheResult) -> Void)
 	{
 		guard let imageURL = account.avatarURL else {
 			completionHandler(.noImage(AvatarImageCacheError.emptyResponse))
 			return
 		}
 		fetchImage(key: imageURL.absoluteString,
-				   url: imageURL,
-				   completionHandler: completionHandler)
+		           url: imageURL,
+		           completionHandler: completionHandler)
 	}
 
 	/// Removes the cached image for the given account, if any.
-	func resetCachedImage(account: Account)
-	{
+	func resetCachedImage(account: Account) {
 		if let imageURL = account.avatarURL {
 			removeCachedImage(key: imageURL.absoluteString)
 		}
 	}
 
 	/// Removes the cached image for the given account, if any.
-	func resetCachedImage(account: AuthorizedAccount)
-	{
+	func resetCachedImage(account: AuthorizedAccount) {
 		if let imageURL = account.avatarURL {
 			removeCachedImage(key: imageURL.absoluteString)
 		}
 	}
 
-	private func removeCachedImage(key: String)
-	{
+	private func removeCachedImage(key: String) {
 		assert(Thread.isMainThread)
 		cache.removeObject(forKey: key as NSString)
 	}
 
-	private func fetchImage(key: String, url: URL, completionHandler: @escaping (AvatarImageCacheResult) -> ())
+	private func fetchImage(key: String, url: URL, completionHandler: @escaping (AvatarImageCacheResult) -> Void)
 	{
 		assert(Thread.isMainThread)
 
@@ -100,7 +94,7 @@ final class AvatarImageCache
 
 		resourcesFetcher.fetchImage(with: url) { result in
 			switch result {
-			case .success(let image):
+			case let .success(image):
 				assert(!Thread.isMainThread)
 
 				// The largest avatar image view in this app is 100 x 100 points, so we don't
@@ -118,7 +112,7 @@ final class AvatarImageCache
 					// The cache is deliberately used from the main queue (see above).
 					self?.cache.setObject(scaledImage, forKey: key)
 				}
-			case .failure(let error):
+			case let .failure(error):
 				completionHandler(.noImage(error))
 			case .emptyResponse:
 				completionHandler(.noImage(AvatarImageCacheError.emptyResponse))

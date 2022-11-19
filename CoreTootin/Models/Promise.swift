@@ -19,16 +19,14 @@
 
 import Foundation
 
-public class Promise<T>
-{
-	public var value: T? = nil
+public class Promise<T> {
+	public var value: T?
 
 	public init() {}
 }
 
-public class WeakPromise<T: AnyObject>
-{
-	public weak var value: T? = nil
+public class WeakPromise<T: AnyObject> {
+	public weak var value: T?
 
 	public init() {}
 }

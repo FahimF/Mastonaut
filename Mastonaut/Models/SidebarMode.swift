@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-enum SidebarMode: RawRepresentable, SidebarModel, Equatable
-{
+enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 	typealias RawValue = String
 
 	case profile(uri: String, account: Account?)
@@ -29,17 +28,15 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable
 	case status(uri: String, status: Status?)
 	case favorites
 
-	var rawValue: String
-	{
-		switch self
-		{
-		case .profile(let uri, _):
+	var rawValue: String {
+		switch self {
+		case let .profile(uri, _):
 			return "profile\n\(uri)"
 
-		case .tag(let tagName):
+		case let .tag(tagName):
 			return "tag\n\(tagName)"
 
-		case .status(let tagName, _):
+		case let .status(tagName, _):
 			return "status\n\(tagName)"
 
 		case .favorites:
@@ -47,64 +44,49 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable
 		}
 	}
 
-	static func profile(uri: String) -> SidebarMode
-	{
+	static func profile(uri: String) -> SidebarMode {
 		return .profile(uri: uri, account: nil)
 	}
 
-	init?(rawValue: String)
-	{
+	init?(rawValue: String) {
 		let components = rawValue.split(separator: "\n")
 
-		if components.count == 2
-		{
-			if components.first == "profile"
-			{
+		if components.count == 2 {
+			if components.first == "profile" {
 				self = .profile(uri: String(components[1]), account: nil)
-			}
-			else if components.first == "tag"
-			{
+			} else if components.first == "tag" {
 				self = .tag(String(components[1]))
-			}
-			else if components.first == "status"
-			{
+			} else if components.first == "status" {
 				self = .status(uri: String(components[1]), status: nil)
-			}
-			else
-			{
+			} else {
 				return nil
 			}
-		}
-		else if components.count == 1, components.first == "favorites"
-		{
+		} else if components.count == 1, components.first == "favorites" {
 			self = .favorites
-		}
-		else
-		{
+		} else {
 			return nil
 		}
 	}
 
 	func makeViewController(client: ClientType,
-							currentAccount: AuthorizedAccount?,
-							currentInstance: Instance) -> SidebarViewController
+	                        currentAccount: AuthorizedAccount?,
+	                        currentInstance: Instance) -> SidebarViewController
 	{
-		switch self
-		{
+		switch self {
 		case .profile(let uri, nil):
 			return ProfileViewController(uri: uri, currentAccount: currentAccount, client: client)
 
-		case .profile(_, .some(let account)):
+		case let .profile(_, .some(account)):
 			return ProfileViewController(account: account, instance: currentInstance)
 
-		case .tag(let tag):
+		case let .tag(tag):
 			let service = currentAccount.map { TagBookmarkService(account: $0) }
 			return TagViewController(tag: tag, tagBookmarkService: service)
 
 		case .status(let uri, nil):
 			return StatusThreadViewController(uri: uri, client: client)
 
-		case .status(_, .some(let status)):
+		case let .status(_, .some(status)):
 			return StatusThreadViewController(status: status)
 
 		case .favorites:
@@ -112,17 +94,15 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable
 		}
 	}
 
-	static func == (lhs: SidebarMode, rhs: SidebarMode) -> Bool
-	{
-		switch (lhs, rhs)
-		{
-		case (.profile(let a1, _), .profile(let a2, _)):
+	static func == (lhs: SidebarMode, rhs: SidebarMode) -> Bool {
+		switch (lhs, rhs) {
+		case let (.profile(a1, _), .profile(a2, _)):
 			return a1 == a2
 
-		case (.tag(let tag1), .tag(let tag2)):
+		case let (.tag(tag1), .tag(tag2)):
 			return tag1 == tag2
 
-		case (.status(let s1, _), .status(let s2, _)):
+		case let (.status(s1, _), .status(s2, _)):
 			return s1 == s2
 
 		default:

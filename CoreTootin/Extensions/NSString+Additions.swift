@@ -19,53 +19,42 @@
 
 import Foundation
 
-public extension NSString
-{
-	@objc var isEmptyString: Bool
-	{
+public extension NSString {
+	@objc var isEmptyString: Bool {
 		return length == 0
 	}
 
-	func allRanges(of string: String, options: NSString.CompareOptions = []) -> [NSRange]
-	{
+	func allRanges(of string: String, options: NSString.CompareOptions = []) -> [NSRange] {
 		var allRanges = [NSRange]()
 		var searchRange = NSMakeRange(0, length)
 		var subrange: NSRange
 
-		repeat
-		{
+		repeat {
 			subrange = range(of: string, options: options, range: searchRange)
 
-			if subrange.location != NSNotFound
-			{
+			if subrange.location != NSNotFound {
 				allRanges.append(subrange)
 				searchRange = NSMakeRange(subrange.upperBound, length - subrange.upperBound)
 			}
-		}
-		while subrange.location != NSNotFound
+		} while subrange.location != NSNotFound
 
 		return allRanges
 	}
 
-	func applyingAttributes(_ attributes: [NSAttributedString.Key: AnyObject]) -> NSAttributedString
-	{
+	func applyingAttributes(_ attributes: [NSAttributedString.Key: AnyObject]) -> NSAttributedString {
 		return NSAttributedString(string: self as String, attributes: attributes)
 	}
 
-	var range: NSRange
-	{
+	var range: NSRange {
 		return NSMakeRange(0, length)
 	}
 }
 
-public extension NSMutableString
-{
-	func replaceCharacters(in rangesReplacementMap: [NSRange: String])
-	{
+public extension NSMutableString {
+	func replaceCharacters(in rangesReplacementMap: [NSRange: String]) {
 		var lengthOffset = 0
 
-		for range in rangesReplacementMap.keys.sorted(by: { $0.location < $1.location })
-		{
+		for range in rangesReplacementMap.keys.sorted(by: { $0.location < $1.location }) {
 			let replacement = rangesReplacementMap[range]!
 			replaceCharacters(in: NSMakeRange(range.location + lengthOffset, range.length), with: replacement)
 			lengthOffset += (replacement as NSString).length - range.length
@@ -73,24 +62,17 @@ public extension NSMutableString
 	}
 }
 
-public extension NSAttributedString
-{
-	var isEmpty: Bool
-	{
+public extension NSAttributedString {
+	var isEmpty: Bool {
 		return length == 0
 	}
 }
 
-private extension Bool
-{
-	func map<U>(_ transform: () throws -> U) rethrows -> U?
-	{
-		if self == true
-		{
+private extension Bool {
+	func map<U>(_ transform: () throws -> U) rethrows -> U? {
+		if self == true {
 			return try transform()
-		}
-		else
-		{
+		} else {
 			return nil
 		}
 	}

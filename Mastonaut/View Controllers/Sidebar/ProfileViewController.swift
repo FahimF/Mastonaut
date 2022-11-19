@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class ProfileViewController: TimelineViewController, SidebarPresentable, AccountBound
-{
+class ProfileViewController: TimelineViewController, SidebarPresentable, AccountBound {
 	private lazy var resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
 	private let accountURI: String
@@ -29,165 +28,136 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 	private var pinnedStatusMap: [String: Status] = [:]
 	private var pinnedStatusList: [String] = []
 
-	private var displayMode: ProfileDisplayMode = .statuses
-	{
+	private var displayMode: ProfileDisplayMode = .statuses {
 		didSet { account.map { source = displayMode.listSource(for: $0.id) } }
 	}
 
-	internal var account: Account? = nil
-	{
+	internal var account: Account? {
 		didSet { account.map { prepareToDisplay(account: $0) } }
 	}
 
-	private var accountAvatarImage: NSImage? = nil
-	{
+	private var accountAvatarImage: NSImage? {
 		didSet { updateAvatarImage() }
 	}
 
-	private var accountHeaderImage: NSImage? = nil
-	{
+	private var accountHeaderImage: NSImage? {
 		didSet { updateHeaderImage() }
 	}
 
-	var sidebarModelValue: SidebarModel
-	{
+	var sidebarModelValue: SidebarModel {
 		return SidebarMode.profile(uri: accountURI)
 	}
 
-	override var needsLoadingIndicator: Bool
-	{
+	override var needsLoadingIndicator: Bool {
 		return entryMap.isEmpty
 	}
 
-	var titleMode: SidebarTitleMode
-	{
-		if let account = self.account
-		{
+	var titleMode: SidebarTitleMode {
+		if let account = account {
 			let font = SidebarTitleViewController.titleAttributes[.font] as? NSFont
 			let emojiTitle = NSAttributedString(string: account.bestDisplayName)
-							.applyingEmojiAttachments(account.cacheableEmojis, font: font)
+				.applyingEmojiAttachments(account.cacheableEmojis, font: font)
 
 			return .subtitle(title: emojiTitle, subtitle: NSAttributedString(string: accountURI))
-		}
-		else
-		{
+		} else {
 			return .title(accountURI)
 		}
 	}
 
-	init(account: Account, instance: Instance)
-	{
-		self.accountURI = account.uri(in: instance)
+	init(account: Account, instance: Instance) {
+		accountURI = account.uri(in: instance)
 		self.account = account
 
 		super.init(source: displayMode.listSource(for: account.id))
 	}
 
-	init(uri: String, currentAccount: AuthorizedAccount?, client: ClientType)
-	{
-		self.accountURI = uri
+	init(uri: String, currentAccount: AuthorizedAccount?, client: ClientType) {
+		accountURI = uri
 
 		super.init(source: nil)
 
 		clearProfileView()
 
-		if currentAccount?.uri == uri
-		{
-			client.run(Accounts.currentUser())
-			{
+		if currentAccount?.uri == uri {
+			client.run(Accounts.currentUser()) {
 				[weak self, client] result in
 
-				DispatchQueue.main.async
-					{
-						guard case .success(let account, _) = result else {
-							self?.setProfileNotFound()
-							return
-						}
-
-						self?.setRecreatedAccount(account)
-						self?.client = client
+				DispatchQueue.main.async {
+					guard case let .success(account, _) = result else {
+						self?.setProfileNotFound()
+						return
 					}
+
+					self?.setRecreatedAccount(account)
+					self?.client = client
+				}
 			}
-		}
-		else
-		{
-			client.run(Accounts.search(query: uri, limit: 1, resolve: true))
-			{
+		} else {
+			client.run(Accounts.search(query: uri, limit: 1, resolve: true)) {
 				[weak self, client] result in
 
-				DispatchQueue.main.async
-					{
-						guard case .success(let accounts, _) = result, let account = accounts.first else {
-							self?.setProfileNotFound()
-							return
-						}
-
-						self?.setRecreatedAccount(account)
-						self?.client = client
+				DispatchQueue.main.async {
+					guard case let .success(accounts, _) = result, let account = accounts.first else {
+						self?.setProfileNotFound()
+						return
 					}
+
+					self?.setRecreatedAccount(account)
+					self?.client = client
+				}
 			}
 		}
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 		topConstraint.constant = -1
 		view.widthAnchor.constraint(greaterThanOrEqualToConstant: 320).isActive = true
 		updateAccessibilityAttributes()
 	}
 
-	internal func setRecreatedAccount(_ account: Account)
-	{
+	internal func setRecreatedAccount(_ account: Account) {
 		self.account = account
-		self.source = displayMode.listSource(for: account.id)
+		source = displayMode.listSource(for: account.id)
 	}
 
-	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?)
-	{
+	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
 		super.clientDidChange(client, oldClient: oldClient)
 
-		guard let account = self.account else { return }
+		guard let account = account else { return }
 
 		prepareToDisplay(account: account)
 		fetchPinnedStatuses()
 	}
 
-	override func sourceDidChange(source: TimelineViewController.Source?)
-	{
+	override func sourceDidChange(source: TimelineViewController.Source?) {
 		reloadList()
 
-		if case .some(.userStatuses) = source
-		{
+		if case .some(.userStatuses) = source {
 			fetchPinnedStatuses()
 		}
 	}
 
-	private func fetchPinnedStatuses()
-	{
-		guard let client = self.client, let accountID = self.account?.id else { return }
+	private func fetchPinnedStatuses() {
+		guard let client = client, let accountID = account?.id else { return }
 
-		client.run(Accounts.statuses(id: accountID, pinnedOnly: true))
-			{
-				[weak self] result in
+		client.run(Accounts.statuses(id: accountID, pinnedOnly: true)) {
+			[weak self] result in
 
-				if case .success(let statuses, _) = result
-				{
-					DispatchQueue.main.async
-						{
-							self?.prepareNewPinnedStatuses(statuses)
-						}
+			if case let .success(statuses, _) = result {
+				DispatchQueue.main.async {
+					self?.prepareNewPinnedStatuses(statuses)
 				}
 			}
+		}
 	}
 
-	override func installLoadingIndicator()
-	{
+	override func installLoadingIndicator() {
 		let containerView = tableView.enclosingScrollView?.contentView ?? view
 		let indicator = loadingIndicator
 		containerView.addSubview(indicator)
@@ -195,24 +165,21 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 
 		let bottomDistance: CGFloat
 
-		if !entryList.isEmpty, let profileCell = profileCellView()
-		{
+		if !entryList.isEmpty, let profileCell = profileCellView() {
 			bottomDistance = (view.frame.height - profileCell.frame.height) / 2
-		}
-		else
-		{
+		} else {
 			bottomDistance = view.frame.height / 2
 		}
 
 		NSLayoutConstraint.activate([
 			containerView.centerXAnchor.constraint(equalTo: indicator.centerXAnchor),
-			containerView.bottomAnchor.constraint(equalTo: indicator.centerYAnchor, constant: bottomDistance)
+			containerView.bottomAnchor.constraint(equalTo: indicator.centerYAnchor, constant: bottomDistance),
 		])
 	}
 
 	override func prepareNewEntries(_ entries: [Status],
-									for insertion: ListViewController<Status>.InsertionPoint,
-									pagination: Pagination?)
+	                                for insertion: ListViewController<Status>.InsertionPoint,
+	                                pagination: Pagination?)
 	{
 		let (pinnedEntries, filteredEntries) = entries.segregated(using: { $0.pinned == true })
 
@@ -220,14 +187,12 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		super.prepareNewEntries(filteredEntries, for: insertion, pagination: pagination)
 	}
 
-	private func prepareNewPinnedStatuses(_ statuses: [Status])
-	{
-		let filteredStatuses = statuses.filter({ pinnedStatusMap[$0.id] == nil })
+	private func prepareNewPinnedStatuses(_ statuses: [Status]) {
+		let filteredStatuses = statuses.filter { pinnedStatusMap[$0.id] == nil }
 		handleNewPinnedStatuses(filteredStatuses)
 	}
 
-	private func handleNewPinnedStatuses(_ statuses: [Status])
-	{
+	private func handleNewPinnedStatuses(_ statuses: [Status]) {
 		guard !statuses.isEmpty else { return }
 
 		for status in statuses {
@@ -235,15 +200,14 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 			pinnedStatusMap[status.id] = status
 		}
 
-		let newStatusList = pinnedStatusMap.values.sorted(by: { $0.createdAt > $1.createdAt }).map({ $0.id })
+		let newStatusList = pinnedStatusMap.values.sorted(by: { $0.createdAt > $1.createdAt }).map { $0.id }
 		let oldStatusIDSet = Set(pinnedStatusList)
-		let newPinnedStatuses = newStatusList.enumerated().filter({ !oldStatusIDSet.contains($0.1) })
+		let newPinnedStatuses = newStatusList.enumerated().filter { !oldStatusIDSet.contains($0.1) }
 		var entryReferences: [Int: EntryReference] = [:]
-		let profileCellOffset = entryList.firstIndex(where: { $0.specialKey == "profile" }).map({ $0 + 1 })
-								?? entryList.startIndex
+		let profileCellOffset = entryList.firstIndex(where: { $0.specialKey == "profile" }).map { $0 + 1 }
+			?? entryList.startIndex
 
-		for (index, newStatusID) in newPinnedStatuses
-		{
+		for (index, newStatusID) in newPinnedStatuses {
 			entryReferences[index + profileCellOffset] = .special(key: "pinned:\(newStatusID)")
 		}
 
@@ -251,116 +215,94 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		insert(entryReferences: entryReferences)
 	}
 
-	override internal func cleanupSpecialRows(_ entryList: inout [EntryReference])
-	{
+	override internal func cleanupSpecialRows(_ entryList: inout [EntryReference]) {
 		pinnedStatusList.removeAll()
 		pinnedStatusMap.removeAll()
 		entryList.removeAll(where: { $0.specialKey?.hasPrefix("pinned:") == true })
 	}
 
-	private func clearProfileView()
-	{
+	private func clearProfileView() {
 		accountAvatarImage = nil
 		accountHeaderImage = nil
 		updateAccountControls()
 	}
 
-	private func setProfileNotFound()
-	{
+	private func setProfileNotFound() {
 		accountAvatarImage = nil
 		accountHeaderImage = nil
 		updateAccountControls()
 	}
 
-	private func prepareToDisplay(account: Account)
-	{
+	private func prepareToDisplay(account: Account) {
 		updateAccessibilityAttributes()
 
-		let completion: () -> Void =
-			{
-				[weak self] in
+		let completion: () -> Void = {
+			[weak self] in
 
-				self?.updateProfileCellView()
-				self?.invalidateSidebarTitleMode()
-			}
+			self?.updateProfileCellView()
+			self?.invalidateSidebarTitleMode()
+		}
 
-		guard !account.emojis.isEmpty else
-		{
+		guard !account.emojis.isEmpty else {
 			completion()
 			return
 		}
 
-		AppDelegate.shared.customEmojiCache.cacheEmojis(for: [account])
-		{
+		AppDelegate.shared.customEmojiCache.cacheEmojis(for: [account]) {
 			_ in DispatchQueue.main.async(execute: completion)
 		}
 	}
 
-	override func prepareToDisplay(cellView: NSTableCellView, at row: Int)
-	{
+	override func prepareToDisplay(cellView: NSTableCellView, at row: Int) {
 		super.prepareToDisplay(cellView: cellView, at: row)
 
-		if cellView is ProfileTableCellView
-		{
-			DispatchQueue.main.async
-			{
+		if cellView is ProfileTableCellView {
+			DispatchQueue.main.async {
 				[weak self] in self?.updateProfileCellView()
 			}
 		}
 	}
 
-	private func updateProfileCellView()
-	{
+	private func updateProfileCellView() {
 		updateAccountControls()
 		updateAvatarImage()
 		updateHeaderImage()
 	}
 
-	override func insertSpecialRows()
-	{
+	override func insertSpecialRows() {
 		super.insertSpecialRows()
 		insert(entryReferences: [0: .special(key: "profile")])
 	}
 
-	override func registerCells()
-	{
+	override func registerCells() {
 		super.registerCells()
 
 		tableView.register(NSNib(nibNamed: "ProfileTableCellView", bundle: .main), forIdentifier: CellViewIdentifier.profile)
 	}
 
-	override func cellIdentifier(for specialCellKey: String) -> NSUserInterfaceItemIdentifier
-	{
-		if specialCellKey.hasPrefix("pinned:")
-		{
+	override func cellIdentifier(for specialCellKey: String) -> NSUserInterfaceItemIdentifier {
+		if specialCellKey.hasPrefix("pinned:") {
 			return StatusListViewController.CellViewIdentifier.status
-		}
-		else
-		{
+		} else {
 			return CellViewIdentifier.profile
 		}
 	}
 
-	override func populate(specialCell: NSTableCellView, for specialCellKey: String)
-	{
+	override func populate(specialCell: NSTableCellView, for specialCellKey: String) {
 		if specialCellKey.hasPrefix("pinned:"),
-			let status = pinnedStatusMap[specialCellKey.substring(afterPrefix: "pinned:")]
+		   let status = pinnedStatusMap[specialCellKey.substring(afterPrefix: "pinned:")]
 		{
 			populate(cell: specialCell, for: status)
 		}
 	}
 
-	override func menuItems(for entryReference: EntryReference) -> [NSMenuItem]
-	{
-		if case .special(let specialCellKey) = entryReference, let account = self.account
-		{
+	override func menuItems(for entryReference: EntryReference) -> [NSMenuItem] {
+		if case let .special(specialCellKey) = entryReference, let account = account {
 			if specialCellKey.hasPrefix("pinned:"),
-				let status = pinnedStatusMap[specialCellKey.substring(afterPrefix: "pinned:")]
+			   let status = pinnedStatusMap[specialCellKey.substring(afterPrefix: "pinned:")]
 			{
 				return StatusMenuItemsController.shared.menuItems(for: status, interactionHandler: self)
-			}
-			else if specialCellKey == "profile"
-			{
+			} else if specialCellKey == "profile" {
 				return AccountMenuItemsController.shared.menuItems(for: account, interactionHandler: self)
 			}
 		}
@@ -368,32 +310,25 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		return super.menuItems(for: entryReference)
 	}
 
-	override func handle(updatedStatus: Status)
-	{
-		if updatedStatus.pinned == true && pinnedStatusMap[updatedStatus.id] == nil
-		{
+	override func handle(updatedStatus: Status) {
+		if updatedStatus.pinned == true, pinnedStatusMap[updatedStatus.id] == nil {
 			handleNewPinnedStatuses([updatedStatus])
 			// remove old status, maybe?
-		}
-		else if let statusID = pinnedStatusMap.removeValue(forKey: updatedStatus.id)?.id
-		{
+		} else if let statusID = pinnedStatusMap.removeValue(forKey: updatedStatus.id)?.id {
 			pinnedStatusList.firstIndex(of: statusID).map { _ = pinnedStatusList.remove(at: $0) }
 			handle(deletedEntry: .special(key: "pinned:\(statusID)"))
 		}
 	}
 
-	private func profileCellView() -> ProfileTableCellView?
-	{
+	private func profileCellView() -> ProfileTableCellView? {
 		guard numberOfRows(in: tableView) > 0 else { return nil }
 		return tableView.view(atColumn: 0, row: 0, makeIfNecessary: false) as? ProfileTableCellView
 	}
 
-	private func updateAccountControls()
-	{
+	private func updateAccountControls() {
 		guard !entryList.isEmpty, let profileCellView = profileCellView() else { return }
 
-		guard let account = self.account else
-		{
+		guard let account = account else {
 			profileCellView.clear()
 			return
 		}
@@ -402,60 +337,55 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		profileCellView.setProfileDisplayMode(displayMode)
 		profileCellView.profileDisplayModeDidChange = { [unowned self] in self.displayMode = $0 }
 
-		if let linkHandler = authorizedAccountProvider
-		{
+		if let linkHandler = authorizedAccountProvider {
 			profileCellView.set(linkHandler: linkHandler)
 		}
 
 		guard
 			let authorizedAccount = authorizedAccountProvider?.currentAccount,
-			let client = self.client
+			let client = client
 		else { return }
 
 		let relationshipService = RelationshipsService(client: client, authorizedAccount: authorizedAccount)
 
 		relationshipService.relationship(with: account) { profileCellView.setRelationship($0) }
-		profileCellView.relationshipInteractionHandler =
-			{
-				[unowned self] interaction in
+		profileCellView.relationshipInteractionHandler = {
+			[unowned self] interaction in
 
-				self.process(relationshipInteraction: interaction, relationshipService: relationshipService)
-			}
-	}
-
-	private func process(relationshipInteraction: ProfileTableCellView.RelationshipInteraction,
-						 relationshipService service: RelationshipsService)
-	{
-		guard let account = self.account else { return }
-
-		let completion: (Swift.Result<AccountReference, RelationshipsService.Errors>) -> Void =
-			{
-				[weak self, account] result in
-
-				guard let profileCellView = self?.profileCellView() else { return }
-
-				guard case .success(let reference) = result else {
-					service.relationship(with: account) { profileCellView.setRelationship($0) }
-					return
-				}
-
-				profileCellView.setRelationship(reference.relationshipSet(with: account, isSelf: false))
-			}
-
-		switch relationshipInteraction
-		{
-		case .follow:	service.follow(account: account, completion: completion)
-		case .unfollow:	service.unfollow(account: account, completion: completion)
-		case .block:	service.block(account: account, completion: completion)
-		case .unblock:	service.unblock(account: account, completion: completion)
-		case .mute:		service.mute(account: account, completion: completion)
-		case .unmute:	service.unmute(account: account, completion: completion)
+			self.process(relationshipInteraction: interaction, relationshipService: relationshipService)
 		}
 	}
 
-	private func updateAvatarImage()
+	private func process(relationshipInteraction: ProfileTableCellView.RelationshipInteraction,
+	                     relationshipService service: RelationshipsService)
 	{
-		guard let account = self.account, let profileCellView = profileCellView() else { return }
+		guard let account = account else { return }
+
+		let completion: (Swift.Result<AccountReference, RelationshipsService.Errors>) -> Void = {
+			[weak self, account] result in
+
+			guard let profileCellView = self?.profileCellView() else { return }
+
+			guard case let .success(reference) = result else {
+				service.relationship(with: account) { profileCellView.setRelationship($0) }
+				return
+			}
+
+			profileCellView.setRelationship(reference.relationshipSet(with: account, isSelf: false))
+		}
+
+		switch relationshipInteraction {
+		case .follow: service.follow(account: account, completion: completion)
+		case .unfollow: service.unfollow(account: account, completion: completion)
+		case .block: service.block(account: account, completion: completion)
+		case .unblock: service.unblock(account: account, completion: completion)
+		case .mute: service.mute(account: account, completion: completion)
+		case .unmute: service.unmute(account: account, completion: completion)
+		}
+	}
+
+	private func updateAvatarImage() {
+		guard let account = account, let profileCellView = profileCellView() else { return }
 
 		if let avatarImage = accountAvatarImage {
 			profileCellView.setAvatar(with: avatarImage)
@@ -470,9 +400,8 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		}
 	}
 
-	private func updateHeaderImage()
-	{
-		guard let account = self.account, let profileCellView = profileCellView() else { return }
+	private func updateHeaderImage() {
+		guard let account = account, let profileCellView = profileCellView() else { return }
 
 		if let headerImage = accountHeaderImage {
 			profileCellView.setHeader(with: headerImage)
@@ -487,15 +416,11 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		}
 	}
 
-	private func fetchImageOrFallback(url: URL, completion: @escaping (NSImage) -> Void)
-	{
-		resourcesFetcher.fetchImage(with: url) { (result) in
-			if case .success(let image) = result
-			{
+	private func fetchImageOrFallback(url: URL, completion: @escaping (NSImage) -> Void) {
+		resourcesFetcher.fetchImage(with: url) { result in
+			if case let .success(image) = result {
 				completion(image)
-			}
-			else
-			{
+			} else {
 				completion(#imageLiteral(resourceName: "missing"))
 			}
 		}
@@ -519,16 +444,13 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		}
 	}
 
-	enum ProfileDisplayMode
-	{
+	enum ProfileDisplayMode {
 		case statuses
 		case statusesAndReplies
 		case mediaOnly
 
-		func listSource(for accountId: String) -> TimelineViewController.Source
-		{
-			switch self
-			{
+		func listSource(for accountId: String) -> TimelineViewController.Source {
+			switch self {
 			case .statuses: return .userStatuses(id: accountId)
 			case .statusesAndReplies: return .userStatusesAndReplies(id: accountId)
 			case .mediaOnly: return .userMediaStatuses(id: accountId)
@@ -536,8 +458,7 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 		}
 	}
 
-	private struct CellViewIdentifier
-	{
+	private enum CellViewIdentifier {
 		static let profile = NSUserInterfaceItemIdentifier("profile")
 	}
 }

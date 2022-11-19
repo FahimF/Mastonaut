@@ -17,32 +17,27 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-extension AccountPreferences
-{
-	@objc dynamic var notificationDisplayMode: NotificationDisplayMode
-	{
+extension AccountPreferences {
+	@objc dynamic var notificationDisplayMode: NotificationDisplayMode {
 		get { NotificationDisplayMode(rawValue: showNotifications) ?? .always }
 		set { showNotifications = newValue.rawValue }
 	}
 
-	@objc dynamic var notificationDetailMode: NotificationDetailMode
-	{
+	@objc dynamic var notificationDetailMode: NotificationDetailMode {
 		get { NotificationDetailMode(rawValue: showNotificationDetails) ?? .whenClean }
 		set { showNotificationDetails = newValue.rawValue }
 	}
 
-	@objc enum NotificationDisplayMode: Int16
-	{
+	@objc enum NotificationDisplayMode: Int16 {
 		case always = 1
 		case never = 2
 		case whenActive = 3
 	}
 
-	@objc enum NotificationDetailMode: Int16
-	{
+	@objc enum NotificationDetailMode: Int16 {
 		case always = 1
 		case never = 2
 		case whenClean = 3

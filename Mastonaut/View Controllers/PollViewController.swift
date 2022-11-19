@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class PollViewController: NSViewController
-{
+class PollViewController: NSViewController {
 	@IBOutlet private unowned var stackView: NSStackView!
 
 	@IBOutlet private unowned var voteControlsContainer: NSView!
@@ -33,8 +32,7 @@ class PollViewController: NSViewController
 
 	private typealias ViewSet = (container: NSView, indicator: NSProgressIndicator, ratio: NSTextField, title: NSTextField)
 
-	override var nibName: NSNib.Name?
-	{
+	override var nibName: NSNib.Name? {
 		return "PollViewController"
 	}
 
@@ -44,36 +42,30 @@ class PollViewController: NSViewController
 
 	weak var delegate: PollViewControllerDelegate?
 
-	private var selectedOptionIndexSet: IndexSet
-	{
-		let optionButtons = stackView.subviews.compactMap({ $0.tag >= 0 ? $0 as? NSButton : nil })
-		return IndexSet(optionButtons.filter({ $0.state == .on }).map({ $0.tag }))
+	private var selectedOptionIndexSet: IndexSet {
+		let optionButtons = stackView.subviews.compactMap { $0.tag >= 0 ? $0 as? NSButton : nil }
+		return IndexSet(optionButtons.filter { $0.state == .on }.map { $0.tag })
 	}
 
-	private let percentageNumberFormatter: NumberFormatter =
-		{
-			let formatter = NumberFormatter()
-			formatter.numberStyle = .percent
-			formatter.generatesDecimalNumbers = false
-			return formatter
-		}()
+	private let percentageNumberFormatter: NumberFormatter = {
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .percent
+		formatter.generatesDecimalNumbers = false
+		return formatter
+	}()
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		if let poll = poll
-		{
+		if let poll = poll {
 			setViews(from: poll)
 		}
 
 		pollEndingLabel.formatter = RelativeDateFormatter.shared
 	}
 
-	func set(poll: Poll)
-	{
-		guard isViewLoaded else
-		{
+	func set(poll: Poll) {
+		guard isViewLoaded else {
 			self.poll = poll
 			return
 		}
@@ -81,47 +73,40 @@ class PollViewController: NSViewController
 		setViews(from: poll)
 	}
 
-	func setControlsEnabled(_ enabled: Bool)
-	{
+	func setControlsEnabled(_ enabled: Bool) {
 		voteTaskIndicator.setAnimating(!enabled)
-		stackView.subviews.forEach({ ($0 as? NSControl)?.isEnabled = enabled })
+		stackView.subviews.forEach { ($0 as? NSControl)?.isEnabled = enabled }
 	}
 
-	func setHasActiveReloadTask(_ hasTask: Bool)
-	{
+	func setHasActiveReloadTask(_ hasTask: Bool) {
 		voteTaskIndicator.setAnimating(hasTask)
 	}
 
-	private func setViews(from poll: Poll)
-	{
+	private func setViews(from poll: Poll) {
 		let multiple = poll.multiple
 		let shouldShowButtons = poll.expired == false && poll.voted == false
 
 		indexSetValidator = { multiple ? $0.count > 0 : $0.count == 1 }
 		voteControlsContainer.isHidden = !shouldShowButtons && poll.expiresAt == nil
-		stackView.subviews.filter({ $0 is NSButton }).forEach({ $0.removeFromSuperview() })
+		stackView.subviews.filter { $0 is NSButton }.forEach { $0.removeFromSuperview() }
 		voteTaskIndicator.setAnimating(false)
 		voteButton.isHidden = !shouldShowButtons
 		voteButton.isEnabled = indexSetValidator?(selectedOptionIndexSet) ?? false
 
-		if let endingTime = poll.expiresAt
-		{
+		if let endingTime = poll.expiresAt {
 			pollEndingLabel.objectValue = endingTime
 			pollEndsOnLabel.stringValue = endingTime < Date() ? 🔠("status.poll.ended") : 🔠("status.poll.ends")
 
 			pollEndingLabel.isHidden = false
 			pollEndsOnLabel.isHidden = false
-		}
-		else
-		{
+		} else {
 			pollEndsOnLabel.isHidden = true
 			pollEndingLabel.isHidden = true
 		}
 
-		if poll.voted == true
-		{
+		if poll.voted == true {
 			voteCountLabel.stringValue = poll.votesCount == 1 ? 🔠("status.poll.vote")
-															  : 🔠("status.poll.votes", poll.votesCount)
+				: 🔠("status.poll.votes", poll.votesCount)
 			voteCountLabel.isHidden = false
 		} else {
 			voteCountLabel.isHidden = true
@@ -131,20 +116,15 @@ class PollViewController: NSViewController
 			stackView.arrangedSubviews.first?.removeFromSuperview()
 		}
 
-		for (index, option) in poll.options.enumerated()
-		{
+		for (index, option) in poll.options.enumerated() {
 			guard index < 200 else { break }
 
-			if shouldShowButtons
-			{
+			if shouldShowButtons {
 				let button: NSButton
 
-				if poll.multiple
-				{
+				if poll.multiple {
 					button = .init(checkboxWithTitle: option.title, target: self, action: #selector(didPickOption(_:)))
-				}
-				else
-				{
+				} else {
 					button = .init(radioButtonWithTitle: option.title, target: self, action: #selector(didPickOption(_:)))
 				}
 
@@ -156,9 +136,7 @@ class PollViewController: NSViewController
 				button.lineBreakMode = .byWordWrapping
 
 				stackView.insertArrangedSubview(button, at: index)
-			}
-			else
-			{
+			} else {
 				let optionVotes = option.votesCount ?? 0
 				let ratio = poll.votesCount > 0 ? Float(optionVotes) / Float(poll.votesCount) : 0
 				let ratioString = percentageNumberFormatter.string(from: NSNumber(value: ratio)) ?? "--"
@@ -170,13 +148,12 @@ class PollViewController: NSViewController
 				viewSet.ratioLabel.stringValue = ratioString
 				viewSet.titleLabel.stringValue = option.title
 				viewSet.progressIndicator.toolTip = optionVotes == 1 ? 🔠("status.poll.vote")
-																	 : 🔠("status.poll.votes", optionVotes)
+					: 🔠("status.poll.votes", optionVotes)
 			}
 		}
 	}
 
-	@IBAction private func didPickOption(_ sender: Any?)
-	{
+	@IBAction private func didPickOption(_ sender: Any?) {
 		guard
 			let optionIndex = (sender as? NSButton)?.tag, optionIndex >= 0,
 			let validator = indexSetValidator
@@ -185,37 +162,30 @@ class PollViewController: NSViewController
 		voteButton.isEnabled = validator(selectedOptionIndexSet)
 	}
 
-	@IBAction private func didClickVote(_ sender: Any?)
-	{
+	@IBAction private func didClickVote(_: Any?) {
 		let optionsIndexSet = selectedOptionIndexSet
 
 		guard let delegate = delegate, let validator = indexSetValidator, validator(optionsIndexSet) else { return }
 
 		setControlsEnabled(false)
 
-		delegate.pollViewController(self, userDidVote: optionsIndexSet)
-			{
-				[weak self] poll in
-				DispatchQueue.main.async
-					{
-						if let poll = poll
-						{
-							self?.set(poll: poll)
-						}
-						else
-						{
-							self?.setControlsEnabled(true)
-						}
-					}
+		delegate.pollViewController(self, userDidVote: optionsIndexSet) {
+			[weak self] poll in
+			DispatchQueue.main.async {
+				if let poll = poll {
+					self?.set(poll: poll)
+				} else {
+					self?.setControlsEnabled(true)
+				}
 			}
+		}
 	}
 }
 
-protocol PollViewControllerDelegate: AnyObject
-{
+protocol PollViewControllerDelegate: AnyObject {
 	func pollViewController(_ viewController: PollViewController,
-							userDidVote optionIndexSet: IndexSet,
-							completion: @escaping (Poll?) -> Void)
+	                        userDidVote optionIndexSet: IndexSet,
+	                        completion: @escaping (Poll?) -> Void)
 }
 
 class PollOptionViewController: NSViewController {

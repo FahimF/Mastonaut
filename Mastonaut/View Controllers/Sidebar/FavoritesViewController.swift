@@ -20,32 +20,26 @@
 import Cocoa
 import CoreTootin
 
-class FavoritesViewController: TimelineViewController, SidebarPresentable
-{
-	var titleMode: SidebarTitleMode
-	{
+class FavoritesViewController: TimelineViewController, SidebarPresentable {
+	var titleMode: SidebarTitleMode {
 		return .title(🔠("Favorites"))
 	}
 
-	var sidebarModelValue: SidebarModel
-	{
+	var sidebarModelValue: SidebarModel {
 		return SidebarMode.favorites
 	}
 
-	init()
-	{
+	init() {
 		super.init(source: .favorites)
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func handle(updatedStatus: Status)
-	{
-		guard updatedStatus.favourited != true else
-		{
+	override func handle(updatedStatus: Status) {
+		guard updatedStatus.favourited != true else {
 			super.handle(updatedStatus: updatedStatus)
 			return
 		}

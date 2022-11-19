@@ -9,13 +9,13 @@
 import Foundation
 
 extension URLRequest {
-    init<A>(url: URL, request: Request<A>, accessToken: String?) {
-        self.init(url: url, timeoutInterval: request.timeout ?? 30)
+	init<A>(url: URL, request: Request<A>, accessToken: String?) {
+		self.init(url: url, timeoutInterval: request.timeout ?? 30)
 
-        httpMethod = request.method.name
-        httpBody = request.method.httpBody
+		httpMethod = request.method.name
+		httpBody = request.method.httpBody
 
-        setValue(accessToken.map { "Bearer \($0)" }, forHTTPHeaderField: "Authorization")
-        setValue(request.method.contentType, forHTTPHeaderField: "Content-Type")
-    }
+		setValue(accessToken.map { "Bearer \($0)" }, forHTTPHeaderField: "Authorization")
+		setValue(request.method.contentType, forHTTPHeaderField: "Content-Type")
+	}
 }

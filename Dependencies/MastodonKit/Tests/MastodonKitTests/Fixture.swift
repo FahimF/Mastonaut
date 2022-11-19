@@ -9,22 +9,22 @@
 import Foundation
 
 enum FixtureError: Error {
-    case invalidPath, invalidData
+	case invalidPath, invalidData
 }
 
 enum Fixture {
-    static func load(fileName: String) throws -> Data {
-        var testsDirectory = URL(fileURLWithPath: #file, isDirectory: false)
-        testsDirectory.deleteLastPathComponent()
+	static func load(fileName: String) throws -> Data {
+		var testsDirectory = URL(fileURLWithPath: #file, isDirectory: false)
+		testsDirectory.deleteLastPathComponent()
 
-        guard let filePath = URL(string: fileName, relativeTo: testsDirectory) else {
-            throw FixtureError.invalidPath
-        }
+		guard let filePath = URL(string: fileName, relativeTo: testsDirectory) else {
+			throw FixtureError.invalidPath
+		}
 
-        guard let jsonData = try? Data(contentsOf: filePath) else {
-            throw FixtureError.invalidData
-        }
+		guard let jsonData = try? Data(contentsOf: filePath) else {
+			throw FixtureError.invalidData
+		}
 
-        return jsonData
-    }
+		return jsonData
+	}
 }

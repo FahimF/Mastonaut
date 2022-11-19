@@ -20,23 +20,21 @@
 import Cocoa
 import CoreTootin
 
-class AccountTableCellView: NSTableCellView
-{
-	@IBOutlet weak var avatarView: NSImageView!
-	@IBOutlet weak var nameLabel: NSTextField!
-	@IBOutlet weak var accountLabel: NSTextField!
-	@IBOutlet weak var instanceLabel: NSTextField!
-	@IBOutlet weak var shortcutLabel: NSTextField!
-	@IBOutlet weak var issueIndicatorImageView: NSImageView!
+class AccountTableCellView: NSTableCellView {
+	@IBOutlet var avatarView: NSImageView!
+	@IBOutlet var nameLabel: NSTextField!
+	@IBOutlet var accountLabel: NSTextField!
+	@IBOutlet var instanceLabel: NSTextField!
+	@IBOutlet var shortcutLabel: NSTextField!
+	@IBOutlet var issueIndicatorImageView: NSImageView!
 
 	private static let nameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold)
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
 	]
 
-	private(set) var displayedAccountUUID: UUID? = nil
+	private(set) var displayedAccountUUID: UUID?
 
-	func setUp(with account: AuthorizedAccount, index: Int)
-	{
+	func setUp(with account: AuthorizedAccount, index: Int) {
 		guard account.isFault == false else { return }
 
 		displayedAccountUUID = account.uuid
@@ -48,8 +46,7 @@ class AccountTableCellView: NSTableCellView
 		issueIndicatorImageView.isHidden = !account.needsAuthorization
 	}
 
-	func setAvatar(_ image: NSImage)
-	{
+	func setAvatar(_ image: NSImage) {
 		avatarView.image = image
 	}
 }

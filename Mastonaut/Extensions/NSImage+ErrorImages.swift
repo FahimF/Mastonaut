@@ -19,12 +19,9 @@
 
 import Foundation
 
-extension NSImage
-{
-	static var previewErrorImage: NSImage?
-	{
-		guard let imagePath = Bundle.main.path(forResource: "error_preview", ofType: "pdf") else
-		{
+extension NSImage {
+	static var previewErrorImage: NSImage? {
+		guard let imagePath = Bundle.main.path(forResource: "error_preview", ofType: "pdf") else {
 			return nil
 		}
 

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -504,10 +504,6 @@
 		15FD4C34223870B000D699EF /* TransientWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FD4C32223870B000D699EF /* TransientWindow.swift */; };
 		5512395A291847DB0026C1D5 /* AuthorizedAccount+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55123959291847DB0026C1D5 /* AuthorizedAccount+Image.swift */; };
 		C98AE162223D7FB700A8DD22 /* AvatarImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98AE161223D7FB700A8DD22 /* AvatarImageCache.swift */; };
-		DD3DA52A2928E10E00AA0ABA /* SSLClientCertificate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA3F42928E10E00AA0ABA /* SSLClientCertificate.swift */; };
-		DD3DA52B2928E10E00AA0ABA /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA3F52928E10E00AA0ABA /* Compression.swift */; };
-		DD3DA52C2928E10E00AA0ABA /* SSLSecurity.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA3F62928E10E00AA0ABA /* SSLSecurity.swift */; };
-		DD3DA52D2928E10E00AA0ABA /* WebSocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA3F72928E10E00AA0ABA /* WebSocket.swift */; };
 		DD3DA53F2928E10E00AA0ABA /* SVGTextElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA42B2928E10E00AA0ABA /* SVGTextElement.m */; };
 		DD3DA5402928E10E00AA0ABA /* SVGPolygonElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA42E2928E10E00AA0ABA /* SVGPolygonElement.m */; };
 		DD3DA5412928E10E00AA0ABA /* SVGGradientStop.m in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA42F2928E10E00AA0ABA /* SVGGradientStop.m */; };
@@ -687,6 +683,8 @@
 		DD3DA7D32929022F00AA0ABA /* Statuses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA6502928ED7D00AA0ABA /* Statuses.swift */; };
 		DD3DA7D42929023800AA0ABA /* PaginationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA61B2928ED7D00AA0ABA /* PaginationItem.swift */; };
 		DD3DA7D829290D0E00AA0ABA /* Mastonaut-acknowledgements.plist in Resources */ = {isa = PBXBuildFile; fileRef = DD3DA7D729290D0E00AA0ABA /* Mastonaut-acknowledgements.plist */; };
+		DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DA29291C0E00AA0ABA /* Starscream */; };
+		DD3DA7DD29291C9700AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DC29291C9700AA0ABA /* Starscream */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1108,10 +1106,6 @@
 		55123959291847DB0026C1D5 /* AuthorizedAccount+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthorizedAccount+Image.swift"; sourceTree = "<group>"; };
 		C98AE161223D7FB700A8DD22 /* AvatarImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarImageCache.swift; sourceTree = "<group>"; };
 		D0D2DCB52811AC15559D8AE9 /* Pods_Mastonaut__Mock_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Mastonaut__Mock_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DD3DA3F42928E10E00AA0ABA /* SSLClientCertificate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLClientCertificate.swift; sourceTree = "<group>"; };
-		DD3DA3F52928E10E00AA0ABA /* Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
-		DD3DA3F62928E10E00AA0ABA /* SSLSecurity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLSecurity.swift; sourceTree = "<group>"; };
-		DD3DA3F72928E10E00AA0ABA /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
 		DD3DA4292928E10E00AA0ABA /* ConverterSVGToCALayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConverterSVGToCALayer.h; sourceTree = "<group>"; };
 		DD3DA42A2928E10E00AA0ABA /* SVGRectElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVGRectElement.h; sourceTree = "<group>"; };
 		DD3DA42B2928E10E00AA0ABA /* SVGTextElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVGTextElement.m; sourceTree = "<group>"; };
@@ -1433,6 +1427,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD3DA7DD29291C9700AA0ABA /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1457,6 +1452,7 @@
 				1596DB46235F65D300B349B7 /* DirectoryService.framework in Frameworks */,
 				15765563229692C200783FFE /* AVKit.framework in Frameworks */,
 				154478A6232B0223009C71D4 /* CoreTootin.framework in Frameworks */,
+				DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1670,7 +1666,6 @@
 			isa = PBXGroup;
 			children = (
 				DD3DA5AC2928ED7D00AA0ABA /* MastodonKit */,
-				DD3DA3EF2928E10E00AA0ABA /* Starscream */,
 				DD3DA4242928E10E00AA0ABA /* SVGKit */,
 			);
 			name = Dependencies;
@@ -2212,34 +2207,6 @@
 				4BCC49A8ECAB04865B510BFF /* Pods_QuickToot.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		DD3DA3EF2928E10E00AA0ABA /* Starscream */ = {
-			isa = PBXGroup;
-			children = (
-				DD3DA3F22928E10E00AA0ABA /* Sources */,
-			);
-			name = Starscream;
-			path = Dependencies/Starscream;
-			sourceTree = "<group>";
-		};
-		DD3DA3F22928E10E00AA0ABA /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				DD3DA3F32928E10E00AA0ABA /* Starscream */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		DD3DA3F32928E10E00AA0ABA /* Starscream */ = {
-			isa = PBXGroup;
-			children = (
-				DD3DA3F42928E10E00AA0ABA /* SSLClientCertificate.swift */,
-				DD3DA3F52928E10E00AA0ABA /* Compression.swift */,
-				DD3DA3F62928E10E00AA0ABA /* SSLSecurity.swift */,
-				DD3DA3F72928E10E00AA0ABA /* WebSocket.swift */,
-			);
-			path = Starscream;
 			sourceTree = "<group>";
 		};
 		DD3DA4242928E10E00AA0ABA /* SVGKit */ = {
@@ -2787,6 +2754,9 @@
 				156F7A5F23FB3E720061ABFB /* PBXTargetDependency */,
 			);
 			name = "Mastonaut (Mock)";
+			packageProductDependencies = (
+				DD3DA7DC29291C9700AA0ABA /* Starscream */,
+			);
 			productName = Sengi;
 			productReference = 1523C71221E94C7F006DE234 /* Mastonaut.app */;
 			productType = "com.apple.product-type.application";
@@ -2846,6 +2816,7 @@
 			);
 			name = Mastonaut;
 			packageProductDependencies = (
+				DD3DA7DA29291C0E00AA0ABA /* Starscream */,
 			);
 			productName = Sengi;
 			productReference = 15C4DD0C21D41EC0002AF6DA /* Mastonaut.app */;
@@ -2922,6 +2893,7 @@
 			);
 			mainGroup = 15C4DD0321D41EC0002AF6DA;
 			packageReferences = (
+				DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = 15C4DD0D21D41EC0002AF6DA /* Products */;
 			projectDirPath = "";
@@ -3456,7 +3428,6 @@
 				157D78C12284D27300DAE4A4 /* StatusListViewController.swift in Sources */,
 				DD3DA54E2928E10E00AA0ABA /* BaseClassForAllSVGBasicShapes.m in Sources */,
 				1573888E25018C5E00DE40F9 /* Selectable.swift in Sources */,
-				DD3DA52A2928E10E00AA0ABA /* SSLClientCertificate.swift in Sources */,
 				150B1EE0227E33C30048EA22 /* NSView+EmojiSubviews.m in Sources */,
 				151199CB22BFCF05007F2AEB /* ComposerPollViewController.swift in Sources */,
 				1572C55C22A2038100FAA77F /* StringCapableTextAttachment.swift in Sources */,
@@ -3471,7 +3442,6 @@
 				DD3DA56E2928E10E00AA0ABA /* CSSStyleRule.m in Sources */,
 				DD3DA5532928E10E00AA0ABA /* SVGPathElement.m in Sources */,
 				DD3DA5772928E10E00AA0ABA /* SVGHelperUtilities.m in Sources */,
-				DD3DA52D2928E10E00AA0ABA /* WebSocket.swift in Sources */,
 				DD3DA5A32928E10F00AA0ABA /* SVGKSourceURL.m in Sources */,
 				15E7451E2236FDF5009A1252 /* WelcomePlaceholderController.swift in Sources */,
 				DD3DA55F2928E10E00AA0ABA /* StyleSheet.m in Sources */,
@@ -3588,7 +3558,6 @@
 				15B981B6234FE549008391F8 /* FavoritesViewController.swift in Sources */,
 				DD3DA54B2928E10E00AA0ABA /* SVGRectElement.m in Sources */,
 				1538FB3622188978006B5F78 /* ViewingPreferencesController.swift in Sources */,
-				DD3DA52C2928E10E00AA0ABA /* SSLSecurity.swift in Sources */,
 				15EE539D22C95854001BEA58 /* SearchResultsPresenter.swift in Sources */,
 				1538FB22221777EE006B5F78 /* CoverView.swift in Sources */,
 				15BC41522262145A00C2A150 /* RichTextCapable.swift in Sources */,
@@ -3665,7 +3634,6 @@
 				158B998421FBBBB30046C8D6 /* NSView+SubviewSearch.m in Sources */,
 				DD3DA58C2928E10F00AA0ABA /* SVGKParserPatternsAndGradients.m in Sources */,
 				159439352299A78700E47DBB /* ISUMultiplierNumberFormatter.swift in Sources */,
-				DD3DA52B2928E10E00AA0ABA /* Compression.swift in Sources */,
 				15F1D24B21F2999500B01F35 /* AnimatableEmojiCell.swift in Sources */,
 				15DDC05A24B0E3D900F6F1EE /* NoInsetsTableView.swift in Sources */,
 				DD3DA57D2928E10E00AA0ABA /* SVGAngle.m in Sources */,
@@ -4470,6 +4438,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DD3DA7DA29291C0E00AA0ABA /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+		DD3DA7DC29291C9700AA0ABA /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		152DA63421E1B3140065CC1B /* Mastonaut.xcdatamodeld */ = {

@@ -19,20 +19,16 @@
 
 import Foundation
 
-extension NSDraggingInfo
-{
-	var firstDraggedFileURL: URL?
-	{
+extension NSDraggingInfo {
+	var firstDraggedFileURL: URL? {
 		return draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])?.first as? URL
 	}
 
-	var draggedFileUrls: [URL]?
-	{
+	var draggedFileUrls: [URL]? {
 		return draggingPasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL]
 	}
 
-	var draggedImages: [NSImage]?
-	{
+	var draggedImages: [NSImage]? {
 		return draggingPasteboard.readObjects(forClasses: [NSImage.self], options: [:]) as? [NSImage]
 	}
 }

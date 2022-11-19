@@ -17,13 +17,12 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import AVFoundation
+import Foundation
 
 let kUTTypeHEIC = "public.heic" as CFString
 
-public class AttachmentUploader
-{
+public class AttachmentUploader {
 	public typealias ConvertedDataProvider = () throws -> Data
 
 	public static let supportedImageTypes = [kUTTypeJPEG, kUTTypePNG, kUTTypeJPEG2000, kUTTypeHEIC, kUTTypeGIF, kUTTypeTIFF]
@@ -34,7 +33,7 @@ public class AttachmentUploader
 	public static let imageTypeConversionMap: [CFString: CFString] = [
 		kUTTypeJPEG2000: kUTTypeJPEG,
 		kUTTypeHEIC: kUTTypeJPEG,
-		kUTTypeTIFF: kUTTypeJPEG
+		kUTTypeTIFF: kUTTypeJPEG,
 	]
 
 	private var activeUploadFutures: [Upload: FutureTask] = [:]
@@ -42,41 +41,34 @@ public class AttachmentUploader
 	private var pendingUploadDescriptionUpdates: [Upload: String?] = [:]
 
 	public private(set) lazy var imageRestrainer = ImageRestrainer(typeConversionMap: AttachmentUploader.imageTypeConversionMap,
-																   maximumImageSize: AttachmentUploader.maxAttachmentImageSize)
+	                                                               maximumImageSize: AttachmentUploader.maxAttachmentImageSize)
 
-	public weak var delegate: AttachmentUploaderDelegate? = nil
+	public weak var delegate: AttachmentUploaderDelegate?
 
-	public var hasActiveTasks: Bool
-	{
+	public var hasActiveTasks: Bool {
 		return activeUploadFutures.count > 0 || activeDescriptionUpdateFutures.count > 0
 	}
 
-	public init(delegate: AttachmentUploaderDelegate? = nil)
-	{
+	public init(delegate: AttachmentUploaderDelegate? = nil) {
 		self.delegate = delegate
 	}
 
-	public func startUploading(uploads: [Upload], for client: ClientType)
-	{
-		uploads.forEach({ prepareData(upload: $0, for: client) })
+	public func startUploading(uploads: [Upload], for client: ClientType) {
+		uploads.forEach { prepareData(upload: $0, for: client) }
 	}
 
-	public func cancel(upload: Upload)
-	{
+	public func cancel(upload: Upload) {
 		activeUploadFutures[upload]?.task?.cancel()
 		activeUploadFutures[upload] = nil
 	}
 
-	public func uploadProgress(for upload: Upload) -> Double?
-	{
+	public func uploadProgress(for upload: Upload) -> Double? {
 		guard let task = activeUploadFutures[upload]?.task else { return nil }
 		return task.progress.fractionCompleted
 	}
 
-	public func set(description: String?, of upload: Upload, for client: ClientType)
-	{
-		guard let attachment = upload.attachment, activeDescriptionUpdateFutures[upload] == nil else
-		{
+	public func set(description: String?, of upload: Upload, for client: ClientType) {
+		guard let attachment = upload.attachment, activeDescriptionUpdateFutures[upload] == nil else {
 			pendingUploadDescriptionUpdates[upload] = description
 			return
 		}
@@ -84,128 +76,111 @@ public class AttachmentUploader
 		let previousDescription = attachment.description
 
 		let task = (client.run(Media.update(id: attachment.id, description: description), resumeImmediately: true)
-		{
-			[weak self] result in
-
-			guard let self = self else { return }
-
-			self.activeDescriptionUpdateFutures.removeValue(forKey: upload)
-			self.dispatchPendingDescriptionUpdate(of: upload, for: client)
-
-			switch result
 			{
-			case .success(let attachment, _):
-				upload.set(attachment: attachment)
-				self.delegate?.attachmentUploader(self, updatedDescription: attachment.description, for: upload)
+				[weak self] result in
 
-			case .failure(let error):
-				#if DEBUG
-				NSLog("Failed updating description: \(error)")
-				#endif
-				self.delegate?.attachmentUploader(self,
-												  failedUpdatingDescriptionFor: upload,
-												  previousValue: previousDescription)
-			}
-		})
+				guard let self = self else { return }
+
+				self.activeDescriptionUpdateFutures.removeValue(forKey: upload)
+				self.dispatchPendingDescriptionUpdate(of: upload, for: client)
+
+				switch result {
+				case let .success(attachment, _):
+					upload.set(attachment: attachment)
+					self.delegate?.attachmentUploader(self, updatedDescription: attachment.description, for: upload)
+
+				case let .failure(error):
+					#if DEBUG
+						NSLog("Failed updating description: \(error)")
+					#endif
+					self.delegate?.attachmentUploader(self,
+					                                  failedUpdatingDescriptionFor: upload,
+					                                  previousValue: previousDescription)
+				}
+			})
 
 		activeDescriptionUpdateFutures[upload] = task
 	}
 
-	public func isPendingCompletion(forSettingDescriptionOf upload: Upload) -> Bool
-	{
+	public func isPendingCompletion(forSettingDescriptionOf upload: Upload) -> Bool {
 		return pendingUploadDescriptionUpdates[upload] != nil
 	}
 
-	private func dispatchPendingDescriptionUpdate(of upload: Upload, for client: ClientType)
-	{
-		if let pendingDescription = pendingUploadDescriptionUpdates[upload]
-		{
+	private func dispatchPendingDescriptionUpdate(of upload: Upload, for client: ClientType) {
+		if let pendingDescription = pendingUploadDescriptionUpdates[upload] {
 			pendingUploadDescriptionUpdates.removeValue(forKey: upload)
 			set(description: pendingDescription, of: upload, for: client)
 		}
 	}
 
-	private func cancelPendingDescriptionUpdate(of upload: Upload)
-	{
-		if pendingUploadDescriptionUpdates[upload] != nil
-		{
+	private func cancelPendingDescriptionUpdate(of upload: Upload) {
+		if pendingUploadDescriptionUpdates[upload] != nil {
 			pendingUploadDescriptionUpdates.removeValue(forKey: upload)
 			delegate?.attachmentUploader(self, failedUpdatingDescriptionFor: upload, previousValue: nil)
 		}
 	}
 
-	private func prepareData(upload: Upload, for client: ClientType)
-	{
-		DispatchQueue.global(qos: .userInitiated).async
-			{
-				[weak self] in
+	private func prepareData(upload: Upload, for client: ClientType) {
+		DispatchQueue.global(qos: .userInitiated).async {
+			[weak self] in
 
-				guard let self = self else { return }
+			guard let self = self else { return }
 
-				guard upload.needsUploading else
-				{
-					self.delegate?.attachmentUploader(self, finishedUploading: upload)
-					self.dispatchPendingDescriptionUpdate(of: upload, for: client)
-					return
+			guard upload.needsUploading else {
+				self.delegate?.attachmentUploader(self, finishedUploading: upload)
+				self.dispatchPendingDescriptionUpdate(of: upload, for: client)
+				return
+			}
+
+			let data: Data
+
+			do { data = try upload.data() } catch {
+				DispatchQueue.main.async {
+					[weak self] in
+
+					guard let self = self else { return }
+
+					self.delegate?.attachmentUploader(self, produced: UploadError.encodeError(error), for: upload)
+					self.cancelPendingDescriptionUpdate(of: upload)
 				}
+				return
+			}
 
-				let data: Data
-
-				do { data = try upload.data() } catch
-				{
-					DispatchQueue.main.async
-					{
-						[weak self] in
-
-						guard let self = self else { return }
-
-						self.delegate?.attachmentUploader(self, produced: UploadError.encodeError(error), for: upload)
-						self.cancelPendingDescriptionUpdate(of: upload)
-					}
-					return
-				}
-
-				DispatchQueue.main.async
-					{
-						[weak self] in self?.dispatch(for: upload, data: data, client: client)
-					}
+			DispatchQueue.main.async {
+				[weak self] in self?.dispatch(for: upload, data: data, client: client)
+			}
 		}
 	}
 
-	private func dispatch(for upload: Upload, data: Data, client: ClientType)
-	{
+	private func dispatch(for upload: Upload, data: Data, client: ClientType) {
 		let observationPromise = Promise<NSKeyValueObservation>()
 		let media = MediaAttachment.other(data, fileExtension: upload.fileExtension, mimeType: upload.mimeType)
 
-		guard let future = (client.run(Media.upload(media: media), resumeImmediately: false)
-		{
+		guard let future = (client.run(Media.upload(media: media), resumeImmediately: false) {
 			[weak self, observationPromise] result in
 
 			observationPromise.value = nil
 
-			DispatchQueue.main.async
-			{
+			DispatchQueue.main.async {
 				[weak self] in
 
 				guard let self = self else { return }
 
 				self.activeUploadFutures.removeValue(forKey: upload)
 
-				switch result
-				{
-				case .success(let attachment, _):
+				switch result {
+				case let .success(attachment, _):
 					upload.set(attachment: attachment)
 					self.delegate?.attachmentUploader(self, finishedUploading: upload)
 					self.dispatchPendingDescriptionUpdate(of: upload, for: client)
 
-				case .failure(let error):
+				case let .failure(error):
 					self.delegate?.attachmentUploader(self, produced: UploadError.serverError(error), for: upload)
 					self.cancelPendingDescriptionUpdate(of: upload)
 				}
 			}
 		})
-		else
-		{
+		else {
 			return
 		}
 
@@ -213,9 +188,8 @@ public class AttachmentUploader
 
 		future.resolutionHandler = { task in
 
-			observationPromise.value = task.observe(\URLSessionDataTask.countOfBytesSent)
-			{
-				[weak self] (task, _) in
+			observationPromise.value = task.observe(\URLSessionDataTask.countOfBytesSent) {
+				[weak self] task, _ in
 
 				guard let self = self else { return }
 
@@ -227,8 +201,7 @@ public class AttachmentUploader
 		}
 	}
 
-	public enum UploadError: Error
-	{
+	public enum UploadError: Error {
 		case noKnownMimeForUTI
 		case failedEncodingResizedImage
 		case encodeError(Error)
@@ -236,8 +209,7 @@ public class AttachmentUploader
 	}
 }
 
-public protocol AttachmentUploaderDelegate: AnyObject
-{
+public protocol AttachmentUploaderDelegate: AnyObject {
 	func attachmentUploader(_: AttachmentUploader, finishedUploading upload: Upload)
 	func attachmentUploader(_: AttachmentUploader, updatedProgress progress: Double, for upload: Upload)
 

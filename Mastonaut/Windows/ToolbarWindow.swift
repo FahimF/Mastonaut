@@ -19,19 +19,14 @@
 
 import Cocoa
 
-class ToolbarWindow: NSWindow
-{
-	lazy var titlebarContainerView: NSView? =
-		{
-			contentView?.superview?.findTitlebarContainerView()
-				// If we're on full screen, then the titlebar actually lives in a separate NSWindow
-				?? standardWindowButton(.closeButton)?.window?.contentView?.findTitlebarContainerView()
-		}()
+class ToolbarWindow: NSWindow {
+	lazy var titlebarContainerView: NSView? = {
+		contentView?.superview?.findTitlebarContainerView()
+			// If we're on full screen, then the titlebar actually lives in a separate NSWindow
+			?? standardWindowButton(.closeButton)?.window?.contentView?.findTitlebarContainerView()
+	}()
 
-	lazy var toolbarView: NSView? =
-		{
-			titlebarContainerView?.findSubview(withClassName: "NSToolbarView")
-		}()
+	lazy var toolbarView: NSView? = titlebarContainerView?.findSubview(withClassName: "NSToolbarView")
 
 	override func toggleToolbarShown(_ sender: Any?) {
 		super.toggleToolbarShown(sender)
@@ -39,16 +34,13 @@ class ToolbarWindow: NSWindow
 	}
 }
 
-private extension NSView
-{
-	func findTitlebarContainerView() -> NSView?
-	{
+private extension NSView {
+	func findTitlebarContainerView() -> NSView? {
 		return findSubview(withClassName: "NSTitlebarContainerView", recursive: false)
 	}
 }
 
 protocol ToolbarWindowController {
-
 	/// Called when the toolbar is toggled between being shown or not
 	/// - Parameter window: The sender window
 	func didToggleToolbarShown(_ window: ToolbarWindow)

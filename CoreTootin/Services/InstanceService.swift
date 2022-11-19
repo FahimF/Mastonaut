@@ -19,8 +19,7 @@
 
 import Foundation
 
-public class InstanceService
-{
+public class InstanceService {
 	private let urlSession: URLSession
 	private let accountsObservation: NSKeyValueObservation
 	private unowned let keychainController: KeychainController
@@ -29,8 +28,8 @@ public class InstanceService
 	private var instancesMap: [UUID: Instance] = [:]
 
 	public init(urlSessionConfiguration: URLSessionConfiguration,
-				keychainController: KeychainController,
-				accountsService: AccountsService)
+	            keychainController: KeychainController,
+	            accountsService: AccountsService)
 	{
 		urlSession = URLSession(configuration: urlSessionConfiguration)
 		self.keychainController = keychainController
@@ -38,22 +37,17 @@ public class InstanceService
 
 		let promise = WeakPromise<InstanceService>()
 
-		accountsObservation = accountsService.observe(\.authorizedAccountsCount, options: [.initial])
-			{
-				(accountsService, _) in promise.value?.updateInstances(for: accountsService.authorizedAccounts)
-			}
+		accountsObservation = accountsService.observe(\.authorizedAccountsCount, options: [.initial]) {
+			accountsService, _ in promise.value?.updateInstances(for: accountsService.authorizedAccounts)
+		}
 
 		promise.value = self
 	}
 
-	public func instance(for account: AuthorizedAccount, completion: @escaping (Instance?) -> Void)
-	{
-		if let instance = instancesMap[account.uuid]
-		{
+	public func instance(for account: AuthorizedAccount, completion: @escaping (Instance?) -> Void) {
+		if let instance = instancesMap[account.uuid] {
 			completion(instance)
-		}
-		else
-		{
+		} else {
 			fetchInstance(for: account, completion: completion)
 		}
 	}
@@ -64,38 +58,33 @@ public class InstanceService
 
 		guard
 			let client = Client.create(for: account,
-									   keychainController: keychainController,
-									   reauthAgent: reauthAgent,
-									   urlSession: urlSession)
-		else
-		{
+			                           keychainController: keychainController,
+			                           reauthAgent: reauthAgent,
+			                           urlSession: urlSession)
+		else {
 			completion?(nil)
 			return
 		}
 
-		client.run(Instances.current())
-			{
-				[weak self] result in
+		client.run(Instances.current()) {
+			[weak self] result in
 
-				switch result
-				{
-				case .success(let instance, _):
-					self?.instancesMap[account.uuid] = instance
-					completion?(instance)
+			switch result {
+			case let .success(instance, _):
+				self?.instancesMap[account.uuid] = instance
+				completion?(instance)
 
-				case .failure(let error):
-					completion?(nil)
-					#if DEBUG
+			case let .failure(error):
+				completion?(nil)
+				#if DEBUG
 					NSLog("Failed fetching instance: \(error)")
-					#endif
-				}
+				#endif
 			}
+		}
 	}
 
-	private func updateInstances(for accounts: [AuthorizedAccount])
-	{
-		for account in accounts
-		{
+	private func updateInstances(for accounts: [AuthorizedAccount]) {
+		for account in accounts {
 			fetchInstance(for: account)
 		}
 	}

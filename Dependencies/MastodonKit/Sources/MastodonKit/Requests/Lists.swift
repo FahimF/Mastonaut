@@ -10,80 +10,80 @@ import Foundation
 
 /// `Lists` requests.
 public enum Lists {
-    /// Retrieves lists.
-    ///
-    /// - Returns: Request for `[List]`.
-    public static func all() -> Request<[List]> {
-        return Request<[List]>(path: "/api/v1/lists")
-    }
+	/// Retrieves lists.
+	///
+	/// - Returns: Request for `[List]`.
+	public static func all() -> Request<[List]> {
+		return Request<[List]>(path: "/api/v1/lists")
+	}
 
-    /// Retrieves accounts in a list.
-    ///
-    /// - Parameter id: The list ID.
-    /// - Returns: Request for `[Account]`.
-    public static func accounts(id: String) -> Request<[Account]> {
-        return Request<[Account]>(path: "/api/v1/lists/\(id)/accounts")
-    }
+	/// Retrieves accounts in a list.
+	///
+	/// - Parameter id: The list ID.
+	/// - Returns: Request for `[Account]`.
+	public static func accounts(id: String) -> Request<[Account]> {
+		return Request<[Account]>(path: "/api/v1/lists/\(id)/accounts")
+	}
 
-    /// Retrieves a list.
-    ///
-    /// - Parameter id: The list ID.
-    /// - Returns: Request for `List`.
-    public static func list(id: String) -> Request<List> {
-        return Request<List>(path: "/api/v1/lists/\(id)")
-    }
+	/// Retrieves a list.
+	///
+	/// - Parameter id: The list ID.
+	/// - Returns: Request for `List`.
+	public static func list(id: String) -> Request<List> {
+		return Request<List>(path: "/api/v1/lists/\(id)")
+	}
 
-    /// Creates a list.
-    ///
-    /// - Parameter title: The title of the list.
-    /// - Returns: Request for `List`.
-    public static func create(title: String) -> Request<List> {
-        let method = HTTPMethod.post(.json(encoding: ["title": title]))
+	/// Creates a list.
+	///
+	/// - Parameter title: The title of the list.
+	/// - Returns: Request for `List`.
+	public static func create(title: String) -> Request<List> {
+		let method = HTTPMethod.post(.json(encoding: ["title": title]))
 
-        return Request<List>(path: "/api/v1/lists", method: method)
-    }
+		return Request<List>(path: "/api/v1/lists", method: method)
+	}
 
-    /// Updates the list title.
-    ///
-    /// - Parameters:
-    ///   - id: The list ID.
-    ///   - title: The title of the list.
-    /// - Returns: Request for `List`.
-    public static func update(id: String, title: String) -> Request<List> {
-        let method = HTTPMethod.put(.json(encoding: ["title": title]))
+	/// Updates the list title.
+	///
+	/// - Parameters:
+	///   - id: The list ID.
+	///   - title: The title of the list.
+	/// - Returns: Request for `List`.
+	public static func update(id: String, title: String) -> Request<List> {
+		let method = HTTPMethod.put(.json(encoding: ["title": title]))
 
-        return Request<List>(path: "/api/v1/lists/\(id)", method: method)
-    }
+		return Request<List>(path: "/api/v1/lists/\(id)", method: method)
+	}
 
-    /// Deletes a list.
-    ///
-    /// - Parameter id: The list ID.
-    /// - Returns: Request for `Empty`.
-    public static func delete(id: String) -> Request<Empty> {
-        return Request<Empty>(path: "/api/v1/lists/\(id)", method: .delete(.empty))
-    }
+	/// Deletes a list.
+	///
+	/// - Parameter id: The list ID.
+	/// - Returns: Request for `Empty`.
+	public static func delete(id: String) -> Request<Empty> {
+		return Request<Empty>(path: "/api/v1/lists/\(id)", method: .delete(.empty))
+	}
 
-    /// Adds accounts to a list.
-    ///
-    /// - Parameters:
-    ///   - accountIDs: The account IDs to be added to the list.
-    ///   - id: The list ID>
-    /// - Returns: Request for `Empty`.
-    public static func add(accountIDs: [String], toList id: String) -> Request<Empty> {
-        let method = HTTPMethod.post(.json(encoding: ["account_ids": accountIDs]))
+	/// Adds accounts to a list.
+	///
+	/// - Parameters:
+	///   - accountIDs: The account IDs to be added to the list.
+	///   - id: The list ID>
+	/// - Returns: Request for `Empty`.
+	public static func add(accountIDs: [String], toList id: String) -> Request<Empty> {
+		let method = HTTPMethod.post(.json(encoding: ["account_ids": accountIDs]))
 
-        return Request<Empty>(path: "/api/v1/lists/\(id)/accounts", method: method)
-    }
+		return Request<Empty>(path: "/api/v1/lists/\(id)/accounts", method: method)
+	}
 
-    /// Removes accounts from a list.
-    ///
-    /// - Parameters:
-    ///   - accountIDs: The account IDs to be removed from the list.
-    ///   - id: The list ID>
-    /// - Returns: Request for `Empty`.
-    public static func remove(accountIDs: [String], fromList id: String) -> Request<Empty> {
-        let method = HTTPMethod.delete(.json(encoding: ["account_ids": accountIDs]))
+	/// Removes accounts from a list.
+	///
+	/// - Parameters:
+	///   - accountIDs: The account IDs to be removed from the list.
+	///   - id: The list ID>
+	/// - Returns: Request for `Empty`.
+	public static func remove(accountIDs: [String], fromList id: String) -> Request<Empty> {
+		let method = HTTPMethod.delete(.json(encoding: ["account_ids": accountIDs]))
 
-        return Request<Empty>(path: "/api/v1/lists/\(id)/accounts", method: method)
-    }
+		return Request<Empty>(path: "/api/v1/lists/\(id)/accounts", method: method)
+	}
 }

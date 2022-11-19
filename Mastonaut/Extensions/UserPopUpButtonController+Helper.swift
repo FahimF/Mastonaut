@@ -17,32 +17,29 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-extension UserPopUpButtonSubcontroller
-{
-	convenience init(display: UserPopUpButtonDisplaying)
-	{
+extension UserPopUpButtonSubcontroller {
+	convenience init(display: UserPopUpButtonDisplaying) {
 		self.init(display: display,
-				  accountsService: AppDelegate.shared.accountsService,
-				  itemsFactory: ItemsFactoryShim())
+		          accountsService: AppDelegate.shared.accountsService,
+		          itemsFactory: ItemsFactoryShim())
 	}
 }
 
-private struct ItemsFactoryShim: AccountMenuItemFactory
-{
+private struct ItemsFactoryShim: AccountMenuItemFactory {
 	func makeMenuItems(accounts: [AuthorizedAccount],
-					   currentUser: UUID?,
-					   action: Selector,
-					   target: AnyObject,
-					   emojiContainer: NSView?,
-					   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
+	                   currentUser: UUID?,
+	                   action: Selector,
+	                   target: AnyObject,
+	                   emojiContainer: NSView?,
+	                   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
 	{
 		return accounts.makeMenuItems(currentUser: currentUser,
-									  action: action,
-									  target: target,
-									  emojiContainer: emojiContainer,
-									  setKeyEquivalents: setKeyEquivalents)
+		                              action: action,
+		                              target: target,
+		                              emojiContainer: emojiContainer,
+		                              setKeyEquivalents: setKeyEquivalents)
 	}
 }

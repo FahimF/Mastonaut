@@ -19,10 +19,8 @@
 
 import Foundation
 
-extension IndexPath
-{
-	static func set(items: [Int], section: Int = 0) -> Set<IndexPath>
-	{
-		return Set(items.map({ IndexPath(item: $0, section: section) }))
+extension IndexPath {
+	static func set(items: [Int], section: Int = 0) -> Set<IndexPath> {
+		return Set(items.map { IndexPath(item: $0, section: section) })
 	}
 }

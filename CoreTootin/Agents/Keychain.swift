@@ -19,8 +19,7 @@
 
 import Foundation
 
-public class Keychain
-{
+public class Keychain {
 	static let appGroup = Bundle.main.object(forInfoDictionaryKey: "MTNAppGroupIdentifier") as! String
 
 	public private(set) lazy var keychainController: KeychainController = {

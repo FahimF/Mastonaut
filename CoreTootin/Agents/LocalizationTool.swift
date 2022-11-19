@@ -19,8 +19,7 @@
 
 import Foundation
 
-public func 🔠(_ key: String, _ parameters: Any...) -> String
-{
+public func 🔠(_ key: String, _ parameters: Any...) -> String {
 	let formatString = Bundle(for: Persistence.self).localizedString(forKey: key, value: nil, table: nil)
-	return String(format: formatString, arguments: parameters.map({ "\($0)" }))
+	return String(format: formatString, arguments: parameters.map { "\($0)" })
 }

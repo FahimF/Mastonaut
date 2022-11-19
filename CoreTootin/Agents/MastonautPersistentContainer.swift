@@ -17,19 +17,17 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-class MastonautPersistentContainer: NSPersistentContainer
-{
+class MastonautPersistentContainer: NSPersistentContainer {
 	static let appGroup = Bundle.main.object(forInfoDictionaryKey: "MTNAppGroupIdentifier") as! String
 
 	override open class func defaultDirectoryURL() -> URL {
 		let storeURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)!
 		let directoryURL = storeURL.appendingPathComponent("Mastonaut", isDirectory: true)
 
-		if FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: nil) == false
-		{
+		if FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: nil) == false {
 			try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
 		}
 

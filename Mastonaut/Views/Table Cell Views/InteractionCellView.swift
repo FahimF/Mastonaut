@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class InteractionCellView: MastonautTableCellView, NotificationDisplaying
-{
+class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 	@IBOutlet private unowned var stackView: NSStackView!
 	@IBOutlet private unowned var interactionIcon: NSImageView!
 	@IBOutlet private unowned var interactionLabel: NSButton!
@@ -40,76 +39,71 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 	@IBOutlet private unowned var favoriteButton: NSButton!
 	@IBOutlet private unowned var timeLabel: NSTextField!
 
-	var displayedNotificationId: String? = nil
+	var displayedNotificationId: String?
 
-	private var displayedNotificationType: NotificationType? = nil
-	private var displayedNotificationTags: [Tag]? = nil
-	private var authorAccount: Account? = nil
-	private var agentAccount: Account? = nil
+	private var displayedNotificationType: NotificationType?
+	private var displayedNotificationTags: [Tag]?
+	private var authorAccount: Account?
+	private var agentAccount: Account?
 
 	private var pollViewController: PollViewController?
 
 	/// Notifications can be relative to a status, so we de technically have to comply with StatusDisplaying
-	var displayedStatusId: String? = nil
+	var displayedStatusId: String?
 
-	private unowned var interactionHandler: NotificationInteractionHandling? = nil
+	private unowned var interactionHandler: NotificationInteractionHandling?
 
 	private static let reblogLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.statusReblogged,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium)
+		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
 	]
 
 	private static let favoriteLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.statusFavorited,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium)
+		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
 	]
 
 	private static let interactionLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium)
+		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
 	]
 
 	private static let authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor,
-		.font: NSFont.systemFont(ofSize: 13, weight: .semibold)
+		.font: NSFont.systemFont(ofSize: 13, weight: .semibold),
 	]
 
 	private static let statusLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor,
-		.font: NSFont.labelFont(ofSize: 13)
+		.font: NSFont.labelFont(ofSize: 13),
 	]
 
 	private static let statusLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
 		.font: NSFont.systemFont(ofSize: 13, weight: .medium),
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		timeLabel.formatter = RelativeDateFormatter.shared
 		statusLabel.linkTextAttributes = InteractionCellView.statusLabelLinkAttributes
 	}
-	
-	override var backgroundStyle: NSView.BackgroundStyle
-	{
-		didSet
-		{
-			guard let notificationType = displayedNotificationType else
-			{
+
+	override var backgroundStyle: NSView.BackgroundStyle {
+		didSet {
+			guard let notificationType = displayedNotificationType else {
 				return
 			}
 
 			let emphasized = backgroundStyle == .emphasized
 			statusLabel.isEmphasized = emphasized
 
-			switch notificationType
-			{
+			switch notificationType {
 			case .reblog:
 				interactionIcon.image = emphasized ? #imageLiteral(resourceName: "retooted") : #imageLiteral(resourceName: "retooted_active")
-				
+
 			case .favourite:
 				interactionIcon.image = emphasized ? #imageLiteral(resourceName: "favorited") : #imageLiteral(resourceName: "favorited_active")
 
@@ -119,7 +113,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 			case .follow:
 				// This type of notification is handled by a different notification cell view.
 				break
-				
+
 			case .mention:
 				// This type of notification is handled by adapting a status cell view.
 				break
@@ -128,11 +122,10 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 				// This should have been catch beforereaching the UI level.
 				break
 			}
-			
-			if #available(OSX 10.14, *) {} else
-			{
+
+			if #available(OSX 10.14, *) {} else {
 				statusLabel.isEmphasized = emphasized
-				
+
 				let effectiveColor: NSColor = emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
 				authorAccountLabel.textColor = effectiveColor
 				timeLabel.textColor = effectiveColor
@@ -142,9 +135,9 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 	}
 
 	func set(displayedNotification notification: MastodonNotification,
-			 attachmentPresenter: AttachmentPresenting,
-			 interactionHandler: NotificationInteractionHandling,
-			 activeInstance: Instance)
+	         attachmentPresenter _: AttachmentPresenting,
+	         interactionHandler: NotificationInteractionHandling,
+	         activeInstance: Instance)
 	{
 		displayedNotificationId = notification.id
 		displayedNotificationType = notification.type
@@ -163,8 +156,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		let status = notification.status
 		let messageAttributes: [NSAttributedString.Key: AnyObject]
 
-		switch notification.type
-		{
+		switch notification.type {
 		case .reblog:
 			interactionIcon.image = #imageLiteral(resourceName: "retooted_active")
 			interactionMessage = 🔠("%@ boosted", notification.authorName)
@@ -197,8 +189,8 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		}
 
 		interactionLabel.set(stringValue: interactionMessage,
-							 applyingAttributes: messageAttributes,
-							 applyingEmojis: notification.account.cacheableEmojis)
+		                     applyingAttributes: messageAttributes,
+		                     applyingEmojis: notification.account.cacheableEmojis)
 
 		authorAvatarButton.image = #imageLiteral(resourceName: "missing")
 		agentAvatarButton.image = #imageLiteral(resourceName: "missing")
@@ -206,10 +198,10 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		let localNotificationID = notification.id
 		AppDelegate.shared.avatarImageCache.fetchImage(account: notification.account) { [weak self] result in
 			switch result {
-			case .inCache(let avatarImage):
+			case let .inCache(avatarImage):
 				assert(Thread.isMainThread)
 				self?.agentAvatarButton.image = avatarImage
-			case .loaded(let avatarImage):
+			case let .loaded(avatarImage):
 				self?.applyAgentImageIfNotReused(avatarImage, originatingNotificationID: localNotificationID)
 			case .noImage:
 				self?.applyAgentImageIfNotReused(nil, originatingNotificationID: localNotificationID)
@@ -219,10 +211,10 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		if let account = notification.status?.account {
 			AppDelegate.shared.avatarImageCache.fetchImage(account: account) { [weak self] result in
 				switch result {
-				case .inCache(let avatarImage):
+				case let .inCache(avatarImage):
 					assert(Thread.isMainThread)
 					self?.authorAvatarButton.image = avatarImage
-				case .loaded(let avatarImage):
+				case let .loaded(avatarImage):
 					self?.applyAuthorImageIfNotReused(avatarImage, originatingNotificationID: localNotificationID)
 				case .noImage:
 					self?.applyAuthorImageIfNotReused(nil, originatingNotificationID: localNotificationID)
@@ -231,17 +223,14 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		}
 	}
 
-	func setHasActivePollTask(_ hasTask: Bool)
-	{
+	func setHasActivePollTask(_ hasTask: Bool) {
 		pollViewController?.setHasActiveReloadTask(hasTask)
 	}
 
-	private func applyAgentImageIfNotReused(_ image: NSImage?, originatingNotificationID: String)
-	{
+	private func applyAgentImageIfNotReused(_ image: NSImage?, originatingNotificationID: String) {
 		DispatchQueue.main.async { [weak self] in
 			// Make sure that the notification view hasn't been reused since this fetch was dispatched.
-			guard self?.displayedNotificationId == originatingNotificationID else
-			{
+			guard self?.displayedNotificationId == originatingNotificationID else {
 				return
 			}
 
@@ -249,12 +238,10 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		}
 	}
 
-	private func applyAuthorImageIfNotReused(_ image: NSImage?, originatingNotificationID: String)
-	{
+	private func applyAuthorImageIfNotReused(_ image: NSImage?, originatingNotificationID: String) {
 		DispatchQueue.main.async { [weak self] in
 			// Make sure that the notification view hasn't been reused since this fetch was dispatched.
-			guard self?.displayedNotificationId == originatingNotificationID else
-			{
+			guard self?.displayedNotificationId == originatingNotificationID else {
 				return
 			}
 
@@ -262,55 +249,44 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		}
 	}
 
-	private func set(attachmentCount: Int)
-	{
-		if attachmentCount > 0
-		{
+	private func set(attachmentCount: Int) {
+		if attachmentCount > 0 {
 			attachmentInfoStackView.isHidden = false
 			attachmentIcon.image = #imageLiteral(resourceName: "attachment")
 			attachmentInfoLabel.stringValue = attachmentCount == 1 ? 🔠("one attachment")
-																   : 🔠("%@ attachments", String(attachmentCount))
-		}
-		else
-		{
+				: 🔠("%@ attachments", String(attachmentCount))
+		} else {
 			attachmentInfoStackView.isHidden = true
 		}
 	}
 
-	private func set(authorName: String, account: String, emojis: [CacheableEmoji])
-	{
+	private func set(authorName: String, account: String, emojis: [CacheableEmoji]) {
 		authorNameLabel.set(stringValue: authorName,
-							applyingAttributes: InteractionCellView.authorLabelAttributes,
-							applyingEmojis: emojis)
+		                    applyingAttributes: InteractionCellView.authorLabelAttributes,
+		                    applyingEmojis: emojis)
 
 		authorAccountLabel.stringValue = account
 	}
 
-	private func set(creationTime: Date)
-	{
+	private func set(creationTime: Date) {
 		timeLabel.objectValue = creationTime
 		timeLabel.toolTip = DateFormatter.longDateFormatter.string(from: creationTime)
 	}
 
-	private func set(status: Status?, activeInstance: Instance)
-	{
-		guard let status = status else
-		{
+	private func set(status: Status?, activeInstance: Instance) {
+		guard let status = status else {
 			statusLabel.isHidden = true
 			set(attachmentCount: 0)
 			return
 		}
 
-		if status.spoilerText.isEmpty
-		{
+		if status.spoilerText.isEmpty {
 			contentWarningContainerView.isHidden = true
-		}
-		else
-		{
+		} else {
 			contentWarningContainerView.isHidden = false
 			contentWarningLabel.set(attributedStringValue: status.attributedSpoiler,
-									applyingAttributes: InteractionCellView.statusLabelAttributes,
-									applyingEmojis: status.cacheableEmojis)
+			                        applyingAttributes: InteractionCellView.statusLabelAttributes,
+			                        applyingEmojis: status.cacheableEmojis)
 		}
 
 		let attributedStatusContent = status.fullAttributedContent
@@ -320,26 +296,25 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		} else {
 			statusLabel.isHidden = false
 			statusLabel.set(attributedStringValue: attributedStatusContent,
-							applyingAttributes: InteractionCellView.statusLabelAttributes,
-							applyingEmojis: status.cacheableEmojis)
+			                applyingAttributes: InteractionCellView.statusLabelAttributes,
+			                applyingEmojis: status.cacheableEmojis)
 		}
 
 		reblogButton.isEnabled = status.visibility.allowsReblog
 		reblogButton.toolTip = status.visibility.reblogToolTip(didReblog: status.reblogged == true)
 		reblogButton.image = status.visibility.reblogIcon
 
-		reblogButton.state		= status.reblogged == true ? .on : .off
-		favoriteButton.state	= status.favourited == true ? .on : .off
+		reblogButton.state = status.reblogged == true ? .on : .off
+		favoriteButton.state = status.favourited == true ? .on : .off
 
 		set(authorName: status.authorName,
-			account: status.account.uri(in: activeInstance),
-			emojis: status.account.cacheableEmojis)
+		    account: status.account.uri(in: activeInstance),
+		    emojis: status.account.cacheableEmojis)
 
 		set(attachmentCount: status.mediaAttachments.count)
 		set(creationTime: status.createdAt)
 
-		if let poll = status.poll
-		{
+		if let poll = status.poll {
 			let viewController = PollViewController()
 			viewController.set(poll: poll)
 
@@ -350,14 +325,11 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		}
 	}
 
-	func set(updatedPoll: Poll)
-	{
+	func set(updatedPoll: Poll) {
 		pollViewController?.set(poll: updatedPoll)
 	}
 
-
-	override func prepareForReuse()
-	{
+	override func prepareForReuse() {
 		super.prepareForReuse()
 
 		displayedNotificationId = nil
@@ -375,66 +347,54 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 		pollViewController = nil
 	}
 
-	@IBAction private func interactionButtonClicked(_ sender: NSButton)
-	{
-		guard let interactedNotificationId = displayedNotificationId else
-		{
+	@IBAction private func interactionButtonClicked(_ sender: NSButton) {
+		guard let interactedNotificationId = displayedNotificationId else {
 			return
 		}
 
-		switch (sender, sender.state)
-		{
+		switch (sender, sender.state) {
 		case (favoriteButton, .on):
-			interactionHandler?.favoriteStatus(for: self)
-			{
+			interactionHandler?.favoriteStatus(for: self) {
 				[weak self] success in
 
-				DispatchQueue.main.async
-					{
-						guard self?.displayedNotificationId == interactedNotificationId else { return }
-						self?.favoriteButton.state = success ? .on : .off
-					}
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.favoriteButton.state = success ? .on : .off
+				}
 			}
 
 		case (favoriteButton, .off):
-			interactionHandler?.unfavoriteStatus(for: self)
-			{
+			interactionHandler?.unfavoriteStatus(for: self) {
 				[weak self] success in
 
-				DispatchQueue.main.async
-					{
-						guard self?.displayedNotificationId == interactedNotificationId else { return }
-						self?.favoriteButton.state = success ? .off : .on
-					}
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.favoriteButton.state = success ? .off : .on
+				}
 			}
 
 		case (reblogButton, .on):
-			interactionHandler?.reblogStatus(for: self)
-			{
+			interactionHandler?.reblogStatus(for: self) {
 				[weak self] success in
 
-				DispatchQueue.main.async
-					{
-						guard self?.displayedNotificationId == interactedNotificationId else { return }
-						self?.reblogButton.state = success ? .on : .off
-					}
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.reblogButton.state = success ? .on : .off
+				}
 			}
 
 		case (reblogButton, .off):
-			interactionHandler?.unreblogStatus(for: self)
-			{
+			interactionHandler?.unreblogStatus(for: self) {
 				[weak self] success in
 
-				DispatchQueue.main.async
-					{
-						guard self?.displayedNotificationId == interactedNotificationId else { return }
-						self?.reblogButton.state = success ? .off : .on
-					}
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.reblogButton.state = success ? .off : .on
+				}
 			}
 
 		case (replyButton, _):
-			guard let statusID = displayedStatusId else
-			{
+			guard let statusID = displayedStatusId else {
 				return
 			}
 
@@ -451,21 +411,17 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying
 	}
 }
 
-extension InteractionCellView: AttributedLabelLinkHandler
-{
-	func handle(linkURL: URL)
-	{
+extension InteractionCellView: AttributedLabelLinkHandler {
+	func handle(linkURL: URL) {
 		interactionHandler?.handle(linkURL: linkURL, knownTags: displayedNotificationTags)
 	}
 }
 
-extension InteractionCellView: RichTextCapable
-{
-	func set(shouldDisplayAnimatedContents animates: Bool)
-	{
-		interactionLabel.animatedEmojiImageViews?.forEach({ $0.animates = animates })
-		authorNameLabel.animatedEmojiImageViews?.forEach({ $0.animates = animates })
-		statusLabel.animatedEmojiImageViews?.forEach({ $0.animates = animates })
-		contentWarningLabel.animatedEmojiImageViews?.forEach({ $0.animates = animates })
+extension InteractionCellView: RichTextCapable {
+	func set(shouldDisplayAnimatedContents animates: Bool) {
+		interactionLabel.animatedEmojiImageViews?.forEach { $0.animates = animates }
+		authorNameLabel.animatedEmojiImageViews?.forEach { $0.animates = animates }
+		statusLabel.animatedEmojiImageViews?.forEach { $0.animates = animates }
+		contentWarningLabel.animatedEmojiImageViews?.forEach { $0.animates = animates }
 	}
 }

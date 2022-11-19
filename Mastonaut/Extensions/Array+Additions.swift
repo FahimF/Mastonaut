@@ -19,17 +19,14 @@
 
 import Foundation
 
-extension Array
-{
+extension Array {
 	/// If the array is empty, returns `startIndex`. Otherwise returns `endIndex`.
-	var lastIndex: Index
-	{
+	var lastIndex: Index {
 		return isEmpty ? startIndex : endIndex
 	}
 
-	func indices(elementIsIncluded: (Element) -> Bool) -> [Index]
-	{
-		return enumerated().compactMap({ elementIsIncluded($0.element) ? $0.offset : nil })
+	func indices(elementIsIncluded: (Element) -> Bool) -> [Index] {
+		return enumerated().compactMap { elementIsIncluded($0.element) ? $0.offset : nil }
 	}
 
 	mutating func removeAllReturningIndices(where shouldBeRemoved: (Element) throws -> Bool) rethrows -> [Index]
@@ -37,14 +34,10 @@ extension Array
 		var removedIndices: [Index] = []
 		var keptElements: [Element] = []
 
-		for (index, element) in self.enumerated()
-		{
-			if try shouldBeRemoved(element)
-			{
+		for (index, element) in enumerated() {
+			if try shouldBeRemoved(element) {
 				removedIndices.append(index)
-			}
-			else
-			{
+			} else {
 				keptElements.append(element)
 			}
 		}
@@ -53,24 +46,18 @@ extension Array
 		return removedIndices
 	}
 
-	@inlinable func compacted<T>() -> [T] where Element == Optional<T>
-	{
-		return compactMap({ $0 })
+	@inlinable func compacted<T>() -> [T] where Element == T? {
+		return compactMap { $0 }
 	}
 
-	func segregated(using goesIntoFirstList: (Element) -> Bool) -> ([Element], [Element])
-	{
+	func segregated(using goesIntoFirstList: (Element) -> Bool) -> ([Element], [Element]) {
 		var first = [Element]()
 		var second = [Element]()
 
-		for element in self
-		{
-			if goesIntoFirstList(element)
-			{
+		for element in self {
+			if goesIntoFirstList(element) {
 				first.append(element)
-			}
-			else
-			{
+			} else {
 				second.append(element)
 			}
 		}

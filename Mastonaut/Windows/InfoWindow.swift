@@ -19,20 +19,16 @@
 
 import Foundation
 
-class InfoWindow: TransientWindow
-{
-	override var canBecomeMain: Bool
-	{
+class InfoWindow: TransientWindow {
+	override var canBecomeMain: Bool {
 		return false
 	}
 
-	override var canBecomeKey: Bool
-	{
+	override var canBecomeKey: Bool {
 		return false
 	}
 
-	override var acceptsFirstResponder: Bool
-	{
+	override var acceptsFirstResponder: Bool {
 		return false
 	}
 }

@@ -20,50 +20,41 @@
 import AppKit
 import CoreTootin
 
-class TagSearchResultsViewController: SearchResultsViewController<Tag>
-{
+class TagSearchResultsViewController: SearchResultsViewController<Tag> {
 	@IBOutlet unowned var _tableView: NSTableView!
 
-	override var tableView: NSTableView!
-	{
+	override var tableView: NSTableView! {
 		return _tableView
 	}
 
-	override internal var cellIdentifier: NSUserInterfaceItemIdentifier
-	{
+	override internal var cellIdentifier: NSUserInterfaceItemIdentifier {
 		return NSUserInterfaceItemIdentifier("tag")
 	}
 
-	override func set(results: ResultsType, instance: Instance)
-	{
+	override func set(results: ResultsType, instance _: Instance) {
 		elements = results.hashtags
 	}
 
-	override internal func populate(cell: NSTableCellView, for tag: Tag)
-	{
+	override internal func populate(cell: NSTableCellView, for tag: Tag) {
 		(cell as? TagResultTableCellView)?.set(tag: tag)
 	}
 
-	override internal func makeSelection(for tag: Tag) -> SearchResultSelection
-	{
+	override internal func makeSelection(for tag: Tag) -> SearchResultSelection {
 		return .tag(tag.name)
 	}
 }
 
-class TagResultTableCellView: NSTableCellView
-{
+class TagResultTableCellView: NSTableCellView {
 	@IBOutlet private unowned var tagNameLabel: NSTextField!
 	@IBOutlet private unowned var tagUsageLabel: NSTextField!
 
-	func set(tag: Tag)
-	{
+	func set(tag: Tag) {
 		tagNameLabel.stringValue = "#\(tag.name)"
 		tagUsageLabel.stringValue = makeUsageInfo(tag.history ?? [])
 	}
 
-	private func makeUsageInfo(_ history: [TagStatistics]) -> String
-	{
-		let totalUses = history.reduce(0) { return $0 + $1.uses }
+	private func makeUsageInfo(_ history: [TagStatistics]) -> String {
+		let totalUses = history.reduce(0) { $0 + $1.uses }
 
 		guard totalUses > 0 else {
 			return 🔠("No recent usage")

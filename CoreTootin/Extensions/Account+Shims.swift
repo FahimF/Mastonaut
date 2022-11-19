@@ -17,17 +17,13 @@
 //  GNU General Public License for more details.
 //
 
-public extension Account
-{
-	var bestDisplayName: String
-	{
+public extension Account {
+	var bestDisplayName: String {
 		return displayName.isEmpty ? username : displayName
 	}
 
-	func uri(in instance: Instance) -> String
-	{
-		guard acct.contains("@") else
-		{
+	func uri(in instance: Instance) -> String {
+		guard acct.contains("@") else {
 			return "@\(username)@\(instance.uri)"
 		}
 

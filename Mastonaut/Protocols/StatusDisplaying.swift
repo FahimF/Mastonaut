@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol StatusDisplaying
-{
+protocol StatusDisplaying {
 	/// Set the displayed status.
 	///
 	/// - Parameters:
@@ -31,17 +30,16 @@ protocol StatusDisplaying
 	///   - interactionHandler: The object that will handle status interaction events.
 	///   - activeInstance: The instance where the active user is registered.
 	func set(displayedStatus: Status,
-			 poll: Poll?,
-			 attachmentPresenter: AttachmentPresenting,
-			 interactionHandler: StatusInteractionHandling,
-			 activeInstance: Instance)
+	         poll: Poll?,
+	         attachmentPresenter: AttachmentPresenting,
+	         interactionHandler: StatusInteractionHandling,
+	         activeInstance: Instance)
 
 	/// Set whether a poll reload task is active for the associated poll.
 	func setHasActivePollTask(_ hasTask: Bool)
 }
 
-protocol StatusInteractionHandling: AnyObject
-{
+protocol StatusInteractionHandling: AnyObject {
 	/// The logged-in client from which the interacted status are fetched.
 	var client: ClientType? { get }
 
@@ -92,102 +90,80 @@ protocol StatusInteractionHandling: AnyObject
 	func menuItems(for status: Status) -> [NSMenuItem]
 }
 
-extension StatusInteractionHandling
-{
-	func favoriteStatus(with statusID: String, completion: @escaping (Bool) -> Void)
-	{
-		interact(using: Statuses.favourite(id: statusID))
-		{
+extension StatusInteractionHandling {
+	func favoriteStatus(with statusID: String, completion: @escaping (Bool) -> Void) {
+		interact(using: Statuses.favourite(id: statusID)) {
 			status in completion((status?.favourited ?? false) == true)
 		}
 	}
 
-	func unfavoriteStatus(with statusID: String, completion: @escaping (Bool) -> Void)
-	{
-		interact(using: Statuses.unfavourite(id: statusID))
-		{
+	func unfavoriteStatus(with statusID: String, completion: @escaping (Bool) -> Void) {
+		interact(using: Statuses.unfavourite(id: statusID)) {
 			status in completion((status?.favourited ?? true) != true)
 		}
 	}
-	
-	func reblogStatus(with statusID: String, completion: @escaping (Bool) -> Void)
-	{
-		interact(using: Statuses.reblog(id: statusID))
-		{
+
+	func reblogStatus(with statusID: String, completion: @escaping (Bool) -> Void) {
+		interact(using: Statuses.reblog(id: statusID)) {
 			status in completion((status?.reblogged ?? false) == true)
 		}
 	}
 
-	func unreblogStatus(with statusID: String, completion: @escaping (Bool) -> Void)
-	{
-		interact(using: Statuses.unreblog(id: statusID))
-		{
+	func unreblogStatus(with statusID: String, completion: @escaping (Bool) -> Void) {
+		interact(using: Statuses.unreblog(id: statusID)) {
 			status in completion((status?.reblogged ?? true) != true)
 		}
 	}
 
-	private func interact(using request: Request<Status>, completion: ((Status?) -> Void)? = nil)
-	{
-		client?.run(request)
-		{
+	private func interact(using request: Request<Status>, completion: ((Status?) -> Void)? = nil) {
+		client?.run(request) {
 			[weak self] result in
 
-			switch result
-			{
-			case .success(let updatedStatus, _):
+			switch result {
+			case let .success(updatedStatus, _):
 				completion?(updatedStatus)
 				DispatchQueue.main.async { self?.handle(updatedStatus: updatedStatus) }
 
-			case .failure(let error):
+			case let .failure(error):
 				completion?(nil)
 				DispatchQueue.main.async { self?.handle(interactionError: NetworkError(error)) }
 			}
 		}
 	}
 
-	func delete(status: Status, redraft: Bool)
-	{
-		confirmDelete(status: status, isRedrafting: redraft)
-		{
+	func delete(status: Status, redraft: Bool) {
+		confirmDelete(status: status, isRedrafting: redraft) {
 			[weak self] proceed in
 
-			if proceed
-			{
+			if proceed {
 				self?.reallyDelete(status: status, redraft: redraft)
 			}
 		}
 	}
 
-	func reallyDelete(status: Status, redraft: Bool)
-	{
-		client?.run(Statuses.delete(id: status.id))
-			{
-				[weak self] (result) in
+	func reallyDelete(status: Status, redraft: Bool) {
+		client?.run(Statuses.delete(id: status.id)) {
+			[weak self] result in
 
-				DispatchQueue.main.async
-					{
-						switch result
-						{
-						case .failure(let error):
-							self?.handle(interactionError: NetworkError(error))
+			DispatchQueue.main.async {
+				switch result {
+				case let .failure(error):
+					self?.handle(interactionError: NetworkError(error))
 
-						case .success:
-							if redraft
-							{
-								self?.redraft(status: status)
-							}
-						}
+				case .success:
+					if redraft {
+						self?.redraft(status: status)
 					}
+				}
 			}
+		}
 	}
 
-	func pin(status: Status)
-	{
+	func pin(status: Status) {
 		interact(using: Statuses.pin(id: status.id))
 	}
 
-	func unpin(status: Status)
-	{
+	func unpin(status: Status) {
 		interact(using: Statuses.unpin(id: status.id))
 	}
 }

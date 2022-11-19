@@ -19,31 +19,26 @@
 
 import Foundation
 
-public extension Foundation.Notification.Name
-{
+public extension Foundation.Notification.Name {
 	static let accountNeedsNewClientToken = Self("ReauthorizationAgentAccountNeedsNewClientToken")
 }
 
-public class ReauthorizationAgent: ClientDelegate
-{
+public class ReauthorizationAgent: ClientDelegate {
 	public let account: AuthorizedAccount
 
 	private let authorizationFuture: FutureTask? = nil
 	private unowned let keychainController: KeychainController
 
-	init(account: AuthorizedAccount, keychainController: KeychainController)
-	{
+	init(account: AuthorizedAccount, keychainController: KeychainController) {
 		self.account = account
 		self.keychainController = keychainController
 	}
 
-	public var isRequestingNewAccessToken: Bool
-	{
+	public var isRequestingNewAccessToken: Bool {
 		return authorizationFuture != nil
 	}
 
-	public func clientProducedUnauthorizedError(_ client: ClientType)
-	{
+	public func clientProducedUnauthorizedError(_ client: ClientType) {
 		var client = client
 
 		guard
@@ -51,66 +46,58 @@ public class ReauthorizationAgent: ClientDelegate
 			let clientApplication = credentials.clientApplication,
 			let grantCode = credentials.grantCode
 		else {
-			DispatchQueue.main.async
-				{
-					self.invalidateCurentToken(client: &client)
-				}
+			DispatchQueue.main.async {
+				self.invalidateCurentToken(client: &client)
+			}
 			return
 		}
 
 		let accountIdentifier = account.account!
 
 		client.run(Login.oauth(clientID: clientApplication.clientID,
-							   clientSecret: clientApplication.clientSecret,
-							   scopes: [.read, .write, .follow, .push],
-							   redirectURI: clientApplication.redirectURI,
-							   code: grantCode))
-			{
-				[weak self] result in
+		                       clientSecret: clientApplication.clientSecret,
+		                       scopes: [.read, .write, .follow, .push],
+		                       redirectURI: clientApplication.redirectURI,
+		                       code: grantCode)) {
+			[weak self] result in
 
-				switch result
-				{
-				case .success(let login, _):
-					DispatchQueue.main.async {
-						client.accessToken = login.accessToken
+			switch result {
+			case let .success(login, _):
+				DispatchQueue.main.async {
+					client.accessToken = login.accessToken
 
-						self?.storeUpdatedCredentials(accessToken: login.accessToken,
-													  accountIdentifier: accountIdentifier,
-													  clientApplication: clientApplication,
-													  grantCode: grantCode)
-					}
+					self?.storeUpdatedCredentials(accessToken: login.accessToken,
+					                              accountIdentifier: accountIdentifier,
+					                              clientApplication: clientApplication,
+					                              grantCode: grantCode)
+				}
 
-				case .failure(let error):
-					if case .unauthorized = error
-					{
-						DispatchQueue.main.async { self?.invalidateCurentToken(client: &client) }
-					}
-					else
-					{
-						DispatchQueue.main.asyncAfter(deadline: .now() + 3.0)
-							{
-								self?.clientProducedUnauthorizedError(client)
-							}
+			case let .failure(error):
+				if case .unauthorized = error {
+					DispatchQueue.main.async { self?.invalidateCurentToken(client: &client) }
+				} else {
+					DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+						self?.clientProducedUnauthorizedError(client)
 					}
 				}
 			}
+		}
 	}
 
 	private func storeUpdatedCredentials(accessToken: String,
-										 accountIdentifier: String,
-										 clientApplication: ClientApplication,
-										 grantCode: String)
+	                                     accountIdentifier: String,
+	                                     clientApplication: ClientApplication,
+	                                     grantCode: String)
 	{
 		let accountAccessToken = AccountAccessToken(account: accountIdentifier,
-													accessToken: accessToken,
-													clientApplication: clientApplication,
-													grantCode: grantCode)
+		                                            accessToken: accessToken,
+		                                            clientApplication: clientApplication,
+		                                            grantCode: grantCode)
 
 		try? keychainController.store(accountAccessToken, overwite: true)
 	}
 
-	private func invalidateCurentToken(client: inout ClientType)
-	{
+	private func invalidateCurentToken(client: inout ClientType) {
 		assert(Thread.isMainThread)
 
 		client.accessToken = nil

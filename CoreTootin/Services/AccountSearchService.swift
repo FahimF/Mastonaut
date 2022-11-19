@@ -19,23 +19,19 @@
 
 import Foundation
 
-public class AccountSearchService
-{
+public class AccountSearchService {
 	private let client: ClientType
 	private let instance: Instance
 
-	public init(client: ClientType, activeInstance: Instance)
-	{
+	public init(client: ClientType, activeInstance: Instance) {
 		self.client = client
-		self.instance = activeInstance
+		instance = activeInstance
 	}
 
-	public func search(query: String, completion: @escaping ([Account]) -> Void)
-	{
-		client.run(Accounts.search(query: query)) { (result) in
+	public func search(query: String, completion: @escaping ([Account]) -> Void) {
+		client.run(Accounts.search(query: query)) { result in
 
-			guard case .success(let accounts, _) = result else
-			{
+			guard case let .success(accounts, _) = result else {
 				completion([])
 				return
 			}
@@ -45,22 +41,19 @@ public class AccountSearchService
 	}
 }
 
-extension AccountSearchService: SuggestionTextViewSuggestionsProvider
-{
-	public func suggestionTextView(_ textView: SuggestionTextView,
-								   suggestionsForMention mention: String,
-								   completion: @escaping ([Suggestion]) -> Void)
+extension AccountSearchService: SuggestionTextViewSuggestionsProvider {
+	public func suggestionTextView(_: SuggestionTextView,
+	                               suggestionsForMention mention: String,
+	                               completion: @escaping ([Suggestion]) -> Void)
 	{
 		let instance = self.instance
 
-		search(query: mention)
-		{
-			(accounts) in
+		search(query: mention) {
+			accounts in
 
-			DispatchQueue.main.async
-				{
-					completion(accounts.map({ AccountSuggestion(account: $0, instance: instance) }))
-				}
+			DispatchQueue.main.async {
+				completion(accounts.map { AccountSuggestion(account: $0, instance: instance) })
+			}
 		}
 	}
 }

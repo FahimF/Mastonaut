@@ -9,8 +9,8 @@
 import Foundation
 
 struct Parameter {
-    let name: String
-    let value: String?
+	let name: String
+	let value: String?
 }
 
 // MARK: - Equatable
@@ -20,18 +20,16 @@ extension Parameter: Equatable {}
 // MARK: - Form Parameter
 
 extension Parameter: FormParameter {
-
 	var formItemValue: Data? {
-		guard let value = self.value else { return nil }
+		guard let value = value else { return nil }
 		return """
---\(Payload.formBoundary)
-Content-Disposition: form-data; name="\(name)"
+		--\(Payload.formBoundary)
+		Content-Disposition: form-data; name="\(name)"
 
-\(value)
+		\(value)
 
-""".applyingCarriageReturns.data(using: .utf8)
+		""".applyingCarriageReturns.data(using: .utf8)
 	}
 }
 
-extension Parameter: Codable {
-}
+extension Parameter: Codable {}

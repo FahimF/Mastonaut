@@ -20,8 +20,7 @@
 import AppKit
 
 @objc
-public protocol UserPopUpButtonDisplaying: AnyObject
-{
+public protocol UserPopUpButtonDisplaying: AnyObject {
 	var currentUserPopUpButton: NSPopUpButton! { get }
 
 	var currentUser: UUID? { get set }
@@ -29,42 +28,38 @@ public protocol UserPopUpButtonDisplaying: AnyObject
 	func shouldChangeCurrentUser(to userUUID: UUID) -> Bool
 }
 
-public protocol AccountMenuItemFactory
-{
+public protocol AccountMenuItemFactory {
 	func makeMenuItems(accounts: [AuthorizedAccount],
-					   currentUser: UUID?,
-					   action: Selector,
-					   target: AnyObject,
-					   emojiContainer: NSView?,
-					   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
+	                   currentUser: UUID?,
+	                   action: Selector,
+	                   target: AnyObject,
+	                   emojiContainer: NSView?,
+	                   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
 }
 
-public class UserPopUpButtonSubcontroller: NSObject
-{
+public class UserPopUpButtonSubcontroller: NSObject {
 	private unowned let display: UserPopUpButtonDisplaying
 	private unowned let accountsService: AccountsService
 	private let itemsFactory: AccountMenuItemFactory
 
 	private let accountCountObservation: NSKeyValueObservation
 
-	private var accounts: [AuthorizedAccount]
-	{
+	private var accounts: [AuthorizedAccount] {
 		return accountsService.authorizedAccounts
 	}
 
 	public init(display: UserPopUpButtonDisplaying,
-				accountsService: AccountsService,
-				itemsFactory: AccountMenuItemFactory)
+	            accountsService: AccountsService,
+	            itemsFactory: AccountMenuItemFactory)
 	{
 		self.display = display
 		self.accountsService = accountsService
 		self.itemsFactory = itemsFactory
 
 		let selfPromise = WeakPromise<UserPopUpButtonSubcontroller>()
-		self.accountCountObservation = accountsService.observe(\.authorizedAccountsCount)
-			{
-				_,_ in selfPromise.value?.updateUserPopUpButton()
-			}
+		accountCountObservation = accountsService.observe(\.authorizedAccountsCount) {
+			_, _ in selfPromise.value?.updateUserPopUpButton()
+		}
 
 		super.init()
 
@@ -73,14 +68,13 @@ public class UserPopUpButtonSubcontroller: NSObject
 		updateUserPopUpButton()
 	}
 
-	public func updateUserPopUpButton()
-	{
+	public func updateUserPopUpButton() {
 		let accountsMenuItems = itemsFactory.makeMenuItems(accounts: accounts,
-														   currentUser: display.currentUser,
-														   action: #selector(UserPopUpButtonSubcontroller.selectAccount(_:)),
-														   target: self,
-														   emojiContainer: display.currentUserPopUpButton,
-														   setKeyEquivalents: false)
+		                                                   currentUser: display.currentUser,
+		                                                   action: #selector(UserPopUpButtonSubcontroller.selectAccount(_:)),
+		                                                   target: self,
+		                                                   emojiContainer: display.currentUserPopUpButton,
+		                                                   setKeyEquivalents: false)
 
 		let usersMenu = NSMenu(title: "Users")
 		usersMenu.setItems(accountsMenuItems.menuItems)
@@ -89,14 +83,12 @@ public class UserPopUpButtonSubcontroller: NSObject
 	}
 
 	@objc
-	public func selectAccount(_ sender: NSMenuItem)
-	{
+	public func selectAccount(_ sender: NSMenuItem) {
 		guard
 			let uuid = sender.representedObject as? UUID,
 			display.currentUser != uuid,
 			display.shouldChangeCurrentUser(to: uuid)
-			else
-		{
+		else {
 			updateUserPopUpButton()
 			return
 		}

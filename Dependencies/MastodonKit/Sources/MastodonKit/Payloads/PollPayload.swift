@@ -9,19 +9,19 @@
 import Foundation
 
 public struct PollPayload: Codable {
-    let options: [String]
-    let expiration: TimeInterval
-    let multipleChoice: Bool
+	let options: [String]
+	let expiration: TimeInterval
+	let multipleChoice: Bool
 
-    public init(options: [String], expiration: TimeInterval, multipleChoice: Bool) {
-        self.options = options
-        self.expiration = expiration
-        self.multipleChoice = multipleChoice
-    }
+	public init(options: [String], expiration: TimeInterval, multipleChoice: Bool) {
+		self.options = options
+		self.expiration = expiration
+		self.multipleChoice = multipleChoice
+	}
 
-    enum CodingKeys: String, CodingKey {
-        case options
-        case expiration = "expires_in"
-        case multipleChoice = "multiple"
-    }
+	enum CodingKeys: String, CodingKey {
+		case options
+		case expiration = "expires_in"
+		case multipleChoice = "multiple"
+	}
 }

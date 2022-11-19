@@ -21,22 +21,21 @@ import Cocoa
 import CoreTootin
 
 class AccountFiltersController: NSObject {
+	@IBOutlet var tableView: NSTableView!
 
-	@IBOutlet weak var tableView: NSTableView!
+	@objc private(set) dynamic
+	var canEditFilter: Bool = false
 
-	@objc dynamic
-	private(set) var canEditFilter: Bool = false
-
-	@objc dynamic
-	private(set) var filters: NSArrayController = {
+	@objc private(set) dynamic
+	var filters: NSArrayController = {
 		let controller = NSArrayController()
 		controller.selectsInsertedObjects = false
 		return controller
 	}()
 
-	private var presentedFilterEditorWindowController: FilterEditorWindowController? = nil
+	private var presentedFilterEditorWindowController: FilterEditorWindowController?
 
-	var account: AuthorizedAccount? = nil {
+	var account: AuthorizedAccount? {
 		didSet {
 			filters.removeAllObjects()
 
@@ -68,28 +67,28 @@ class AccountFiltersController: NSObject {
 	}
 
 	@IBAction
-	func showFilterCreator(_ sender: Any?) {
+	func showFilterCreator(_: Any?) {
 		startFilterEditor(with: nil)
 	}
 
 	@IBAction
-	func confirmDeletingSelectedFilter(_ sender: Any?) {
+	func confirmDeletingSelectedFilter(_: Any?) {
 		guard tableView.selectedRow >= 0,
-			  let filter = (filters.arrangedObjects as? [UserFilterWrapper])?[tableView.selectedRow].filter,
-			  let window = tableView.window else {
+		      let filter = (filters.arrangedObjects as? [UserFilterWrapper])?[tableView.selectedRow].filter,
+		      let window = tableView.window
+		else {
 			return
 		}
 
 		let alert = NSAlert(style: .warning,
-							title: 🔠("Attention"),
-							message: 🔠("dialog.filter.delete.confirmation"))
+		                    title: 🔠("Attention"),
+		                    message: 🔠("dialog.filter.delete.confirmation"))
 
 		alert.addButton(withTitle: 🔠("Delete Filter"))
 		alert.addButton(withTitle: 🔠("Cancel"))
 
 		alert.beginSheetModal(for: window) { [weak self] response in
-			switch response
-			{
+			switch response {
 			case .alertFirstButtonReturn:
 				self?.deleteFilter(filter)
 
@@ -100,9 +99,9 @@ class AccountFiltersController: NSObject {
 	}
 
 	@IBAction
-	func editSelectedFilter(_ sender: Any?) {
+	func editSelectedFilter(_: Any?) {
 		guard tableView.selectedRow >= 0,
-			  let wrapper = (filters.arrangedObjects as? [UserFilterWrapper])?[tableView.selectedRow]
+		      let wrapper = (filters.arrangedObjects as? [UserFilterWrapper])?[tableView.selectedRow]
 		else {
 			return
 		}
@@ -133,7 +132,7 @@ class AccountFiltersController: NSObject {
 						self?.handleFilterCreateUpdateResponse(result: result)
 					}
 				}
-			case .edit(let originalFilter):
+			case let .edit(originalFilter):
 				filterService.updateFilter(id: originalFilter.id, updatedFilter: filter) { [weak self] result in
 					DispatchQueue.main.async { [weak self] in
 						self?.handleFilterCreateUpdateResponse(result: result)
@@ -151,7 +150,7 @@ class AccountFiltersController: NSObject {
 		switch result {
 		case .success:
 			tableView.window?.endSheet(editorWindow)
-		case .failure(let error):
+		case let .failure(error):
 			editorWindow.presentError(error)
 		}
 	}
@@ -160,12 +159,12 @@ class AccountFiltersController: NSObject {
 		guard let account = account, let filterService = FilterService.service(for: account) else { return }
 
 		filterService.delete(filter: filter) { [weak self] result in
-			guard case .failure(let error) = result else { return }
+			guard case let .failure(error) = result else { return }
 
 			DispatchQueue.main.async {
 				let alert = NSAlert(style: .warning,
-									title: 🔠("Error"),
-									message: 🔠("dialog.filter.delete.error", error.localizedDescription))
+				                    title: 🔠("Error"),
+				                    message: 🔠("dialog.filter.delete.error", error.localizedDescription))
 
 				alert.addButton(withTitle: 🔠("OK"))
 
@@ -201,20 +200,18 @@ extension AccountFiltersController: FilterServiceObserver {
 }
 
 extension AccountFiltersController: NSTableViewDelegate {
-
-	func tableViewSelectionDidChange(_ notification: Foundation.Notification) {
+	func tableViewSelectionDidChange(_: Foundation.Notification) {
 		canEditFilter = tableView.selectedRow >= 0
 	}
 }
 
 extension NSArrayController {
-
 	func removeAllObjects() {
 		guard let count = (arrangedObjects as? NSArray)?.count, count > 0 else {
 			return
 		}
 
-		remove(atArrangedObjectIndexes: IndexSet(integersIn: 0..<count))
+		remove(atArrangedObjectIndexes: IndexSet(integersIn: 0 ..< count))
 	}
 }
 

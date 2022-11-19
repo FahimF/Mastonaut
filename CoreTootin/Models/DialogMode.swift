@@ -19,39 +19,34 @@
 
 import Foundation
 
-public enum DialogMode
-{
+public enum DialogMode {
 	case yesNo
 	case okCancel
 	case discardKeepEditing
 	case custom(proceed: String, dismiss: String)
 
-	public var proceedTitle: String
-	{
-		switch self
-		{
+	public var proceedTitle: String {
+		switch self {
 		case .yesNo:
 			return 🔠("Yes")
 		case .okCancel:
 			return 🔠("OK")
 		case .discardKeepEditing:
 			return 🔠("Discard")
-		case .custom(let proceed, _):
+		case let .custom(proceed, _):
 			return proceed
 		}
 	}
 
-	public var dismissTitle: String
-	{
-		switch self
-		{
+	public var dismissTitle: String {
+		switch self {
 		case .yesNo:
 			return 🔠("No")
 		case .okCancel:
 			return 🔠("Cancel")
 		case .discardKeepEditing:
 			return 🔠("Keep Editing")
-		case .custom(_, let dismiss):
+		case let .custom(_, dismiss):
 			return dismiss
 		}
 	}

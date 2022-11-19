@@ -20,16 +20,14 @@
 import Foundation
 
 extension NotificationCenter {
-
 	static func observer(for notificationName: Foundation.Notification.Name,
-						 object: Any? = nil,
-						 queue: OperationQueue? = nil,
-						 using block: @escaping (Foundation.Notification) -> Void) -> NSObjectProtocol
+	                     object: Any? = nil,
+	                     queue: OperationQueue? = nil,
+	                     using block: @escaping (Foundation.Notification) -> Void) -> NSObjectProtocol
 	{
-
 		return NotificationCenter.default.addObserver(forName: notificationName,
-													  object: object,
-													  queue: queue,
-													  using: block)
+		                                              object: object,
+		                                              queue: queue,
+		                                              using: block)
 	}
 }

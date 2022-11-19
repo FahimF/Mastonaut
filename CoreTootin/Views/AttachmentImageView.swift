@@ -20,8 +20,7 @@
 import Cocoa
 
 @IBDesignable
-public class AttachmentImageView: NSControl
-{
+public class AttachmentImageView: NSControl {
 	private lazy var clickGestureRecognizer: NSClickGestureRecognizer = {
 		let recognizer = NSClickGestureRecognizer()
 		recognizer.numberOfClicksRequired = 1
@@ -31,35 +30,27 @@ public class AttachmentImageView: NSControl
 	}()
 
 	@IBInspectable
-	public var cornerRadius: CGFloat = 0.0
-	{
-		didSet
-		{
-			if let layer = self.layer
-			{
+	public var cornerRadius: CGFloat = 0.0 {
+		didSet {
+			if let layer = layer {
 				layer.cornerRadius = cornerRadius
 			}
 		}
 	}
 
 	@IBInspectable
-	public var exposureAdjust: CGFloat = 0
-	{
-		didSet
-		{
+	public var exposureAdjust: CGFloat = 0 {
+		didSet {
 			applyExposureFilterIfNecessary()
 		}
 	}
 
 	@IBInspectable
-	public var image: NSImage?
-	{
-		didSet
-		{
+	public var image: NSImage? {
+		didSet {
 			needsDisplay = true
 
-			if overrideContentSize == nil, superview != nil
-			{
+			if overrideContentSize == nil, superview != nil {
 				// There's no need to invalidate the intrinsic content size if we are overriding it, or if we're not
 				// attached yet.
 				invalidateIntrinsicContentSize()
@@ -70,51 +61,41 @@ public class AttachmentImageView: NSControl
 	/// Use this value as the intrinsicContentSize.
 	///
 	/// Useful if the size of the image is known before it is fetched from a remote location, for example.
-	public var overrideContentSize: NSSize? = nil
-	{
-		didSet
-		{
+	public var overrideContentSize: NSSize? {
+		didSet {
 			invalidateIntrinsicContentSize()
 		}
 	}
 
-	public override var wantsUpdateLayer: Bool
-	{
+	override public var wantsUpdateLayer: Bool {
 		return true
 	}
 
-	public override var intrinsicContentSize: NSSize
-	{
+	override public var intrinsicContentSize: NSSize {
 		return overrideContentSize ?? image?.size ?? .zero
 	}
 
-	public override init(frame frameRect: NSRect)
-	{
+	override public init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		setup()
 	}
 
-	public required init?(coder: NSCoder)
-	{
+	public required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		setup()
 	}
 
-	private func setup()
-	{
+	private func setup() {
 		addGestureRecognizer(clickGestureRecognizer)
 	}
 
-	public override func updateLayer()
-	{
-		guard let layer = layer else
-		{
+	override public func updateLayer() {
+		guard let layer = layer else {
 			assertionFailure()
 			return
 		}
 
-		guard let image = self.image else
-		{
+		guard let image = image else {
 			layer.contents = nil
 			return
 		}
@@ -126,19 +107,14 @@ public class AttachmentImageView: NSControl
 		applyExposureFilterIfNecessary()
 	}
 
-	@objc private func gestureRecognizer(_ sender: Any?)
-	{
+	@objc private func gestureRecognizer(_: Any?) {
 		sendAction(action, to: target)
 	}
 
-	private func applyExposureFilterIfNecessary()
-	{
-		if exposureAdjust != 0
-		{
+	private func applyExposureFilterIfNecessary() {
+		if exposureAdjust != 0 {
 			layer?.filters = [CIFilter(name: "CIExposureAdjust", parameters: ["inputEV": exposureAdjust])!]
-		}
-		else
-		{
+		} else {
 			layer?.filters = nil
 		}
 	}

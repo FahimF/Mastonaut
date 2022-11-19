@@ -20,37 +20,29 @@
 import AppKit
 
 @IBDesignable
-open class BorderView: BackgroundView
-{
+open class BorderView: BackgroundView {
 	@IBInspectable
-	public var borderWidth: CGFloat = 0
-	{
-		didSet
-		{
+	public var borderWidth: CGFloat = 0 {
+		didSet {
 			needsDisplay = true
 		}
 	}
 
 	@IBInspectable
-	public var borderColor: NSColor = .clear
-	{
-		didSet
-		{
+	public var borderColor: NSColor = .clear {
+		didSet {
 			needsDisplay = true
 		}
 	}
 
 	@IBInspectable
-	public var borderRadius: CGFloat = 0
-	{
-		didSet
-		{
+	public var borderRadius: CGFloat = 0 {
+		didSet {
 			needsDisplay = true
 		}
 	}
 
-	public override func updateLayer()
-	{
+	override public func updateLayer() {
 		super.updateLayer()
 
 		layer?.cornerRadius = borderRadius

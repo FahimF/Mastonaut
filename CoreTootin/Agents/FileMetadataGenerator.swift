@@ -18,22 +18,20 @@
 //
 
 import AppKit
-import QuickLook
 import AVFoundation
+import QuickLook
 
-public struct FileMetadataGenerator
-{
-	public static func thumbnail(for fileUrl: URL, maxSize: CGSize) -> NSImage
-	{
+public enum FileMetadataGenerator {
+	public static func thumbnail(for fileUrl: URL, maxSize: CGSize) -> NSImage {
 		assert(!Thread.isMainThread)
 
 		let options: [CFString: Any] = [
 			kQLThumbnailOptionIconModeKey: kCFBooleanFalse!,
-			kQLThumbnailOptionScaleFactorKey: 1.0 as CFNumber
+			kQLThumbnailOptionScaleFactorKey: 1.0 as CFNumber,
 		]
 
-		guard let thumbnail = QLThumbnailImageCreate(nil, fileUrl as CFURL, maxSize, options as CFDictionary) else
-		{
+		guard let thumbnail = QLThumbnailImageCreate(nil, fileUrl as CFURL, maxSize, options as CFDictionary)
+		else {
 			return NSWorkspace.shared.icon(forFile: fileUrl.path)
 		}
 
@@ -45,37 +43,29 @@ public struct FileMetadataGenerator
 		return image
 	}
 
-	public static func metadata(for fileUrl: URL) -> Metadata
-	{
+	public static func metadata(for fileUrl: URL) -> Metadata {
 		assert(!Thread.isMainThread)
 
-		if fileUrl.fileConforms(toUTI: kUTTypeMovie)
-		{
+		if fileUrl.fileConforms(toUTI: kUTTypeMovie) {
 			let duration = AVURLAsset(url: fileUrl).duration.seconds
 			return .movie(duration: duration)
-		}
-		else if fileUrl.fileConforms(toUTI: kUTTypeImage)
-		{
+		} else if fileUrl.fileConforms(toUTI: kUTTypeImage) {
 			guard
 				let imageSource = CGImageSourceCreateWithURL(fileUrl as CFURL, nil),
 				let propertiesDict = CGImageSourceCopyProperties(imageSource, nil) as? [CFString: Any],
 				let fileSize = propertiesDict[kCGImagePropertyFileSize] as? Int64
-			else
-			{
+			else {
 				return .picture(byteCount: 0)
 			}
 
 			return .picture(byteCount: fileSize)
-		}
-		else
-		{
+		} else {
 			return .unknown
 		}
 	}
 }
 
-public enum Metadata
-{
+public enum Metadata {
 	case picture(byteCount: Int64)
 	case movie(duration: TimeInterval)
 	case unknown

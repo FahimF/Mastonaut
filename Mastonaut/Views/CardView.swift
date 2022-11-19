@@ -20,12 +20,10 @@
 import Cocoa
 import CoreTootin
 
-class CardView: BorderView
-{
-	var clickHandler: (() -> Void)? = nil
+class CardView: BorderView {
+	var clickHandler: (() -> Void)?
 
-	@IBAction private func clickedCardButton(_ sender: Any?)
-	{
+	@IBAction private func clickedCardButton(_: Any?) {
 		clickHandler?()
 	}
 }

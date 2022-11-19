@@ -19,16 +19,14 @@
 
 import Cocoa
 
-public extension NSAlert
-{
+public extension NSAlert {
 	static func makeAlert(style: NSAlert.Style = .informational,
-						  title: String, message: String,
-						  dialogMode: DialogMode? = nil) -> NSAlert
+	                      title: String, message: String,
+	                      dialogMode: DialogMode? = nil) -> NSAlert
 	{
 		let alert = NSAlert(style: style, title: title, message: message)
 
-		if let dialogMode = dialogMode
-		{
+		if let dialogMode = dialogMode {
 			alert.addButton(withTitle: dialogMode.proceedTitle)
 			alert.addButton(withTitle: dialogMode.dismissTitle)
 		}

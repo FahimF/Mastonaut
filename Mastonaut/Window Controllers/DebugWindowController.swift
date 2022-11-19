@@ -21,35 +21,29 @@ import Cocoa
 
 #if DEBUG
 
-class DebugWindowController: NSWindowController {
+	class DebugWindowController: NSWindowController {
+		@objc dynamic var eventListenerCount = 0
+		@objc dynamic var eventReceiverCount = 0
 
-	@objc dynamic var eventListenerCount = 0
-	@objc dynamic var eventReceiverCount = 0
+		private var observers: [NSKeyValueObservation] = []
 
-	private var observers: [NSKeyValueObservation] = []
+		override var windowNibName: NSNib.Name? {
+			return "DebugWindowController"
+		}
 
-	override var windowNibName: NSNib.Name?
-	{
-		return "DebugWindowController"
-	}
+		override func windowDidLoad() {
+			super.windowDidLoad()
 
-	override func windowDidLoad()
-	{
-		super.windowDidLoad()
-
-		observers.observe(RemoteEventsCoordinator.shared, \.listenerCount, sendInitial: true)
-			{
+			observers.observe(RemoteEventsCoordinator.shared, \.listenerCount, sendInitial: true) {
 				[weak self] coordinator, _ in
 				self?.eventListenerCount = coordinator.listenerCount
 			}
 
-		observers.observe(RemoteEventsCoordinator.shared, \.totalReceiverCount, sendInitial: true)
-			{
+			observers.observe(RemoteEventsCoordinator.shared, \.totalReceiverCount, sendInitial: true) {
 				[weak self] coordinator, _ in
 				self?.eventReceiverCount = coordinator.totalReceiverCount
 			}
+		}
 	}
-
-}
 
 #endif

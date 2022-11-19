@@ -19,8 +19,7 @@
 
 import Foundation
 
-public extension NSRegularExpression
-{
+public extension NSRegularExpression {
 	/// Adapted from the RFC2396 Regex, with the following changes:
 	/// - Only http and https protocols are allowed
 	/// - Must be prefixed by either the start of the string, or by a whitespace character
@@ -28,16 +27,16 @@ public extension NSRegularExpression
 	/// Notice:
 	/// - The contents of the first capture group must be reinserted into the original string.
 	static let uriRegex = try! NSRegularExpression(pattern: """
-(^|\\s)((http|https):)(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
-""", options: [.caseInsensitive])
+	(^|\\s)((http|https):)(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
+	""", options: [.caseInsensitive])
 
 	/// Adapted from the Mastodon mention Regex, with changes to make it compatible with the POSIX parser
 	/// https://github.com/tootsuite/mastodon/blob/ed3011061896dfc4819d517a0f4f4947e56feac4/app/models/account.rb#L52
 	///
 	/// Notice: The contents of the 3rd capture group is the username without a domain
 	static let mentionRegex = try! NSRegularExpression(pattern: """
-((?<=^)|(?<=[^\\/\\w]))@(([a-z0-9_]+([a-z0-9_\\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\\.\\-]+[a-z0-9]+)?)
-""", options: [.caseInsensitive])
+	((?<=^)|(?<=[^\\/\\w]))@(([a-z0-9_]+([a-z0-9_\\.-]+[a-z0-9_]+)?)(?:@[a-z0-9\\.\\-]+[a-z0-9]+)?)
+	""", options: [.caseInsensitive])
 
 	/// Pattern used to match shortcodes, and place the keyword in the first match group.
 	///
@@ -49,6 +48,6 @@ public extension NSRegularExpression
 	///
 	/// - Example: ":ZWJ:" will be matched.
 	static let zwjGroupRegex = try! NSRegularExpression(pattern: """
-.\(Character.zeroWidthJoiner)(.\(Character.zeroWidthJoiner))*.
-""", options: [])
+	.\(Character.zeroWidthJoiner)(.\(Character.zeroWidthJoiner))*.
+	""", options: [])
 }

@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-final class RelativeDateFormatter: DateFormatter
-{
+final class RelativeDateFormatter: DateFormatter {
 	static let shared: RelativeDateFormatter = {
 		let formatter = RelativeDateFormatter()
 		formatter.dateStyle = .medium
@@ -29,21 +28,18 @@ final class RelativeDateFormatter: DateFormatter
 		formatter.doesRelativeDateFormatting = true
 		return formatter
 	}()
-	
-	override func string(for object: Any?) -> String?
-	{
-		guard let date = object as? Date else
-		{
+
+	override func string(for object: Any?) -> String? {
+		guard let date = object as? Date else {
 			return super.string(for: object)
 		}
 
 		let components = calendar.dateComponents([.second, .minute, .hour, .day, .weekOfYear, .month, .year],
-												 from: date, to: Date())
+		                                         from: date, to: Date())
 
 		guard let seconds = components.second else { return nil }
 
-		if seconds >= 0
-		{
+		if seconds >= 0 {
 			if let year = components.year, year >= 2 { return 🔠("%@ years ago", year) }
 			if let year = components.year, year >= 1 { return 🔠("Last year") }
 			if let month = components.month, month >= 2 { return 🔠("%@ months ago", month) }
@@ -59,9 +55,7 @@ final class RelativeDateFormatter: DateFormatter
 			if let second = components.second, second >= 3 { return 🔠("%@ seconds ago", second) }
 
 			return 🔠("Just now")
-		}
-		else
-		{
+		} else {
 			if let year = components.year.map({ abs($0) }), year > 1 { return 🔠("In %@ years", abs(year)) }
 			if let year = components.year.map({ abs($0) }), year == 1 { return 🔠("Next year") }
 			if let month = components.month.map({ abs($0) }), month > 1 { return 🔠("In %@ months", abs(month)) }
@@ -81,8 +75,7 @@ final class RelativeDateFormatter: DateFormatter
 	}
 }
 
-extension DateFormatter
-{
+extension DateFormatter {
 	static let longDateFormatter: DateFormatter = {
 		let formatter = DateFormatter()
 		formatter.timeStyle = .long

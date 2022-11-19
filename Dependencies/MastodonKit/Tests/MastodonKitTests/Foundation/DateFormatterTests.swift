@@ -6,19 +6,19 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class DateFormatterTests: XCTestCase {
-    func testDateFromMastodonWithValidDate() {
-        let date = DateFormatter.mastodonFormatter.date(from: "2016-12-20T13:14:15.132Z")
+	func testDateFromMastodonWithValidDate() {
+		let date = DateFormatter.mastodonFormatter.date(from: "2016-12-20T13:14:15.132Z")
 
-        XCTAssertEqual(date?.timeIntervalSince1970, 1482239655.132)
-    }
+		XCTAssertEqual(date?.timeIntervalSince1970, 1_482_239_655.132)
+	}
 
-    func testDateFromMastodonWithInvalidDate() {
-        let date = DateFormatter.mastodonFormatter.date(from: "2016-12-20")
+	func testDateFromMastodonWithInvalidDate() {
+		let date = DateFormatter.mastodonFormatter.date(from: "2016-12-20")
 
-        XCTAssertNil(date)
-    }
+		XCTAssertNil(date)
+	}
 }

@@ -19,20 +19,16 @@
 
 import Foundation
 
-public extension URL
-{
-	var fileUTI: String?
-	{
+public extension URL {
+	var fileUTI: String? {
 		return (try? resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier) ?? fallbackFileUTI
 	}
 
 	/// This routine allows computing the UTI for remote URLs and URLs for files that don't exist.
-	private var fallbackFileUTI: String?
-	{
+	private var fallbackFileUTI: String? {
 		let utiRef = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil)
 
-		guard let utiCFString = utiRef?.takeUnretainedValue() else
-		{
+		guard let utiCFString = utiRef?.takeUnretainedValue() else {
 			utiRef?.release()
 			return nil
 		}
@@ -42,13 +38,11 @@ public extension URL
 		return utiString
 	}
 
-	var preferredMimeType: String?
-	{
+	var preferredMimeType: String? {
 		guard
-			let fileUTI = self.fileUTI,
+			let fileUTI = fileUTI,
 			let mimeReference = UTTypeCopyPreferredTagWithClass(fileUTI as CFString, kUTTagClassMIMEType)
-		else
-		{
+		else {
 			return nil
 		}
 
@@ -58,56 +52,46 @@ public extension URL
 		return mimeType
 	}
 
-	func fileConforms(toUTI: String) -> Bool
-	{
+	func fileConforms(toUTI: String) -> Bool {
 		return fileConforms(toUTI: toUTI as CFString)
 	}
 
-	func fileConforms(toUTI: CFString) -> Bool
-	{
-		guard let fileUTI = self.fileUTI else
-		{
+	func fileConforms(toUTI: CFString) -> Bool {
+		guard let fileUTI = fileUTI else {
 			return false
 		}
 
 		return UTTypeConformsTo(fileUTI as CFString, toUTI)
 	}
 
-	var mastodonHandleFromAccountURI: String
-	{
-		guard let instance = host else
-		{
+	var mastodonHandleFromAccountURI: String {
+		guard let instance = host else {
 			// Fallback
 			return absoluteStringByDroppingScheme
 		}
 
 		// Mastodon: instance.domain/@username
-		if pathComponents.count == 2, pathComponents[1].hasPrefix("@")
-		{
+		if pathComponents.count == 2, pathComponents[1].hasPrefix("@") {
 			return "\(pathComponents[1])@\(instance)"
 		}
 
 		// Pleroma: instance.domain/users/username
-		if pathComponents.count == 3, pathComponents[1] == "users"
-		{
+		if pathComponents.count == 3, pathComponents[1] == "users" {
 			return "@\(pathComponents[2])@\(instance)"
 		}
 
 		// Plume: instance.domain/@/username
-		if pathComponents.count == 3, pathComponents[1] == "@", !pathComponents[2].hasPrefix("@")
-		{
+		if pathComponents.count == 3, pathComponents[1] == "@", !pathComponents[2].hasPrefix("@") {
 			return "@\(pathComponents[2])@\(instance)"
 		}
 
 		// PeerTube: instance.domain/accounts/username
-		if pathComponents.count == 3, pathComponents[1] == "accounts"
-		{
+		if pathComponents.count == 3, pathComponents[1] == "accounts" {
 			return "@\(pathComponents[2])@\(instance)"
 		}
 
 		// Write.as: instance.domain/username
-		if pathComponents.count == 2
-		{
+		if pathComponents.count == 2 {
 			return "@\(pathComponents[1])@\(instance)"
 		}
 
@@ -115,12 +99,10 @@ public extension URL
 		return absoluteStringByDroppingScheme
 	}
 
-	var absoluteStringByDroppingScheme: String
-	{
+	var absoluteStringByDroppingScheme: String {
 		let absoluteString = self.absoluteString
 
-		guard let scheme = scheme else
-		{
+		guard let scheme = scheme else {
 			return absoluteString
 		}
 

@@ -20,33 +20,29 @@
 import Cocoa
 import CoreTootin
 
-class AccountsPlaceholderController: NSViewController
-{
-	@IBOutlet private weak var imageView: NSImageView!
-	@IBOutlet private weak var collectionView: NSCollectionView!
+class AccountsPlaceholderController: NSViewController {
+	@IBOutlet private var imageView: NSImageView!
+	@IBOutlet private var collectionView: NSCollectionView!
 
-	@IBOutlet private weak var collectionViewWidthConstraint: NSLayoutConstraint!
+	@IBOutlet private var collectionViewWidthConstraint: NSLayoutConstraint!
 
 	private unowned let accountsService = AppDelegate.shared.accountsService
 
-	private var svgSourceCode: String? = nil
-	private var effectiveAppearanceObserver: NSObjectProtocol? = nil
-	private var accountsCountObserver: NSKeyValueObservation? = nil
+	private var svgSourceCode: String?
+	private var effectiveAppearanceObserver: NSObjectProtocol?
+	private var accountsCountObserver: NSKeyValueObservation?
 
 	private lazy var resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
-	private var accounts: [AuthorizedAccount]
-	{
+	private var accounts: [AuthorizedAccount] {
 		return accountsService.authorizedAccounts
 	}
 
-	private var collectionViewLayout: NSCollectionViewFlowLayout
-	{
+	private var collectionViewLayout: NSCollectionViewFlowLayout {
 		return collectionView.collectionViewLayout as! NSCollectionViewFlowLayout
 	}
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		guard
@@ -56,19 +52,17 @@ class AccountsPlaceholderController: NSViewController
 
 		self.svgSourceCode = svgSourceCode
 
-		effectiveAppearanceObserver = view.observe(\NSView.effectiveAppearance)
-			{
-				[weak self] (view, change) in
+		effectiveAppearanceObserver = view.observe(\NSView.effectiveAppearance) {
+			[weak self] _, _ in
 
-				self?.updatePlaceholderImage()
-			}
+			self?.updatePlaceholderImage()
+		}
 
-		accountsCountObserver = accountsService.observe(\.authorizedAccountsCount)
-			{
-				[weak self] (service, _) in
+		accountsCountObserver = accountsService.observe(\.authorizedAccountsCount) {
+			[weak self] _, _ in
 
-				self?.collectionView.reloadData()
-			}
+			self?.collectionView.reloadData()
+		}
 
 		collectionView.register(AccountAvatarItem.self, forItemWithIdentifier: ItemIdentifier.avatar)
 
@@ -76,8 +70,7 @@ class AccountsPlaceholderController: NSViewController
 		collectionViewWidthConstraint.constant = collectionViewLayout.horizontalContentSize(for: count)
 	}
 
-	private func updatePlaceholderImage()
-	{
+	private func updatePlaceholderImage() {
 		guard
 			let tintColor = NSColor.safeControlTintColor.rgbHexString,
 			let tintedSource = svgSourceCode?.replacingOccurrences(of: "#A1B2C3", with: tintColor),
@@ -87,16 +80,13 @@ class AccountsPlaceholderController: NSViewController
 		imageView.image = svgImage.nsImage
 	}
 
-	struct ItemIdentifier
-	{
+	enum ItemIdentifier {
 		static let avatar = NSUserInterfaceItemIdentifier("avatarItem")
 	}
 }
 
-extension AccountsPlaceholderController: NSCollectionViewDataSource
-{
-	func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int
-	{
+extension AccountsPlaceholderController: NSCollectionViewDataSource {
+	func collectionView(_: NSCollectionView, numberOfItemsInSection _: Int) -> Int {
 		return accounts.count
 	}
 
@@ -104,25 +94,21 @@ extension AccountsPlaceholderController: NSCollectionViewDataSource
 	{
 		let item = collectionView.makeItem(withIdentifier: ItemIdentifier.avatar, for: indexPath)
 
-		if let avatarItem = item as? AccountAvatarItem
-		{
+		if let avatarItem = item as? AccountAvatarItem {
 			let account = accounts[indexPath.item]
 			avatarItem.set(account: account, index: indexPath.item)
 			avatarItem.set(avatar: #imageLiteral(resourceName: "missing"))
 
-			if let avatarUrl = account.avatarURL
-			{
-				resourcesFetcher.fetchImage(with: avatarUrl)
-					{
-						[weak self] result in
+			if let avatarUrl = account.avatarURL {
+				resourcesFetcher.fetchImage(with: avatarUrl) {
+					[weak self] result in
 
-						guard case .success(let image) = result else { return }
+					guard case let .success(image) = result else { return }
 
-						DispatchQueue.main.async
-							{
-								(self?.collectionView?.item(at: indexPath) as? AccountAvatarItem)?.set(avatar: image)
-							}
+					DispatchQueue.main.async {
+						(self?.collectionView?.item(at: indexPath) as? AccountAvatarItem)?.set(avatar: image)
 					}
+				}
 			}
 		}
 
@@ -130,24 +116,19 @@ extension AccountsPlaceholderController: NSCollectionViewDataSource
 	}
 }
 
-extension AccountsPlaceholderController: NSCollectionViewDelegate
-{
-	func collectionView(_ collectionView: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>)
-	{
+extension AccountsPlaceholderController: NSCollectionViewDelegate {
+	func collectionView(_: NSCollectionView, didSelectItemsAt indexPaths: Set<IndexPath>) {
 		guard let indexPath = indexPaths.first else { return }
 
-		if let timelinesWindowController = view.window?.windowController as? TimelinesWindowController
-		{
+		if let timelinesWindowController = view.window?.windowController as? TimelinesWindowController {
 			timelinesWindowController.currentUser = accounts[indexPath.item].uuid
 			timelinesWindowController.updateUserPopUpButton()
 		}
 	}
 }
 
-private extension NSCollectionViewFlowLayout
-{
-	func horizontalContentSize(for itemCount: Int) -> CGFloat
-	{
+private extension NSCollectionViewFlowLayout {
+	func horizontalContentSize(for itemCount: Int) -> CGFloat {
 		if itemCount <= 0 {
 			return 0
 		}
@@ -155,13 +136,10 @@ private extension NSCollectionViewFlowLayout
 		let floatCount = CGFloat(itemCount)
 		return itemSize.width * floatCount + minimumInteritemSpacing * (floatCount - 1) + sectionInset.horizontal
 	}
-
 }
 
-private extension NSEdgeInsets
-{
-	var horizontal: CGFloat
-	{
+private extension NSEdgeInsets {
+	var horizontal: CGFloat {
 		return left + right
 	}
 }

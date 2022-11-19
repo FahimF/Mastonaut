@@ -17,8 +17,8 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 extension Foundation.Notification.Name {
 	static var contextObjectsDidChange: Foundation.Notification.Name {
@@ -26,8 +26,7 @@ extension Foundation.Notification.Name {
 	}
 }
 
-class UserNotificationAgent
-{
+class UserNotificationAgent {
 	let notificationTool = UserNotificationTool()
 
 	private unowned let accountService = AppDelegate.shared.accountsService
@@ -39,103 +38,88 @@ class UserNotificationAgent
 	private var accountReceiverMap: [String: (receiver: ConcreteRemoteEventsReceiver, reference: ReceiverRef)] = [:]
 	private var remoteEventsCoordinator: RemoteEventsCoordinator { return .shared }
 
+	func setUp() {
+		observations.observe(accountService, \.authorizedAccountsCount) {
+			[weak self] _, _ in DispatchQueue.main.async { self?.updateActiveEventReceivers() }
+		}
 
-	func setUp()
-	{
-		observations.observe(accountService, \.authorizedAccountsCount)
-			{
-				[weak self] (_, _) in DispatchQueue.main.async { self?.updateActiveEventReceivers() }
-			}
+		coreDataObserver = NotificationCenter.observer(for: .contextObjectsDidChange) {
+			[weak self] notification in
 
-		coreDataObserver = NotificationCenter.observer(for: .contextObjectsDidChange)
-			{
-				[weak self] notification in
-				
-				guard notification.hasChangedObjects(ofType: AccountPreferences.self) else { return }
-				
-				DispatchQueue.main.async { self?.updateActiveEventReceivers() }
-			}
+			guard notification.hasChangedObjects(ofType: AccountPreferences.self) else { return }
+
+			DispatchQueue.main.async { self?.updateActiveEventReceivers() }
+		}
 
 		updateActiveEventReceivers()
 	}
 
-	private func updateActiveEventReceivers()
-	{
-		for account in accountService.authorizedAccounts
-		{
-			if account.preferences(context: context).notificationDisplayMode == .always
-			{
+	private func updateActiveEventReceivers() {
+		for account in accountService.authorizedAccounts {
+			if account.preferences(context: context).notificationDisplayMode == .always {
 				addOrUpdateReceiver(for: account)
-			}
-			else
-			{
+			} else {
 				removeReceiver(for: account)
 			}
 		}
 	}
 
-	private func addOrUpdateReceiver(for account: AuthorizedAccount)
-	{
+	private func addOrUpdateReceiver(for account: AuthorizedAccount) {
 		let uuid = account.uuid.uuidString
 
-		if let receiver = accountReceiverMap[uuid]?.receiver
-		{
+		if let receiver = accountReceiverMap[uuid]?.receiver {
 			receiver.mode = account.preferences(context: context).notificationDetailMode
-		}
-		else if
+		} else if
 			let client = Client.create(for: account),
 			let accessToken = client.accessToken,
 			let baseURL = client.parsedBaseUrl
 		{
 			let receiver = ConcreteRemoteEventsReceiver(mode: account.preferences(context: context).notificationDetailMode)
 			let reference = remoteEventsCoordinator.add(receiver: receiver, for: .init(baseURL: baseURL,
-																					   accessToken: accessToken,
-																					   stream: .user))
+			                                                                           accessToken: accessToken,
+			                                                                           stream: .user))
 
 			accountReceiverMap[uuid] = (receiver, reference)
 
 			let uuid = account.uuid
 			let acountURI = account.uri!
 
-			receiver.eventReceivedHandler =
-				{
-					[weak self] event, detailMode in
+			receiver.eventReceivedHandler = {
+				[weak self] event, detailMode in
 
-					guard case .notification(let notification) = event else { return }
+				guard case let .notification(notification) = event else { return }
 
-					self?.postNotification(for: uuid,
-										   receiverName: acountURI,
-										   notification: notification,
-										   detailMode: detailMode)
-				}
+				self?.postNotification(for: uuid,
+				                       receiverName: acountURI,
+				                       notification: notification,
+				                       detailMode: detailMode)
+			}
 
-			receiver.didDisconnectHandler =
-				{
-					[weak self] in
+			receiver.didDisconnectHandler = {
+				[weak self] in
 
-					guard
-						let self = self,
-						let reference = self.accountReceiverMap[uuid.uuidString]?.reference
-						else { return }
+				guard
+					let self = self,
+					let reference = self.accountReceiverMap[uuid.uuidString]?.reference
+				else { return }
 
-					self.remoteEventsCoordinator.reconnectListener(for: reference)
-				}
+				self.remoteEventsCoordinator.reconnectListener(for: reference)
+			}
 		}
 	}
 
 	private func postNotification(for accountUUID: UUID,
-								  receiverName: String?,
-								  notification: MastodonNotification,
-								  detailMode: AccountPreferences.NotificationDetailMode)
+	                              receiverName: String?,
+	                              notification: MastodonNotification,
+	                              detailMode: AccountPreferences.NotificationDetailMode)
 	{
 		notificationTool.postNotification(mastodonEvent: notification,
-										  receiverName: receiverName,
-										  userAccount: accountUUID,
-										  detailMode: detailMode)
+		                                  receiverName: receiverName,
+		                                  userAccount: accountUUID,
+		                                  detailMode: detailMode)
 	}
 
-	private func removeReceiver(for account: AuthorizedAccount)
-	{
+	private func removeReceiver(for account: AuthorizedAccount) {
 		guard let reference = accountReceiverMap[account.uuid.uuidString]?.reference else { return }
 
 		remoteEventsCoordinator.remove(receiver: reference)
@@ -143,46 +127,39 @@ class UserNotificationAgent
 	}
 }
 
-private class ConcreteRemoteEventsReceiver: NSObject, RemoteEventsReceiver
-{
+private class ConcreteRemoteEventsReceiver: NSObject, RemoteEventsReceiver {
 	var mode: AccountPreferences.NotificationDetailMode
 
 	var eventReceivedHandler: ((ClientEvent, AccountPreferences.NotificationDetailMode) -> Void)?
 	var didConnectHandler: (() -> Void)?
 	var didDisconnectHandler: (() -> Void)?
 
-	deinit
-	{
+	deinit {
 		NSLog("Releasing event receiver: \(self)")
 	}
 
-	internal init(mode: AccountPreferences.NotificationDetailMode)
-	{
+	internal init(mode: AccountPreferences.NotificationDetailMode) {
 		self.mode = mode
 	}
 
-	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didHandleEvent event: ClientEvent)
+	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, didHandleEvent event: ClientEvent)
 	{
 		eventReceivedHandler?(event, mode)
 	}
 
-	func remoteEventsCoordinator(streamIdentifierDidConnect: StreamIdentifier)
-	{
+	func remoteEventsCoordinator(streamIdentifierDidConnect _: StreamIdentifier) {
 		didConnectHandler?()
 	}
 
-	func remoteEventsCoordinator(streamIdentifierDidDisconnect: StreamIdentifier)
-	{
+	func remoteEventsCoordinator(streamIdentifierDidDisconnect _: StreamIdentifier) {
 		didDisconnectHandler?()
 	}
 
-	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, parserProducedError error: Error) {}
+	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, parserProducedError _: Error) {}
 }
 
-private extension Foundation.Notification
-{
-	func hasChangedObjects<T: NSManagedObject>(ofType: T.Type) -> Bool
-	{
+private extension Foundation.Notification {
+	func hasChangedObjects<T: NSManagedObject>(ofType _: T.Type) -> Bool {
 		return (userInfo?[NSUpdatedObjectsKey] as? Set<NSManagedObject>)?.first(where: { $0 is T }) != nil
 	}
 }

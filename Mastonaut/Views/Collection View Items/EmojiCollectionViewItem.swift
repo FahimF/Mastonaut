@@ -19,33 +19,27 @@
 
 import Cocoa
 
-class EmojiCollectionViewItem: NSCollectionViewItem
-{
-	@IBOutlet private weak var backgroundBox: NSBox!
-	@IBOutlet private weak var animatedImageView: AnimatedImageView!
+class EmojiCollectionViewItem: NSCollectionViewItem {
+	@IBOutlet private var backgroundBox: NSBox!
+	@IBOutlet private var animatedImageView: AnimatedImageView!
 
 	var displayedItemHashValue: Int = 0
 
-	var animates: Bool
-	{
+	var animates: Bool {
 		get { return animatedImageView?.animates ?? false }
 		set { animatedImageView?.animates = newValue }
 	}
 
-	override var isSelected: Bool
-	{
+	override var isSelected: Bool {
 		didSet { backgroundBox.isHidden = !isSelected }
 	}
 
-	func setEmojiTooltip(from emoji: CacheableEmoji)
-	{
+	func setEmojiTooltip(from emoji: CacheableEmoji) {
 		view.toolTip = ":\(emoji.shortcode):"
 	}
 
-	func setEmojiImage(from data: Data)
-	{
-		if let imageView = animatedImageView
-		{
+	func setEmojiImage(from data: Data) {
+		if let imageView = animatedImageView {
 			imageView.animates = true
 			imageView.setAnimatedImage(from: data)
 		}
@@ -53,8 +47,7 @@ class EmojiCollectionViewItem: NSCollectionViewItem
 		imageView?.alphaValue = 1.0
 	}
 
-	override func prepareForReuse()
-	{
+	override func prepareForReuse() {
 		super.prepareForReuse()
 
 		imageView?.alphaValue = 0.0

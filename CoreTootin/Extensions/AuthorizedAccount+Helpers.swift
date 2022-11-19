@@ -19,28 +19,25 @@
 
 import CoreData
 
-public extension AuthorizedAccount
-{
-	func preferences(context: NSManagedObjectContext) -> AccountPreferences
-	{
-		if let preferences = self.accountPreferences
-		{
+public extension AuthorizedAccount {
+	func preferences(context: NSManagedObjectContext) -> AccountPreferences {
+		if let preferences = accountPreferences {
 			return preferences
 		}
 
 		let preferences = AccountPreferences(context: managedObjectContext ?? context)
-		self.accountPreferences = preferences
+		accountPreferences = preferences
 		return preferences
 	}
 
 	static func insert(context: NSManagedObjectContext,
-					   account: String,
-					   baseDomain: String,
-					   displayName: String,
-					   username: String,
-					   avatarURL: URL?,
-					   uri: String,
-					   login: LoginSettings) -> AuthorizedAccount
+	                   account: String,
+	                   baseDomain: String,
+	                   displayName: String,
+	                   username: String,
+	                   avatarURL: URL?,
+	                   uri: String,
+	                   login: LoginSettings) -> AuthorizedAccount
 	{
 		let authorizedAccount = AuthorizedAccount(context: context)
 
@@ -57,41 +54,33 @@ public extension AuthorizedAccount
 		return authorizedAccount
 	}
 
-	static func fetchAll(context: NSManagedObjectContext) throws -> [AuthorizedAccount]
-	{
+	static func fetchAll(context: NSManagedObjectContext) throws -> [AuthorizedAccount] {
 		let request: NSFetchRequest<AuthorizedAccount> = fetchRequest()
 		return try context.fetch(request)
 	}
 
-	static func fetch(with uuid: UUID, context: NSManagedObjectContext) throws -> AuthorizedAccount
-	{
+	static func fetch(with uuid: UUID, context: NSManagedObjectContext) throws -> AuthorizedAccount {
 		let request: NSFetchRequest<AuthorizedAccount> = fetchRequest()
 		request.predicate = NSPredicate(format: "uuidString = %@", uuid.uuidString)
-		if let account = try context.fetch(request).first
-		{
+		if let account = try context.fetch(request).first {
 			return account
-		}
-		else
-		{
+		} else {
 			throw FetchError.notFound
 		}
 	}
 
-	func updateLocalInfo(using account: Account, instance: Instance)
-	{
+	func updateLocalInfo(using account: Account, instance: Instance) {
 		displayName = account.displayName
 		username = account.username
 		avatarURL = account.avatarURL
 		uri = account.uri(in: instance)
 	}
 
-	var uuid: UUID
-	{
+	var uuid: UUID {
 		guard let uuid = uuidString.flatMap({ UUID(uuidString: $0) }) else {
 			let newUUID = UUID()
 
-			if !isFault, !isDeleted
-			{
+			if !isFault, !isDeleted {
 				uuidString = newUUID.uuidString
 			}
 
@@ -101,56 +90,46 @@ public extension AuthorizedAccount
 		return uuid
 	}
 
-	var bestDisplayName: String
-	{
-		guard let displayName = self.displayName, !displayName.isEmpty else
-		{
+	var bestDisplayName: String {
+		guard let displayName = displayName, !displayName.isEmpty else {
 			return username!
 		}
 
 		return displayName
 	}
 
-	var accountWithInstance: String
-	{
+	var accountWithInstance: String {
 		return isFault ? "" : (uri ?? "@\(username!)@\(baseDomain!)")
 	}
 
-	enum FetchError: Error
-	{
+	enum FetchError: Error {
 		case notFound
 	}
 }
 
-public extension AuthorizedAccount
-{
-	var bookmarkedTagsList: [String]
-	{
+public extension AuthorizedAccount {
+	var bookmarkedTagsList: [String] {
 		let tags = (bookmarkedTags as? Set<BookmarkedTag>) ?? []
-		return tags.map({ $0.name! }).sorted()
+		return tags.map { $0.name! }.sorted()
 	}
 
-	func hasBookmarkedTag(_ tagName: String) -> Bool
-	{
+	func hasBookmarkedTag(_ tagName: String) -> Bool {
 		return bookmarkedTag(with: tagName) != nil
 	}
 
-	func bookmarkTag(_ tagName: String)
-	{
+	func bookmarkTag(_ tagName: String) {
 		guard !isDeleted, hasBookmarkedTag(tagName) == false else { return }
 		let tag = BookmarkedTag(context: managedObjectContext!)
 		tag.name = tagName
 		addToBookmarkedTags(tag)
 	}
 
-	func unbookmarkTag(_ tagName: String)
-	{
+	func unbookmarkTag(_ tagName: String) {
 		guard !isDeleted, let tag = bookmarkedTag(with: tagName) else { return }
 		removeFromBookmarkedTags(tag)
 	}
 
-	private func bookmarkedTag(with name: String) -> BookmarkedTag?
-	{
+	private func bookmarkedTag(with name: String) -> BookmarkedTag? {
 		let fetchRequest: NSFetchRequest<BookmarkedTag> = BookmarkedTag.fetchRequest()
 		fetchRequest.predicate = NSPredicate(format: "account = %@ AND name = %@", self, name)
 		return try! managedObjectContext!.fetch(fetchRequest).first

@@ -19,55 +19,46 @@
 
 import Foundation
 
-public class PreferencesController: NSObject
-{
+public class PreferencesController: NSObject {
 	internal lazy var defaults = UserDefaults(suiteName: suiteName) ?? .standard
 
 	/// The suite name. Should be the same as the App's App Group identifier.
-	internal var suiteName: String?
-	{
+	internal var suiteName: String? {
 		return nil
 	}
 
 	// Default helpers
 
-	public func number(forKey key: String) -> NSNumber?
-	{
+	public func number(forKey key: String) -> NSNumber? {
 		return defaults.object(forKey: key) as? NSNumber
 	}
 
-	public func string(forKey key: String) -> String?
-	{
+	public func string(forKey key: String) -> String? {
 		return defaults.string(forKey: key)
 	}
 
-	public func bool(forKey key: String) -> Bool?
-	{
+	public func bool(forKey key: String) -> Bool? {
 		return number(forKey: key)?.boolValue
 	}
 
-	public func rect(forKey key: String) -> NSRect?
-	{
+	public func rect(forKey key: String) -> NSRect? {
 		return string(forKey: key).map { NSRectFromString($0) }
 	}
 
-	public func object<T>(forKey key: String) -> T?
-	{
+	public func object<T>(forKey key: String) -> T? {
 		return defaults.object(forKey: key) as? T
 	}
 
 	public func integerRepresentable<T: RawRepresentable>(for key: String, default: T) -> T where T.RawValue == Int
 	{
-		guard let number = number(forKey: key) else
-		{
+		guard let number = number(forKey: key) else {
 			return `default`
 		}
 
-		return T.init(rawValue: number.intValue) ?? `default`
+		return T(rawValue: number.intValue) ?? `default`
 	}
 
-	public func uuid(forKey key: String) -> UUID?
-	{
+	public func uuid(forKey key: String) -> UUID? {
 		guard let uuid = string(forKey: key) else { return nil }
 		return UUID(uuidString: uuid)
 	}

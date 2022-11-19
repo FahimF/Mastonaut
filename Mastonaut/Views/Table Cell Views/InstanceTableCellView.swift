@@ -19,8 +19,7 @@
 
 import Foundation
 
-class InstanceTableCellView: NSTableCellView
-{
+class InstanceTableCellView: NSTableCellView {
 	@IBOutlet private unowned var nameLabel: NSTextField!
 	@IBOutlet private unowned var descriptionLabel: NSTextField!
 
@@ -32,28 +31,21 @@ class InstanceTableCellView: NSTableCellView
 	@IBOutlet private unowned var safeForWorkFlagView: NSView!
 	@IBOutlet private unowned var adultContentFlagView: NSView!
 
-	func set(instance: DirectoryService.Instance)
-	{
+	func set(instance: DirectoryService.Instance) {
 		nameLabel.stringValue = instance.name
 		descriptionLabel.stringValue = instance.info.shortDescription
 		versionLabel.stringValue = instance.version ?? "––"
 		uptimeLabel.stringValue = "\(Int(instance.uptime * 100))%"
 
-		if let integerCount = Int(instance.statuses)
-		{
+		if let integerCount = Int(instance.statuses) {
 			statusCountLabel.integerValue = integerCount
-		}
-		else
-		{
+		} else {
 			statusCountLabel.stringValue = instance.statuses
 		}
 
-		if let integerCount = Int(instance.users)
-		{
+		if let integerCount = Int(instance.users) {
 			userCountLabel.integerValue = integerCount
-		}
-		else
-		{
+		} else {
 			userCountLabel.stringValue = instance.users
 		}
 
@@ -62,15 +54,12 @@ class InstanceTableCellView: NSTableCellView
 	}
 }
 
-private extension DirectoryService.Instance
-{
-	var isSafeForWork: Bool
-	{
+private extension DirectoryService.Instance {
+	var isSafeForWork: Bool {
 		return info.prohibitedContent.contains("pornography_all") && info.prohibitedContent.contains("nudity_all")
 	}
 
-	var isAdultCommunity: Bool
-	{
+	var isAdultCommunity: Bool {
 		return info.categories.contains("adult")
 	}
 }

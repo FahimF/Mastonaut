@@ -19,7 +19,6 @@
 
 import Foundation
 
-func addressAsString(_ obj: AnyObject) -> String
-{
+func addressAsString(_ obj: AnyObject) -> String {
 	return String(format: "%p", obj as! CVarArg)
 }

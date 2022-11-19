@@ -6,62 +6,62 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class ClientsTests: XCTestCase {
-    func testRegisterApplication() {
-        let request = Clients.register(clientName: "MastodonKitTestApplication", scopes: [])
+	func testRegisterApplication() {
+		let request = Clients.register(clientName: "MastodonKitTestApplication", scopes: [])
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/apps")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/apps")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNotNil(request.method.httpBody)
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNotNil(request.method.httpBody)
 
-        let payload = String(data: request.method.httpBody!, encoding: .utf8)!
-        XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
-        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
-        XCTAssertTrue(payload.contains("redirect_uris=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob"))
-        XCTAssertTrue(payload.contains("scopes="))
-    }
+		let payload = String(data: request.method.httpBody!, encoding: .utf8)!
+		XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
+		XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+		XCTAssertTrue(payload.contains("redirect_uris=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob"))
+		XCTAssertTrue(payload.contains("scopes="))
+	}
 
-    func testRegisterApplicationWithRedirectURI() {
-        let request = Clients.register(clientName: "MastodonKitTestApplication", redirectURI: "my-awesome-app://", scopes: [.read, .follow])
+	func testRegisterApplicationWithRedirectURI() {
+		let request = Clients.register(clientName: "MastodonKitTestApplication", redirectURI: "my-awesome-app://", scopes: [.read, .follow])
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/apps")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/apps")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNotNil(request.method.httpBody)
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNotNil(request.method.httpBody)
 
-        let payload = String(data: request.method.httpBody!, encoding: .utf8)!
-        XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
-        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
-        XCTAssertTrue(payload.contains("redirect_uris=my-awesome-app%3A//"))
-        XCTAssertTrue(payload.contains("scopes=read%20follow"))
-    }
+		let payload = String(data: request.method.httpBody!, encoding: .utf8)!
+		XCTAssertEqual(payload.components(separatedBy: "&").count, 3)
+		XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+		XCTAssertTrue(payload.contains("redirect_uris=my-awesome-app%3A//"))
+		XCTAssertTrue(payload.contains("scopes=read%20follow"))
+	}
 
-    func testRegisterApplicationWithStatusAndWebsite() {
-        let request = Clients.register(clientName: "MastodonKitTestApplication", scopes: [.read, .write, .follow], website: "https://github.com/ornithocoder/MastodonKit")
+	func testRegisterApplicationWithStatusAndWebsite() {
+		let request = Clients.register(clientName: "MastodonKitTestApplication", scopes: [.read, .write, .follow], website: "https://github.com/ornithocoder/MastodonKit")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/apps")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/apps")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNotNil(request.method.httpBody)
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNotNil(request.method.httpBody)
 
-        let payload = String(data: request.method.httpBody!, encoding: .utf8)!
-        XCTAssertEqual(payload.components(separatedBy: "&").count, 4)
-        XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
-        XCTAssertTrue(payload.contains("redirect_uris=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob"))
-        XCTAssertTrue(payload.contains("scopes=read%20write%20follow"))
-        XCTAssertTrue(payload.contains("website=https%3A//github.com/ornithocoder/MastodonKit"))
-    }
+		let payload = String(data: request.method.httpBody!, encoding: .utf8)!
+		XCTAssertEqual(payload.components(separatedBy: "&").count, 4)
+		XCTAssertTrue(payload.contains("client_name=MastodonKitTestApplication"))
+		XCTAssertTrue(payload.contains("redirect_uris=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob"))
+		XCTAssertTrue(payload.contains("scopes=read%20write%20follow"))
+		XCTAssertTrue(payload.contains("website=https%3A//github.com/ornithocoder/MastodonKit"))
+	}
 }

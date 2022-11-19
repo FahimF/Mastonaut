@@ -19,15 +19,12 @@
 
 import Foundation
 
-internal extension KeychainController
-{
-	func query(authorizedAccount: AuthorizedAccount) throws -> AccountAccessToken?
-	{
+internal extension KeychainController {
+	func query(authorizedAccount: AuthorizedAccount) throws -> AccountAccessToken? {
 		return try authorizedAccount.account.flatMap { try query(account: $0) }
 	}
 
-	func migrateStorableToSharedLocalKeychain(_ authorizedAccount: AuthorizedAccount) throws
-	{
+	func migrateStorableToSharedLocalKeychain(_ authorizedAccount: AuthorizedAccount) throws {
 		guard let account = authorizedAccount.account else {
 			throw MigrationError.badAccoountParameter
 		}

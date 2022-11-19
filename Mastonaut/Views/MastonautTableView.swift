@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Cocoa
 import Carbon
+import Cocoa
 
 class MastonautTableView: NoInsetsTableView {
-
 	override func resignFirstResponder() -> Bool {
 		defer {
 			(delegate as? MastonautTableViewDelegate)?.tableViewDidResignFirstResponder?(self)
@@ -35,7 +34,7 @@ class MastonautTableView: NoInsetsTableView {
 		}
 		return super.becomeFirstResponder()
 	}
-	
+
 	override func scrollRowToVisible(_ row: Int) {
 		NSAnimationContext.runAnimationGroup { context in
 			context.allowsImplicitAnimation = true
@@ -44,7 +43,6 @@ class MastonautTableView: NoInsetsTableView {
 	}
 
 	override func keyDown(with event: NSEvent) {
-
 		switch Int(event.keyCode) {
 		case kVK_DownArrow, kVK_UpArrow:
 			guard selectedRowIndexes.first.flatMap({ isRowVisible($0) }) != true else {
@@ -54,9 +52,10 @@ class MastonautTableView: NoInsetsTableView {
 			selectFirstVisibleRow()
 
 		case kVK_Space:
-			if let delegate = self.delegate as? MastonautTableViewDelegate,
+			if let delegate = delegate as? MastonautTableViewDelegate,
 			   delegate.responds(to: #selector(MastonautTableViewDelegate.tableView(_:shouldTogglePreviewForRow:))),
-			   let selectedRow = selectedRowIndexes.first {
+			   let selectedRow = selectedRowIndexes.first
+			{
 				delegate.tableView?(self, shouldTogglePreviewForRow: selectedRow)
 			} else {
 				super.keyDown(with: event)
@@ -78,7 +77,6 @@ class MastonautTableView: NoInsetsTableView {
 
 @objc
 protocol MastonautTableViewDelegate: NSTableViewDelegate {
-
 	@objc
 	optional func tableViewDidResignFirstResponder(_ tableView: MastonautTableView)
 

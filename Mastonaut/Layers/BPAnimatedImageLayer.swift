@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import QuartzCore
 import CoreGraphics
+import QuartzCore
 
 class BPAnimatedImageLayer: CALayer {
-
 	// MARK: Initializers
 
 	convenience init?(imageAt url: URL) {
@@ -55,7 +54,8 @@ class BPAnimatedImageLayer: CALayer {
 		super.init(layer: layer)
 	}
 
-	required init?(coder: NSCoder) {
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
@@ -86,7 +86,7 @@ class BPAnimatedImageLayer: CALayer {
 
 	private let isCopy: Bool
 	private let imageSource: CGImageSource
-	private let scaledAtlasLayer: CALayer = CALayer()
+	private let scaledAtlasLayer: CALayer = .init()
 	private var atlasGenerator: LayerImageAtlasGenerator?
 	fileprivate var atlasImage: CGImage?
 	fileprivate var frameDelays: [TimeInterval] = []
@@ -94,7 +94,7 @@ class BPAnimatedImageLayer: CALayer {
 	private func recomputeImageAtlas() {
 		let generator = atlasGenerator ?? .init(layer: self)
 		generator.createAtlas(imageSource: imageSource)
-		self.atlasGenerator = generator
+		atlasGenerator = generator
 	}
 
 	fileprivate func recomputeScaledLayer() {
@@ -105,8 +105,8 @@ class BPAnimatedImageLayer: CALayer {
 		}
 
 		scaledAtlasLayer.frame = CGRect(x: 0, y: 0,
-										width: CGFloat(scaledAtlasImage.width) / contentsScale,
-										height: CGFloat(scaledAtlasImage.height) / contentsScale)
+		                                width: CGFloat(scaledAtlasImage.width) / contentsScale,
+		                                height: CGFloat(scaledAtlasImage.height) / contentsScale)
 		scaledAtlasLayer.contentsScale = contentsScale
 		scaledAtlasLayer.contents = scaledAtlasImage
 
@@ -121,7 +121,7 @@ class BPAnimatedImageLayer: CALayer {
 
 		let frameWidth = scaledAtlasLayer.frame.width / CGFloat(frameDelays.count)
 		let spriteKeyframeAnimation = CAKeyframeAnimation(keyPath: "position.x")
-		spriteKeyframeAnimation.values = (0..<frameDelays.count).map({ CGFloat($0) * -frameWidth })
+		spriteKeyframeAnimation.values = (0 ..< frameDelays.count).map { CGFloat($0) * -frameWidth }
 		spriteKeyframeAnimation.duration = frameDelays.reduce(0, +)
 		spriteKeyframeAnimation.timingFunction = CAMediaTimingFunction(name: .linear)
 		spriteKeyframeAnimation.repeatCount = .greatestFiniteMagnitude
@@ -131,25 +131,21 @@ class BPAnimatedImageLayer: CALayer {
 	}
 }
 
-func CGImageSourceCopyDelayTimeAtIndex(_ source: CGImageSource, _ index: Int) -> TimeInterval?
-{
-	func validDelay(_ input: TimeInterval?) -> TimeInterval?
-	{
-		guard case .some(let delay) = input, delay > 0 else { return nil }
+func CGImageSourceCopyDelayTimeAtIndex(_ source: CGImageSource, _ index: Int) -> TimeInterval? {
+	func validDelay(_ input: TimeInterval?) -> TimeInterval? {
+		guard case let .some(delay) = input, delay > 0 else { return nil }
 		return input
 	}
 
-	if let infoDict = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as NSDictionary?
-	{
+	if let infoDict = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as NSDictionary? {
 		if let pngDict = infoDict[kCGImagePropertyPNGDictionary] as? NSDictionary,
 		   let delayTime = validDelay(pngDict[kCGImagePropertyAPNGUnclampedDelayTime] as? TimeInterval)
-			?? pngDict[kCGImagePropertyAPNGDelayTime] as? TimeInterval
+		   ?? pngDict[kCGImagePropertyAPNGDelayTime] as? TimeInterval
 		{
 			return delayTime
-		}
-		else if let gifDict = infoDict[kCGImagePropertyGIFDictionary] as? NSDictionary,
-				let delayTime = validDelay(gifDict[kCGImagePropertyGIFUnclampedDelayTime] as? TimeInterval)
-					?? gifDict[kCGImagePropertyGIFDelayTime] as? TimeInterval
+		} else if let gifDict = infoDict[kCGImagePropertyGIFDictionary] as? NSDictionary,
+		          let delayTime = validDelay(gifDict[kCGImagePropertyGIFUnclampedDelayTime] as? TimeInterval)
+		          ?? gifDict[kCGImagePropertyGIFDelayTime] as? TimeInterval
 		{
 			return delayTime
 		}
@@ -159,10 +155,9 @@ func CGImageSourceCopyDelayTimeAtIndex(_ source: CGImageSource, _ index: Int) ->
 }
 
 private class LayerImageAtlasGenerator {
-
 	weak var originalLayer: BPAnimatedImageLayer?
 
-	weak var layer: BPAnimatedImageLayer? = nil {
+	weak var layer: BPAnimatedImageLayer? {
 		didSet {
 			guard let result = lastGeneratedAtlas else { return }
 
@@ -181,7 +176,7 @@ private class LayerImageAtlasGenerator {
 	}
 
 	init(layer: BPAnimatedImageLayer) {
-		self.originalLayer = layer
+		originalLayer = layer
 		self.layer = layer
 	}
 
@@ -190,10 +185,11 @@ private class LayerImageAtlasGenerator {
 		let firstImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)!
 
 		guard let atlasContext = CGContext(data: nil, width: firstImage.width * frameCount, height: firstImage.height,
-										   bitsPerComponent: 8,
-										   bytesPerRow: 4 * firstImage.width * frameCount, // 4 bytes per RGBA pixel
-										   space: CGColorSpaceCreateDeviceRGB(),
-										   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+		                                   bitsPerComponent: 8,
+		                                   bytesPerRow: 4 * firstImage.width * frameCount, // 4 bytes per RGBA pixel
+		                                   space: CGColorSpaceCreateDeviceRGB(),
+		                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+		else {
 			fatalError("Could not create CGBitmapContext")
 		}
 
@@ -204,10 +200,10 @@ private class LayerImageAtlasGenerator {
 			atlasContext.draw(firstImage, in: CGRect(x: 0, y: 0, width: firstImage.width, height: firstImage.height))
 			delays.append(CGImageSourceCopyDelayTimeAtIndex(imageSource, 0) ?? 0.05)
 
-			for index in 1..<frameCount {
+			for index in 1 ..< frameCount {
 				let frameImage = CGImageSourceCreateImageAtIndex(imageSource, index, nil)!
 				atlasContext.draw(frameImage, in: CGRect(x: firstImage.width * index, y: 0,
-														 width: frameImage.width, height: frameImage.height))
+				                                         width: frameImage.width, height: frameImage.height))
 
 				delays.append(CGImageSourceCopyDelayTimeAtIndex(imageSource, index) ?? 0.05)
 			}

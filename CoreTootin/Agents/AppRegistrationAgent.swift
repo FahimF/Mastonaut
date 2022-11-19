@@ -19,39 +19,31 @@
 
 import Foundation
 
-public class AppRegistrationAgent
-{
+public class AppRegistrationAgent {
 	private unowned let keychainController: KeychainController
 
-	public init(keychainController: KeychainController)
-	{
+	public init(keychainController: KeychainController) {
 		self.keychainController = keychainController
 	}
 
 	public func clientAppRegistration(for baseDomain: String,
-									  completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
+	                                  completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
 	{
-		if let clientApplication = keychainController.clientAppRegistration(for: baseDomain)
-		{
+		if let clientApplication = keychainController.clientAppRegistration(for: baseDomain) {
 			completion(.success(clientApplication))
-		}
-		else
-		{
-			registerApplication(onInstance: baseDomain)
-			{
+		} else {
+			registerApplication(onInstance: baseDomain) {
 				[weak self] result in
 
 				guard let self = self else { return }
 
-				DispatchQueue.main.async
-				{
-					switch result
-					{
-					case .success(let clientApplication):
+				DispatchQueue.main.async {
+					switch result {
+					case let .success(clientApplication):
 						self.keychainController.register(clientApplication: clientApplication, for: baseDomain)
 						completion(.success(clientApplication))
 
-					case .failure(let error):
+					case let .failure(error):
 						completion(.failure(error))
 					}
 				}
@@ -59,104 +51,83 @@ public class AppRegistrationAgent
 		}
 	}
 
-	private func redirectUri(for baseDomain: String) -> String
-	{
+	private func redirectUri(for baseDomain: String) -> String {
 		return "mastonaut-auth://oauth/grant/\(baseDomain)/code/"
 	}
 
 	private func registerApplication(onInstance baseDomain: String,
-									 completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
+	                                 completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
 	{
 		let client = Client(baseURL: "https://" + baseDomain)
 
 		client.run(Clients.register(clientName: "Mastonaut",
-									redirectURI: redirectUri(for: baseDomain),
-									scopes: [.read, .write, .push, .follow],
-									website: "https://www.mastonaut.app"))
-		{
+		                            redirectURI: redirectUri(for: baseDomain),
+		                            scopes: [.read, .write, .push, .follow],
+		                            website: "https://www.mastonaut.app")) {
 			result in
 
-			switch result
-			{
-			case .failure(let error):
+			switch result {
+			case let .failure(error):
 				completion(.failure(.restError(error.localizedDescription)))
 
-			case .success(let registration, _):
+			case let .success(registration, _):
 				completion(.success(registration))
 			}
 		}
 	}
 
-	public enum Errors: Error
-	{
+	public enum Errors: Error {
 		case restError(String)
 		case keychainError(Error)
 		case unknownAuthorization
 
-		var localizedDescription: String
-		{
-			switch self
-			{
-			case .restError(let error): return "REST: \(error)"
-			case .keychainError(let error): return "Keychain: \(error.localizedDescription)"
+		var localizedDescription: String {
+			switch self {
+			case let .restError(error): return "REST: \(error)"
+			case let .keychainError(error): return "Keychain: \(error.localizedDescription)"
 			case .unknownAuthorization: return 🔠("authorization.unknown")
 			}
 		}
 	}
 }
 
-private extension KeychainController
-{
-	func clientAppRegistration(for instanceBaseUrl: String) -> ClientApplication?
-	{
-		do
-		{
+private extension KeychainController {
+	func clientAppRegistration(for instanceBaseUrl: String) -> ClientApplication? {
+		do {
 			let registration: InstanceRegistration? = try query(account: instanceBaseUrl)
 
-			if registration?.client.redirectURI.contains("https://www.mastonaut.app") == true
-			{
+			if registration?.client.redirectURI.contains("https://www.mastonaut.app") == true {
 				// This is a bad registration which won't work anymore. It should be deleted.
 				try delete(instanceBaseUrl)
 				return nil
 			}
 
 			return registration?.client
-		}
-		catch
-		{
+		} catch {
 			NSLog("Failed fetching instance registration for instance “\(instanceBaseUrl)”: \(error.localizedDescription)")
 			return nil
 		}
 	}
 
-	func register(clientApplication: ClientApplication, for instanceBaseUrl: String)
-	{
-		do
-		{
+	func register(clientApplication: ClientApplication, for instanceBaseUrl: String) {
+		do {
 			try store(InstanceRegistration(account: instanceBaseUrl, client: clientApplication))
-		}
-		catch
-		{
+		} catch {
 			NSLog("Failed storing registration for instance “\(instanceBaseUrl)”: \(error.localizedDescription)")
 		}
 	}
 
-	func deleteRegistration(for instanceBaseUrl: String)
-	{
-		do
-		{
+	func deleteRegistration(for instanceBaseUrl: String) {
+		do {
 			guard let registration: InstanceRegistration = try? query(account: instanceBaseUrl) else { return }
 			try delete(registration)
-		}
-		catch
-		{
+		} catch {
 			NSLog("Failed deleting registration for instance “\(instanceBaseUrl)”: \(error.localizedDescription)")
 		}
 	}
 
 	/// Stores the app registration with an individual instance.
-	struct InstanceRegistration: KeychainStorable
-	{
+	struct InstanceRegistration: KeychainStorable {
 		let account: String
 		let client: ClientApplication
 	}

@@ -10,8 +10,7 @@ import Foundation
 
 /// The Client delegate is responsibe for fetching a new authorization token if the use being currently used expires.
 public protocol ClientDelegate: AnyObject {
+	var isRequestingNewAccessToken: Bool { get }
 
-    var isRequestingNewAccessToken: Bool { get }
-
-    func clientProducedUnauthorizedError(_ client: ClientType)
+	func clientProducedUnauthorizedError(_ client: ClientType)
 }

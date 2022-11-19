@@ -19,12 +19,10 @@
 
 import AppKit
 
-open class SuggestionTextView: NSTextView
-{
-	public weak var suggestionsProvider: SuggestionTextViewSuggestionsProvider? = nil
+open class SuggestionTextView: NSTextView {
+	public weak var suggestionsProvider: SuggestionTextViewSuggestionsProvider?
 
-	public weak var imagesProvider: SuggestionWindowImagesProvider?
-	{
+	public weak var imagesProvider: SuggestionWindowImagesProvider? {
 		get { return suggestionWindowController.imagesProvider }
 		set { suggestionWindowController.imagesProvider = newValue }
 	}
@@ -33,10 +31,8 @@ open class SuggestionTextView: NSTextView
 
 	private var lastSuggestionRequestId: UUID?
 
-	public override func moveUp(_ sender: Any?)
-	{
-		guard suggestionWindowController.isWindowVisible else
-		{
+	override public func moveUp(_ sender: Any?) {
+		guard suggestionWindowController.isWindowVisible else {
 			super.moveUp(sender)
 			return
 		}
@@ -44,10 +40,8 @@ open class SuggestionTextView: NSTextView
 		suggestionWindowController.selectPrevious(sender)
 	}
 
-	public override func moveDown(_ sender: Any?)
-	{
-		guard suggestionWindowController.isWindowVisible else
-		{
+	override public func moveDown(_ sender: Any?) {
+		guard suggestionWindowController.isWindowVisible else {
 			super.moveDown(sender)
 			return
 		}
@@ -55,56 +49,49 @@ open class SuggestionTextView: NSTextView
 		suggestionWindowController.selectNext(sender)
 	}
 
-	public override func cancelOperation(_ sender: Any?)
-	{
-		guard suggestionWindowController.isWindowVisible else
-		{
+	override public func cancelOperation(_: Any?) {
+		guard suggestionWindowController.isWindowVisible else {
 			return
 		}
 
 		dismissSuggestionsWindow()
 	}
-	
-	open func textStorage(_ textStorage: NSTextStorage,
-						  didProcessEditing editedMask: NSTextStorageEditActions,
-						  range editedRange: NSRange,
-						  changeInLength delta: Int)
+
+	open func textStorage(_: NSTextStorage,
+	                      didProcessEditing editedMask: NSTextStorageEditActions,
+	                      range _: NSRange,
+	                      changeInLength _: Int)
 	{
 		guard
 			undoManager?.isUndoing != true,
 			editedMask.contains(.editedCharacters)
 		else { return }
 
-		DispatchQueue.main.async
-			{
-				self.dispatchSuggestionsFetch()
-			}
+		DispatchQueue.main.async {
+			self.dispatchSuggestionsFetch()
+		}
 	}
 
-	public func dispatchSuggestionsFetch()
-	{
+	public func dispatchSuggestionsFetch() {
 		SuggestionTextView.cancelPreviousPerformRequests(withTarget: self,
-														 selector: #selector(reallyDispatchSuggestionsFetch),
-														 object: nil)
+		                                                 selector: #selector(reallyDispatchSuggestionsFetch),
+		                                                 object: nil)
 
 		perform(#selector(reallyDispatchSuggestionsFetch), with: nil, afterDelay: 0.33)
 	}
 
-	public func dismissSuggestionsWindow()
-	{
+	public func dismissSuggestionsWindow() {
 		suggestionWindowController.close()
 	}
 
-	public func insertCurrentlySelectedSuggestion()
-	{
+	public func insertCurrentlySelectedSuggestion() {
 		suggestionWindowController.insertSelectedSuggestion()
 		dismissSuggestionsWindow()
 	}
 
 	// MARK: Private Stuff
 
-	@objc private func reallyDispatchSuggestionsFetch()
-	{
+	@objc private func reallyDispatchSuggestionsFetch() {
 		let selection = selectedRange()
 		let string = self.string
 
@@ -112,8 +99,7 @@ open class SuggestionTextView: NSTextView
 			selection.length == 0,
 			let provider = suggestionsProvider,
 			let (mention, range) = string.mentionUpTo(index: selection.location)
-		else
-		{
+		else {
 			dismissSuggestionsWindow()
 			return
 		}
@@ -121,33 +107,28 @@ open class SuggestionTextView: NSTextView
 		let requestId = UUID()
 		lastSuggestionRequestId = requestId
 
-		provider.suggestionTextView(self, suggestionsForMention: mention)
-		{
+		provider.suggestionTextView(self, suggestionsForMention: mention) {
 			[weak self] suggestions in
 
-			guard !suggestions.isEmpty else
-			{
+			guard !suggestions.isEmpty else {
 				DispatchQueue.main.async { self?.dismissSuggestionsWindow() }
 				return
 			}
 
-			DispatchQueue.main.async
-				{
-					guard self?.lastSuggestionRequestId == requestId else { return }
-					self?.showSuggestionsWindow(with: suggestions, mentionRange: range)
-				}
+			DispatchQueue.main.async {
+				guard self?.lastSuggestionRequestId == requestId else { return }
+				self?.showSuggestionsWindow(with: suggestions, mentionRange: range)
+			}
 		}
 	}
 
-	private func showSuggestionsWindow(with suggestions: [Suggestion], mentionRange: NSRange)
-	{
+	private func showSuggestionsWindow(with suggestions: [Suggestion], mentionRange: NSRange) {
 		guard
 			mentionRange.upperBound <= (textStorage?.length ?? 0),
-			let window = self.window,
-			let layoutManager = self.layoutManager,
-			let textContainer = self.textContainer
-		else
-		{
+			let window = window,
+			let layoutManager = layoutManager,
+			let textContainer = textContainer
+		else {
 			dismissSuggestionsWindow()
 			return
 		}
@@ -160,22 +141,20 @@ open class SuggestionTextView: NSTextView
 		suggestionWindowController.set(suggestions: suggestions)
 		suggestionWindowController.showWindow(nil)
 
-		suggestionWindowController.insertSuggestionBlock =
-			{
-				[weak self] suggestion in
-				guard let self = self else { return }
-				self.replaceCharacters(in: mentionRange, with: "\(suggestion.text) ")
-			}
+		suggestionWindowController.insertSuggestionBlock = {
+			[weak self] suggestion in
+			guard let self = self else { return }
+			self.replaceCharacters(in: mentionRange, with: "\(suggestion.text) ")
+		}
 
 		suggestionWindowController.positionWindow(under: screenRect)
 	}
 }
 
-@objc public protocol SuggestionTextViewSuggestionsProvider: AnyObject
-{
+@objc public protocol SuggestionTextViewSuggestionsProvider: AnyObject {
 	func suggestionTextView(_ textView: SuggestionTextView,
-							suggestionsForMention: String,
-							completion: @escaping ([Suggestion]) -> Void)
+	                        suggestionsForMention: String,
+	                        completion: @escaping ([Suggestion]) -> Void)
 }
 
 @objc public protocol Suggestion {
@@ -184,23 +163,18 @@ open class SuggestionTextView: NSTextView
 	var displayName: String { get }
 }
 
-private extension NSString
-{
-	func mentionUpTo(index: Int) -> (mention: String, range: NSRange)?
-	{
+private extension NSString {
+	func mentionUpTo(index: Int) -> (mention: String, range: NSRange)? {
 		guard length > 0, index <= length else { return nil }
 
-		var previous＠CharacterIndex: Int? = nil
+		var previous＠CharacterIndex: Int?
 		let charset＠ = NSCharacterSet(charactersIn: "@")
 
-		for charIndex in (0..<index).reversed()
-		{
+		for charIndex in (0 ..< index).reversed() {
 			let char = character(at: charIndex)
 
-			if (CharacterSet.whitespacesAndNewlines as NSCharacterSet).characterIsMember(char)
-			{
-				if let ＠CharacterIndex = previous＠CharacterIndex
-				{
+			if (CharacterSet.whitespacesAndNewlines as NSCharacterSet).characterIsMember(char) {
+				if let ＠CharacterIndex = previous＠CharacterIndex {
 					let mentionRange = NSMakeRange(＠CharacterIndex, index - ＠CharacterIndex)
 					let mention = substring(with: mentionRange)
 					return (mention, mentionRange)
@@ -208,11 +182,8 @@ private extension NSString
 
 				// Found an empty space character before an `@` character
 				return nil
-			}
-			else if charset＠.characterIsMember(char), index - charIndex > 1
-			{
-				if previous＠CharacterIndex != nil
-				{
+			} else if charset＠.characterIsMember(char), index - charIndex > 1 {
+				if previous＠CharacterIndex != nil {
 					let mentionRange = NSMakeRange(charIndex, index - charIndex)
 					let mention = substring(with: mentionRange)
 					return (mention, mentionRange)
@@ -222,8 +193,7 @@ private extension NSString
 			}
 		}
 
-		if let ＠CharacterIndex = previous＠CharacterIndex
-		{
+		if let ＠CharacterIndex = previous＠CharacterIndex {
 			let mentionRange = NSMakeRange(＠CharacterIndex, index - ＠CharacterIndex)
 			let mention = substring(with: mentionRange)
 			return (mention, mentionRange)

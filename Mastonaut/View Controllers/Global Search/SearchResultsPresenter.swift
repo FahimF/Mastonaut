@@ -20,36 +20,31 @@
 import AppKit
 import CoreTootin
 
-protocol SearchResultsPresenter: NSViewController
-{
+protocol SearchResultsPresenter: NSViewController {
 	var delegate: SearchResultsPresenterDelegate? { get set }
 
 	func set(results: ResultsType, instance: Instance)
 }
 
-protocol SearchResultsPresenterDelegate: AnyObject
-{
+protocol SearchResultsPresenterDelegate: AnyObject {
 	func searchResultsPresenter(_ presenter: SearchResultsPresenter, userDidSelect selection: SearchResultSelection?)
 	func searchResultsPresenter(_ presenter: SearchResultsPresenter, userDidDoubleClick selection: SearchResultSelection)
 }
 
-enum SearchResultSelection: Equatable
-{
+enum SearchResultSelection: Equatable {
 	case account(Account)
 	case status(Status)
 	case tag(String)
 
-	static func == (lhs: SearchResultSelection, rhs: SearchResultSelection) -> Bool
-	{
-		switch (lhs, rhs)
-		{
-		case (.account(let a1), .account(let a2)):
+	static func == (lhs: SearchResultSelection, rhs: SearchResultSelection) -> Bool {
+		switch (lhs, rhs) {
+		case let (.account(a1), .account(a2)):
 			return a1.id == a2.id
 
-		case (.status(let s1), .status(let s2)):
+		case let (.status(s1), .status(s2)):
 			return s1.id == s2.id
 
-		case (.tag(let t1), .tag(let t2)):
+		case let (.tag(t1), .tag(t2)):
 			return t1 == t2
 
 		default:

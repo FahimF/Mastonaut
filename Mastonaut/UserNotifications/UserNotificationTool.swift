@@ -17,16 +17,13 @@
 //  GNU General Public License for more details.
 //
 
+import CoreTootin
 import Foundation
 import UserNotifications
-import CoreTootin
 
-class UserNotificationTool
-{
-	private var postedNotificationsCount: Int = 0
-	{
-		didSet
-		{
+class UserNotificationTool {
+	private var postedNotificationsCount: Int = 0 {
+		didSet {
 			let count = postedNotificationsCount
 			NSApp.dockTile.badgeLabel = count == 0 ? nil : "\(count)"
 		}
@@ -42,42 +39,36 @@ class UserNotificationTool
 
 		NSUserNotificationCenter.default.scheduleNotification(notification)
 
-		if NSApp.isActive == false
-		{
+		if NSApp.isActive == false {
 			postedNotificationsCount += 1
-		}
-		else
-		{
+		} else {
 			postedNotificationsCount = 0
 		}
 	}
 
 	func postNotification(mastodonEvent notification: MastodonNotification,
-						  receiverName: String?,
-						  userAccount: UUID,
-						  detailMode: AccountPreferences.NotificationDetailMode)
+	                      receiverName: String?,
+	                      userAccount: UUID,
+	                      detailMode: AccountPreferences.NotificationDetailMode)
 	{
 		let showDetails: Bool
 
-		switch detailMode
-		{
+		switch detailMode {
 		case .always: showDetails = true
 		case .never: showDetails = false
 		case .whenClean: showDetails = notification.isClean
 		}
 
 		var actorName: String { return showDetails ? notification.authorName : 🔠("A user") }
-		var contentOrSpoiler: NSAttributedString?
-		{
+		var contentOrSpoiler: NSAttributedString? {
 			return showDetails ? notification.status?.attributedContent : notification.status?.attributedSpoiler
 		}
 
 		let title: String
 		let subtitle = receiverName.map { 🔠("For %@", $0) }
-		var message: String? = nil
+		var message: String?
 
-		switch notification.type
-		{
+		switch notification.type {
 		case .mention:
 			title = 🔠("%@ mentioned you", actorName)
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
@@ -99,54 +90,43 @@ class UserNotificationTool
 
 		let notificationPayload: NotificationPayload
 
-		if let status = notification.status
-		{
+		if let status = notification.status {
 			notificationPayload = NotificationPayload(accountUUID: userAccount,
-													  referenceURI: status.resolvableURI,
-													  referenceType: .status)
-		}
-		else
-		{
+			                                          referenceURI: status.resolvableURI,
+			                                          referenceType: .status)
+		} else {
 			notificationPayload = NotificationPayload(accountUUID: userAccount,
-													  referenceURI: notification.account.acct,
-													  referenceType: .account)
+			                                          referenceURI: notification.account.acct,
+			                                          referenceType: .account)
 		}
 
 		postNotification(title: title, subtitle: subtitle, message: message, payload: notificationPayload)
 	}
 
-	func resetDockTileBadge()
-	{
+	func resetDockTileBadge() {
 		postedNotificationsCount = 0
 	}
 }
 
-extension NSUserNotification
-{
-	var payload: NotificationPayload?
-	{
-		set(payload)
-		{
+extension NSUserNotification {
+	var payload: NotificationPayload? {
+		set(payload) {
 			var dict = userInfo ?? [:]
 
-			if let payload = payload
-			{
+			if let payload = payload {
 				dict["mastonaut_payload"] = [
 					"account_UUID": payload.accountUUID.uuidString,
 					"reference_URI": payload.referenceURI,
-					"reference_type": payload.referenceType.rawValue
+					"reference_type": payload.referenceType.rawValue,
 				]
-			}
-			else
-			{
+			} else {
 				dict["mastonaut_payload"] = nil
 			}
 
 			userInfo = dict
 		}
 
-		get
-		{
+		get {
 			guard
 				let dict = userInfo?["mastonaut_payload"] as? [String: Any?],
 				let accountUUID = (dict["account_UUID"] as? String).flatMap({ UUID(uuidString: $0) }),
@@ -159,14 +139,12 @@ extension NSUserNotification
 	}
 }
 
-struct NotificationPayload
-{
+struct NotificationPayload {
 	let accountUUID: UUID
 	let referenceURI: String
 	let referenceType: Reference
 
-	enum Reference: String
-	{
+	enum Reference: String {
 		case account
 		case status
 	}

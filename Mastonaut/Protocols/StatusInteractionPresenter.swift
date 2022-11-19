@@ -21,7 +21,6 @@ import AppKit
 import CoreTootin
 
 protocol StatusInteractionPresenter {
-
 	var replyButton: NSButton! { get }
 	var reblogButton: NSButton! { get }
 	var favoriteButton: NSButton! { get }
@@ -30,7 +29,6 @@ protocol StatusInteractionPresenter {
 }
 
 extension StatusInteractionPresenter where Self: MastonautTableCellView {
-
 	func setUpInteractions(status: Status) {
 		reblogButton?.isEnabled = status.visibility.allowsReblog
 		reblogButton?.toolTip = status.visibility.reblogToolTip(didReblog: status.reblogged == true)
@@ -44,12 +42,11 @@ extension StatusInteractionPresenter where Self: MastonautTableCellView {
 		sensitiveContentButton?.state = status.sensitive == true ? .on : .off
 
 		let buttons = [replyButton, reblogButton, favoriteButton, warningButton, sensitiveContentButton]
-		setAccessibilityCustomActions(buttons.compactMap({ $0?.isHidden == false ? $0 : nil })
-											 .map({ .init(actionForButton: $0) }))
+		setAccessibilityCustomActions(buttons.compactMap { $0?.isHidden == false ? $0 : nil }
+			.map { .init(actionForButton: $0) })
 	}
 
-	private func favoriteToolTip(_ status: Status) -> String
-	{
+	private func favoriteToolTip(_ status: Status) -> String {
 		if status.favourited == true {
 			return 🔠("Unfavorite this toot")
 		} else {
@@ -59,7 +56,6 @@ extension StatusInteractionPresenter where Self: MastonautTableCellView {
 }
 
 extension NSAccessibilityCustomAction {
-
 	convenience init(actionForButton button: NSButton) {
 		self.init(name: button.toolTip ?? "", handler: { [unowned button] in
 			button.performClick(nil)

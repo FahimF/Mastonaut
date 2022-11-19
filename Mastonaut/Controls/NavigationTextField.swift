@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Cocoa
 import Carbon
+import Cocoa
 
 @objc protocol NavigationTextFieldDelegate: AnyObject {
-
 	func textField(_ textField: NavigationTextField, didStartNavigationModeFrom direction: NavigationTextField.Source)
 	func textFieldDidCancelNavigationMode(_ textField: NavigationTextField)
 	func textFieldDidCommitNavigationMode(_ textField: NavigationTextField)
@@ -29,94 +28,72 @@ import Carbon
 }
 
 class NavigationTextField: NSTextField, NSTextViewDelegate {
-
 	private(set) var isNavigationModeOn: Bool = false
 
-	func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool
-	{
-		switch commandSelector
-		{
-		case #selector(moveUp(_:)):		moveUp()
-		case #selector(moveDown(_:)):	moveDown()
-		case #selector(moveLeft(_:)):	moveLeft()
-		case #selector(moveRight(_:)):	moveRight()
+	func textView(_: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+		switch commandSelector {
+		case #selector(moveUp(_:)): moveUp()
+		case #selector(moveDown(_:)): moveDown()
+		case #selector(moveLeft(_:)): moveLeft()
+		case #selector(moveRight(_:)): moveRight()
 		default: return false
 		}
 		return true
 	}
 
 	@IBOutlet
-	var navigationDelegate: NavigationTextFieldDelegate?
-	{
-		didSet
-		{
-			if navigationDelegate == nil
-			{
+	var navigationDelegate: NavigationTextFieldDelegate? {
+		didSet {
+			if navigationDelegate == nil {
 				isNavigationModeOn = false
 			}
 		}
 	}
 
-	private func moveDown()
-	{
-		guard let delegate = navigationDelegate else
-		{
+	private func moveDown() {
+		guard let delegate = navigationDelegate else {
 			return
 		}
 
-		if isNavigationModeOn
-		{
+		if isNavigationModeOn {
 			delegate.textField(self, didNavigate: .down)
-		}
-		else
-		{
+		} else {
 			isNavigationModeOn = true
 			delegate.textField(self, didStartNavigationModeFrom: .top)
 		}
 	}
 
-	private func moveUp()
-	{
-		guard let delegate = navigationDelegate else
-		{
+	private func moveUp() {
+		guard let delegate = navigationDelegate else {
 			return
 		}
 
-		if isNavigationModeOn
-		{
+		if isNavigationModeOn {
 			delegate.textField(self, didNavigate: .up)
-		}
-		else
-		{
+		} else {
 			isNavigationModeOn = true
 			delegate.textField(self, didStartNavigationModeFrom: .bottom)
 		}
 	}
 
-	private func moveLeft()
-	{
-		guard let delegate = navigationDelegate, isNavigationModeOn else
-		{
+	private func moveLeft() {
+		guard let delegate = navigationDelegate, isNavigationModeOn else {
 			return
 		}
 
 		delegate.textField(self, didNavigate: .left)
 	}
 
-	private func moveRight()
-	{
-		guard let delegate = navigationDelegate, isNavigationModeOn else
-		{
+	private func moveRight() {
+		guard let delegate = navigationDelegate, isNavigationModeOn else {
 			return
 		}
 
 		delegate.textField(self, didNavigate: .right)
 	}
 
-	override func textDidChange(_ notification: Notification)
-	{
-		if let delegate = navigationDelegate, isNavigationModeOn
-		{
+	override func textDidChange(_ notification: Notification) {
+		if let delegate = navigationDelegate, isNavigationModeOn {
 			isNavigationModeOn = false
 			delegate.textFieldDidCancelNavigationMode(self)
 		}
@@ -124,17 +101,13 @@ class NavigationTextField: NSTextField, NSTextViewDelegate {
 		super.textDidChange(notification)
 	}
 
-	override func textDidEndEditing(_ notification: Notification)
-	{
-		if let delegate = navigationDelegate, isNavigationModeOn
-		{
+	override func textDidEndEditing(_: Notification) {
+		if let delegate = navigationDelegate, isNavigationModeOn {
 			if let currentEvent = NSApp.currentEvent, currentEvent.type == .keyDown,
-				currentEvent.specialKey == .carriageReturn
+			   currentEvent.specialKey == .carriageReturn
 			{
 				delegate.textFieldDidCommitNavigationMode(self)
-			}
-			else
-			{
+			} else {
 				delegate.textFieldDidCancelNavigationMode(self)
 			}
 		}
@@ -142,13 +115,11 @@ class NavigationTextField: NSTextField, NSTextViewDelegate {
 		isNavigationModeOn = false
 	}
 
-	@objc enum Direction: Int
-	{
+	@objc enum Direction: Int {
 		case up, down, left, right
 	}
 
-	@objc enum Source: Int
-	{
+	@objc enum Source: Int {
 		case bottom, top
 	}
 }

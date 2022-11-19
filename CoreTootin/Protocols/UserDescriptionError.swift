@@ -19,7 +19,6 @@
 
 import Foundation
 
-public protocol UserDescriptionError: Error
-{
+public protocol UserDescriptionError: Error {
 	var userDescription: String { get }
 }

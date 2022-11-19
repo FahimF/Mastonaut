@@ -17,43 +17,34 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-public class TagBookmarkService
-{
+public class TagBookmarkService {
 	private var bookmarkedTags: Set<String> = []
 
 	private let account: AuthorizedAccount
 
-	public init(account: AuthorizedAccount)
-	{
+	public init(account: AuthorizedAccount) {
 		self.account = account
 	}
 
-	public func isTagBookmarked(_ tag: String) -> Bool
-	{
+	public func isTagBookmarked(_ tag: String) -> Bool {
 		return account.hasBookmarkedTag(tag)
 	}
 
-	public func bookmarkTag(_ tag: String)
-	{
+	public func bookmarkTag(_ tag: String) {
 		account.bookmarkTag(tag)
 	}
 
-	public func unbookmarkTag(_ tag: String)
-	{
+	public func unbookmarkTag(_ tag: String) {
 		account.unbookmarkTag(tag)
 	}
 
-	public func toggleBookmarkedState(for tag: String)
-	{
-		if account.hasBookmarkedTag(tag)
-		{
+	public func toggleBookmarkedState(for tag: String) {
+		if account.hasBookmarkedTag(tag) {
 			unbookmarkTag(tag)
-		}
-		else
-		{
+		} else {
 			bookmarkTag(tag)
 		}
 	}

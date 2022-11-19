@@ -19,17 +19,14 @@
 
 import Foundation
 
-class LazyEvaluationAdapter<ReturnType>
-{
+class LazyEvaluationAdapter<ReturnType> {
 	private var lazyBlock: () -> ReturnType
 
-	init(_ block: @escaping () -> ReturnType)
-	{
-		self.lazyBlock = block
+	init(_ block: @escaping () -> ReturnType) {
+		lazyBlock = block
 	}
 
-	func evaluate() -> ReturnType
-	{
+	func evaluate() -> ReturnType {
 		return lazyBlock()
 	}
 }

@@ -19,8 +19,7 @@
 
 import Foundation
 
-struct RelationshipSet: OptionSet
-{
+struct RelationshipSet: OptionSet {
 	let rawValue: Int8
 
 	static let follower = RelationshipSet(rawValue: 1 << 0)

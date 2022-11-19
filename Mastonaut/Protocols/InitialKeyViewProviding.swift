@@ -19,7 +19,6 @@
 
 import Foundation
 
-protocol InitialKeyViewProviding
-{
+protocol InitialKeyViewProviding {
 	var initialKeyView: NSView? { get }
 }

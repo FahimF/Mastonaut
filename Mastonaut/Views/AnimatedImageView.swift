@@ -19,19 +19,16 @@
 
 import Cocoa
 
-@objc class AnimatedImageView: NSView
-{
+@objc class AnimatedImageView: NSView {
 	@objc var tagged = false
 
-	private weak var animatedLayer: BPAnimatedImageLayer? = nil
+	private weak var animatedLayer: BPAnimatedImageLayer?
 
-	override var wantsUpdateLayer: Bool
-	{
+	override var wantsUpdateLayer: Bool {
 		return true
 	}
 
-	deinit
-	{
+	deinit {
 		animatedLayer?.stopAnimation()
 	}
 
@@ -44,10 +41,8 @@ import Cocoa
 		}
 	}
 
-	var animates: Bool = true
-	{
-		didSet
-		{
+	var animates: Bool = true {
+		didSet {
 			assert(Thread.isMainThread)
 			if animates {
 				animatedLayer?.startAnimation()
@@ -57,13 +52,11 @@ import Cocoa
 		}
 	}
 
-	@objc func clearAnimatedImage()
-	{
-		self.animatedLayer?.removeFromSuperlayer()
+	@objc func clearAnimatedImage() {
+		animatedLayer?.removeFromSuperlayer()
 	}
 
-	@objc func setAnimatedImage(from data: Data)
-	{
+	@objc func setAnimatedImage(from data: Data) {
 		if data.isEmpty == false, let imageSource = CGImageSourceCreateWithData(data as CFData, nil) {
 			wantsLayer = true
 			self.animatedLayer?.removeFromSuperlayer()

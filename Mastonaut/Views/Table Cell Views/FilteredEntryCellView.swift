@@ -19,7 +19,6 @@
 
 import AppKit
 
-class FilteredEntryCellView: MastonautTableCellView
-{
-	@IBOutlet private weak var label: NSTextField!
+class FilteredEntryCellView: MastonautTableCellView {
+	@IBOutlet private var label: NSTextField!
 }

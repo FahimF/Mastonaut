@@ -19,7 +19,6 @@
 
 import Cocoa
 
-class StringCapableTextAttachment: NSTextAttachment
-{
+class StringCapableTextAttachment: NSTextAttachment {
 	var stringRepresentation: String = ""
 }

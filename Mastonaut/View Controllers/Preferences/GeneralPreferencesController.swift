@@ -17,21 +17,19 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class GeneralPreferencesController: NSViewController
-{
-	@IBOutlet private weak var timelinesResizeExpandFirstButton: NSButton!
-	@IBOutlet private weak var timelinesResizeShrinkFirstButton: NSButton!
+class GeneralPreferencesController: NSViewController {
+	@IBOutlet private var timelinesResizeExpandFirstButton: NSButton!
+	@IBOutlet private var timelinesResizeShrinkFirstButton: NSButton!
 
-	@IBOutlet private weak var newWindowAccountModeAskButton: NSButton!
-	@IBOutlet private weak var newWindowAccountModePickFirstOneButton: NSButton!
+	@IBOutlet private var newWindowAccountModeAskButton: NSButton!
+	@IBOutlet private var newWindowAccountModePickFirstOneButton: NSButton!
 
 	private var preferenceObservers: [AnyObject] = []
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		let timelinesResizeModeButtonMap: [MastonautPreferences.TimelinesResizeMode: NSButton] = [
@@ -40,7 +38,7 @@ class GeneralPreferencesController: NSViewController
 		]
 
 		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.timelinesResizeMode,
-															   buttonMap: timelinesResizeModeButtonMap))
+		                                                       buttonMap: timelinesResizeModeButtonMap))
 
 		let newWindowAccountModeButtonMap: [MastonautPreferences.NewWindowAccountMode: NSButton] = [
 			.ask: newWindowAccountModeAskButton,
@@ -48,6 +46,6 @@ class GeneralPreferencesController: NSViewController
 		]
 
 		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.newWindowAccountMode,
-															   buttonMap: newWindowAccountModeButtonMap))
+		                                                       buttonMap: newWindowAccountModeButtonMap))
 	}
 }

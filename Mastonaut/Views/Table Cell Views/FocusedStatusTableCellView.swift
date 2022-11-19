@@ -17,86 +17,77 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class FocusedStatusTableCellView: StatusTableCellView
-{
+class FocusedStatusTableCellView: StatusTableCellView {
 	@IBOutlet private unowned var appNameConatiner: NSView!
 	@IBOutlet private unowned var appNameLabel: NSButton!
 
-	private var sourceApplication: Application? = nil
+	private var sourceApplication: Application?
 
 	private static let _authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 15, weight: .semibold)
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 15, weight: .semibold),
 	]
 
 	private static let _statusLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 16),
-		.underlineStyle: NSNumber(value: 0) // <-- This is a hack to prevent the label's contents from shifting
+		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
 		// vertically when clicked.
 	]
 
 	private static let _statusLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
 		.font: NSFont.systemFont(ofSize: 16, weight: .medium),
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
 
-	internal override func authorLabelAttributes() -> [NSAttributedString.Key: AnyObject]
-	{
+	override internal func authorLabelAttributes() -> [NSAttributedString.Key: AnyObject] {
 		return FocusedStatusTableCellView._authorLabelAttributes
 	}
 
-	internal override func statusLabelAttributes() -> [NSAttributedString.Key: AnyObject]
-	{
+	override internal func statusLabelAttributes() -> [NSAttributedString.Key: AnyObject] {
 		return FocusedStatusTableCellView._statusLabelAttributes
 	}
 
-	internal override func statusLabelLinkAttributes() -> [NSAttributedString.Key: AnyObject]
-	{
+	override internal func statusLabelLinkAttributes() -> [NSAttributedString.Key: AnyObject] {
 		return FocusedStatusTableCellView._statusLabelLinkAttributes
 	}
 
 	override func set(displayedStatus status: Status,
-					  poll: Poll?,
-					  attachmentPresenter: AttachmentPresenting,
-					  interactionHandler: StatusInteractionHandling,
-					  activeInstance: Instance)
+	                  poll: Poll?,
+	                  attachmentPresenter: AttachmentPresenting,
+	                  interactionHandler: StatusInteractionHandling,
+	                  activeInstance: Instance)
 	{
 		super.set(displayedStatus: status,
-				  poll: poll,
-				  attachmentPresenter: attachmentPresenter,
-				  interactionHandler: interactionHandler,
-				  activeInstance: activeInstance)
+		          poll: poll,
+		          attachmentPresenter: attachmentPresenter,
+		          interactionHandler: interactionHandler,
+		          activeInstance: activeInstance)
 
 		setContentLabelsSelectable(true)
 
-		if let application = status.application
-		{
+		if let application = status.application {
 			sourceApplication = application
 			appNameLabel.title = application.name
 			appNameLabel.isEnabled = application.website != nil
 			appNameConatiner.isHidden = false
-		}
-		else
-		{
+		} else {
 			appNameLabel.title = ""
 			appNameConatiner.isHidden = true
 		}
 	}
 
-	override func prepareForReuse()
-	{
+	override func prepareForReuse() {
 		super.prepareForReuse()
 
 		sourceApplication = nil
 	}
 
-	@IBAction func showStatusApp(_ sender: Any?)
-	{
-		guard let applicationWebsite = sourceApplication?.website, let url = URL(string: applicationWebsite) else
-		{
+	@IBAction func showStatusApp(_: Any?) {
+		guard let applicationWebsite = sourceApplication?.website, let url = URL(string: applicationWebsite)
+		else {
 			return
 		}
 

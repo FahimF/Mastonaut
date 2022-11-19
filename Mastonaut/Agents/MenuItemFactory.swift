@@ -19,16 +19,14 @@
 
 import Foundation
 
-enum MenuItemFactory
-{
+enum MenuItemFactory {
 	static func makeMenuItems(forTags tags: [String], action: Selector, target: AnyObject?) -> [NSMenuItem]
 	{
-		return tags.map()
-			{
-				let item = NSMenuItem(title: "#\($0)", action: action, keyEquivalent: "")
-				item.target = target
-				item.representedObject = $0
-				return item
-			}
+		return tags.map {
+			let item = NSMenuItem(title: "#\($0)", action: action, keyEquivalent: "")
+			item.target = target
+			item.representedObject = $0
+			return item
+		}
 	}
 }

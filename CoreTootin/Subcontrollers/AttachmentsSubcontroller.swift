@@ -19,199 +19,165 @@
 
 import AppKit
 
-@objc public protocol StatusComposerController: AnyObject
-{
+@objc public protocol StatusComposerController: AnyObject {
 	func updateSubmitEnabled()
 	func showAttachmentError(message: String)
 }
 
-public class AttachmentsSubcontroller: NSObject
-{
-	@IBOutlet private(set) weak var attachmentCollectionView: NSCollectionView!
-	@IBOutlet private(set) weak var statusComposerController: StatusComposerController!
+public class AttachmentsSubcontroller: NSObject {
+	@IBOutlet private(set) var attachmentCollectionView: NSCollectionView!
+	@IBOutlet private(set) var statusComposerController: StatusComposerController!
 
 	public private(set) lazy var attachmentUploader = AttachmentUploader(delegate: self)
 
 	private let descriptionPopoverViewController = AttachmentDescriptionViewController()
 
-	private var lastOpenedDescriptionAttachmentIndex: Array<Upload>.Index? = nil
+	private var lastOpenedDescriptionAttachmentIndex: Array<Upload>.Index?
 	private let descriptionCharacterLimit = 420
 	private var uploadsWithDescriptionUpdateError: Set<Upload> = []
 
-	public var showProposedAttachmentItem: Bool = false
-	{
-		didSet
-		{
-			if showProposedAttachmentItem, !oldValue
-			{
+	public var showProposedAttachmentItem: Bool = false {
+		didSet {
+			if showProposedAttachmentItem, !oldValue {
 				attachmentCollectionView.animator().insertItems(at: [IndexPath(item: attachments.count, section: 0)])
-			}
-			else if !showProposedAttachmentItem, oldValue
-			{
+			} else if !showProposedAttachmentItem, oldValue {
 				attachmentCollectionView.animator().deleteItems(at: [IndexPath(item: attachments.count, section: 0)])
 			}
 		}
 	}
 
-	public var client: ClientType? = nil
-	{
+	public var client: ClientType? {
 		didSet { dispatchAllPendingUploads() }
 	}
 
-	public override func awakeFromNib()
-	{
+	override public func awakeFromNib() {
 		super.awakeFromNib()
 
 		attachmentCollectionView.register(AttachmentItem.self,
-										  forItemWithIdentifier: ReuseIdentifiers.attachment)
+		                                  forItemWithIdentifier: ReuseIdentifiers.attachment)
 
 		attachmentCollectionView.register(ProposedAttachmentItem.self,
-										  forItemWithIdentifier: ReuseIdentifiers.proposedAttachment)
+		                                  forItemWithIdentifier: ReuseIdentifiers.proposedAttachment)
 
-		descriptionPopoverViewController.descriptionStringValueDidChangeHandler =
-			{
-				[unowned self] in self.updateRemainingDescriptionCountLabel()
-			}
+		descriptionPopoverViewController.descriptionStringValueDidChangeHandler = {
+			[unowned self] in self.updateRemainingDescriptionCountLabel()
+		}
 
-		descriptionPopoverViewController.didClickSubmitChangeHandler =
-			{
-				[unowned self] in self.submitDescription()
-			}
+		descriptionPopoverViewController.didClickSubmitChangeHandler = {
+			[unowned self] in self.submitDescription()
+		}
 
 		descriptionPopoverViewController.loadView()
 	}
 
-	@objc public dynamic var attachmentCount: Int
-	{
+	@objc public dynamic var attachmentCount: Int {
 		return attachments.count
 	}
 
-	public private(set) var attachments: [Upload] = []
-	{
-		willSet
-		{
+	public private(set) var attachments: [Upload] = [] {
+		willSet {
 			willChangeValue(for: \AttachmentsSubcontroller.attachmentCount)
 		}
 
-		didSet
-		{
+		didSet {
 			didChangeValue(for: \AttachmentsSubcontroller.attachmentCount)
 		}
 	}
 
-	public var hasAttachmentsPendingUpload: Bool
-	{
-		return attachments.filter({ $0.attachment == nil }).count != 0
+	public var hasAttachmentsPendingUpload: Bool {
+		return attachments.filter { $0.attachment == nil }.count != 0
 	}
 
-	public func reset()
-	{
-		let allItemIndexPaths = Set((0..<attachments.count).map({ IndexPath(item: $0, section: 0) }))
+	public func reset() {
+		let allItemIndexPaths = Set((0 ..< attachments.count).map { IndexPath(item: $0, section: 0) })
 		attachments.removeAll()
 		attachmentCollectionView.animator().deleteItems(at: allItemIndexPaths)
 		uploadsWithDescriptionUpdateError = []
 		lastOpenedDescriptionAttachmentIndex = nil
 	}
 
-	public func discardAllAttachmentsAndUploadAgain()
-	{
+	public func discardAllAttachmentsAndUploadAgain() {
 		uploadsWithDescriptionUpdateError = []
 		lastOpenedDescriptionAttachmentIndex = nil
 
-		attachments.forEach({ $0.discardAttachment() })
+		attachments.forEach { $0.discardAttachment() }
 
-		if let client = self.client
-		{
+		if let client = client {
 			attachmentUploader.startUploading(uploads: attachments, for: client)
 		}
 	}
 
-	public func collectionViewItem(for upload: Upload) -> AttachmentItem?
-	{
+	public func collectionViewItem(for upload: Upload) -> AttachmentItem? {
 		guard
 			let index = attachments.firstIndex(of: upload),
 			attachmentCollectionView.indexPathsForVisibleItems().contains(IndexPath(item: index, section: 0))
-			else
-		{
+		else {
 			return nil
 		}
 
 		return attachmentCollectionView.item(at: IndexPath(item: index, section: 0)) as? AttachmentItem
 	}
 
-	public func addAttachments(_ urls: [URL])
-	{
+	public func addAttachments(_ urls: [URL]) {
 		guard !urls.isEmpty else { return }
 
 		var validUploads: [Upload] = []
 		var failedURLs: [URL] = []
 
-		for url in urls
-		{
-			if let upload = Upload(fileUrl: url, imageRestrainer: attachmentUploader.imageRestrainer)
-			{
+		for url in urls {
+			if let upload = Upload(fileUrl: url, imageRestrainer: attachmentUploader.imageRestrainer) {
 				validUploads.append(upload)
-			}
-			else
-			{
+			} else {
 				failedURLs.append(url)
 			}
 		}
 
-		if !failedURLs.isEmpty
-		{
+		if !failedURLs.isEmpty {
 			// Show Error
 		}
 
 		add(uploads: validUploads)
 	}
 
-	public func addAttachments(_ images: [NSImage])
-	{
-		add(uploads: images.map({ Upload(image: $0) }))
+	public func addAttachments(_ images: [NSImage]) {
+		add(uploads: images.map { Upload(image: $0) })
 	}
 
 	@discardableResult
-	public func addAttachments(_ attachments: [Attachment]) -> [Upload]
-	{
-		let uploads = attachments.map({ Upload(attachment: $0) })
+	public func addAttachments(_ attachments: [Attachment]) -> [Upload] {
+		let uploads = attachments.map { Upload(attachment: $0) }
 		add(uploads: uploads)
 		return uploads
 	}
 
-	private func add(uploads: [Upload])
-	{
+	private func add(uploads: [Upload]) {
 		attachments.append(contentsOf: uploads)
 
-		if let client = self.client
-		{
+		if let client = client {
 			// Only start processing after uploads are stored in the attachments array so we can track
 			// their idexes on the delegate method calls.
 			attachmentUploader.startUploading(uploads: uploads, for: client)
 		}
 
 		let totalAttachments = attachments.count
-		let insertedItems = (totalAttachments - uploads.count)..<(totalAttachments)
-		let insertedSet = Set(insertedItems.map({ IndexPath(item: $0, section: 0) }))
+		let insertedItems = (totalAttachments - uploads.count) ..< totalAttachments
+		let insertedSet = Set(insertedItems.map { IndexPath(item: $0, section: 0) })
 
 		attachmentCollectionView.animator().insertItems(at: insertedSet)
 	}
 
-	public func removeAttachment(_ attachment: Upload)
-	{
+	public func removeAttachment(_ attachment: Upload) {
 		guard let index = attachments.firstIndex(of: attachment) else { return }
 		attachmentUploader.cancel(upload: attachments.remove(at: index))
 		attachmentCollectionView.animator().deleteItems(at: [IndexPath(item: index, section: 0)])
 	}
 
-	public func update(thumbnail: NSImage, for upload: Upload)
-	{
+	public func update(thumbnail: NSImage, for upload: Upload) {
 		guard let index = attachments.firstIndex(of: upload) else { return }
 		(attachmentCollectionView.item(at: index) as? AttachmentItem)?.image = thumbnail
 	}
 
-	private func updateRemainingDescriptionCountLabel()
-	{
+	private func updateRemainingDescriptionCountLabel() {
 		let remainingCount = descriptionCharacterLimit - descriptionPopoverViewController.descriptionStringValue.count
 		descriptionPopoverViewController.set(remainingCount: remainingCount)
 
@@ -219,60 +185,50 @@ public class AttachmentsSubcontroller: NSObject
 		descriptionPopoverViewController.set(submitEnabled: submitEnabled)
 	}
 
-	private func dispatchAllPendingUploads()
-	{
-		guard let client = self.client else { return }
-		let pendingUploads = attachments.filter({ $0.needsUploading })
+	private func dispatchAllPendingUploads() {
+		guard let client = client else { return }
+		let pendingUploads = attachments.filter { $0.needsUploading }
 		attachmentUploader.startUploading(uploads: pendingUploads, for: client)
 	}
 
-	fileprivate struct ReuseIdentifiers
-	{
+	fileprivate enum ReuseIdentifiers {
 		static let attachment = NSUserInterfaceItemIdentifier(rawValue: "attachment")
 		static let proposedAttachment = NSUserInterfaceItemIdentifier(rawValue: "proposed")
 	}
 }
 
-extension AttachmentsSubcontroller: NSCollectionViewDataSource
-{
-	public func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int
-	{
+extension AttachmentsSubcontroller: NSCollectionViewDataSource {
+	public func collectionView(_: NSCollectionView, numberOfItemsInSection _: Int) -> Int {
 		return attachments.count + (showProposedAttachmentItem ? 1 : 0)
 	}
 
 	public func collectionView(_ collectionView: NSCollectionView,
-							   itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem
+	                           itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem
 	{
-		guard indexPath.item < attachments.count else
-		{
+		guard indexPath.item < attachments.count else {
 			return collectionView.makeItem(withIdentifier: ReuseIdentifiers.proposedAttachment, for: indexPath)
 		}
 
 		let item = collectionView.makeItem(withIdentifier: ReuseIdentifiers.attachment, for: indexPath)
 
-		if let attachmentItem = item as? AttachmentItem
-		{
+		if let attachmentItem = item as? AttachmentItem {
 			let attachment = attachments[indexPath.item]
 
-			attachment.loadMetadata()
-				{
-					[weak collectionView] metadata in
+			attachment.loadMetadata {
+				[weak collectionView] metadata in
 
-					DispatchQueue.main.async
-						{
-							(collectionView?.item(at: indexPath) as? AttachmentItem)?.set(itemMetadata: metadata)
-						}
+				DispatchQueue.main.async {
+					(collectionView?.item(at: indexPath) as? AttachmentItem)?.set(itemMetadata: metadata)
 				}
+			}
 
-			attachment.loadThumbnail()
-				{
-					[weak collectionView] thumbnail in
+			attachment.loadThumbnail {
+				[weak collectionView] thumbnail in
 
-					DispatchQueue.main.async
-						{
-							(collectionView?.item(at: indexPath) as? AttachmentItem)?.image = thumbnail
-						}
+				DispatchQueue.main.async {
+					(collectionView?.item(at: indexPath) as? AttachmentItem)?.image = thumbnail
 				}
+			}
 
 			attachmentItem.removeButtonAction = { [unowned self] in self.removeAttachment(attachment) }
 			attachmentItem.descriptionButtonAction = { [unowned self] in self.showDescriptionEditor(for: attachment) }
@@ -282,39 +238,34 @@ extension AttachmentsSubcontroller: NSCollectionViewDataSource
 		return item
 	}
 
-	private func showDescriptionEditor(for attachment: Upload)
-	{
-		guard let index = attachments.firstIndex(of: attachment) else
-		{
+	private func showDescriptionEditor(for attachment: Upload) {
+		guard let index = attachments.firstIndex(of: attachment) else {
 			return
 		}
 
 		let indexPath = IndexPath(item: index, section: 0)
 
-		guard attachmentCollectionView.indexPathsForVisibleItems().contains(indexPath) else
-		{
+		guard attachmentCollectionView.indexPathsForVisibleItems().contains(indexPath) else {
 			return
 		}
 
 		lastOpenedDescriptionAttachmentIndex = index
 
 		descriptionPopoverViewController.set(description: attachment.attachment?.description ?? "",
-											 hasError: uploadsWithDescriptionUpdateError.contains(attachment))
+		                                     hasError: uploadsWithDescriptionUpdateError.contains(attachment))
 
 		descriptionPopoverViewController.showPopover(relativeTo: attachmentCollectionView.frameForItem(at: index),
-													 of: attachmentCollectionView)
+		                                             of: attachmentCollectionView)
 
 		updateRemainingDescriptionCountLabel()
 	}
 
-	private func submitDescription()
-	{
+	private func submitDescription() {
 		guard
-			let client = self.client,
+			let client = client,
 			let index = lastOpenedDescriptionAttachmentIndex,
 			index < attachments.count, index >= 0
-		else
-		{
+		else {
 			return
 		}
 
@@ -333,116 +284,103 @@ extension AttachmentsSubcontroller: NSCollectionViewDataSource
 	}
 }
 
-extension AttachmentsSubcontroller: AttachmentUploaderDelegate
-{
-	public func attachmentUploader(_: AttachmentUploader, finishedUploading upload: Upload)
-	{
-		DispatchQueue.main.async
-			{
-				[weak self] in
-				self?.collectionViewItem(for: upload)?.set(progressIndicatorState: .uploaded)
-				self?.statusComposerController.updateSubmitEnabled()
-			}
+extension AttachmentsSubcontroller: AttachmentUploaderDelegate {
+	public func attachmentUploader(_: AttachmentUploader, finishedUploading upload: Upload) {
+		DispatchQueue.main.async {
+			[weak self] in
+			self?.collectionViewItem(for: upload)?.set(progressIndicatorState: .uploaded)
+			self?.statusComposerController.updateSubmitEnabled()
+		}
 	}
 
 	public func attachmentUploader(_: AttachmentUploader, updatedProgress progress: Double, for upload: Upload)
 	{
-		DispatchQueue.main.async
-			{
-				[weak self] in
-				self?.collectionViewItem(for: upload)?.set(progressIndicatorState: .uploading(progress: progress))
-			}
+		DispatchQueue.main.async {
+			[weak self] in
+			self?.collectionViewItem(for: upload)?.set(progressIndicatorState: .uploading(progress: progress))
+		}
 	}
 
 	public func attachmentUploader(_: AttachmentUploader, produced error: AttachmentUploader.UploadError, for upload: Upload)
 	{
 		let errorMessage: String
 
-		switch error
-		{
+		switch error {
 		case .noKnownMimeForUTI:
 			errorMessage = 🔠("compose.attachment.upload.noknownuti",
-								upload.fileName ?? "<error>",
-								"HEIC, PNG, JPG, JPG2000, TIFF, BMP, GIF, MOV, MP4")
+			                 upload.fileName ?? "<error>",
+			                 "HEIC, PNG, JPG, JPG2000, TIFF, BMP, GIF, MOV, MP4")
 
 		case .failedEncodingResizedImage:
 			let maxSize = AttachmentUploader.maxAttachmentImageSize
 			let maxMegaPixels = Int(maxSize.area / 1_000_000)
 			errorMessage = 🔠("compose.attachment.upload.badresizeencode",
-								upload.fileName ?? "<error>",
-								maxMegaPixels, maxSize.width, maxSize.height)
+			                 upload.fileName ?? "<error>",
+			                 maxMegaPixels, maxSize.width, maxSize.height)
 
-		case .encodeError(let encodeError):
+		case let .encodeError(encodeError):
 			errorMessage = 🔠("compose.attachment.encode",
-								upload.fileName ?? "<error>",
-								encodeError.localizedDescription)
+			                 upload.fileName ?? "<error>",
+			                 encodeError.localizedDescription)
 
-		case .serverError(let serverError):
-			if (serverError as NSError).code == NSURLErrorCancelled
-			{
+		case let .serverError(serverError):
+			if (serverError as NSError).code == NSURLErrorCancelled {
 				// Not an error: user cancelled upload.
 				return
 			}
 
 			errorMessage = 🔠("compose.attachment.server",
-								upload.fileName ?? "<error>",
-								String(describing: serverError))
+			                 upload.fileName ?? "<error>",
+			                 String(describing: serverError))
 		}
 
-		DispatchQueue.main.async
-			{
-				[weak self] in
+		DispatchQueue.main.async {
+			[weak self] in
 
-				guard let self = self else { return }
+			guard let self = self else { return }
 
-				self.removeAttachment(upload)
-				self.statusComposerController.showAttachmentError(message: errorMessage)
-				self.statusComposerController.updateSubmitEnabled()
-			}
+			self.removeAttachment(upload)
+			self.statusComposerController.showAttachmentError(message: errorMessage)
+			self.statusComposerController.updateSubmitEnabled()
+		}
 	}
 
-	public func attachmentUploader(_: AttachmentUploader, updatedDescription: String?, for upload: Upload)
+	public func attachmentUploader(_: AttachmentUploader, updatedDescription _: String?, for upload: Upload)
 	{
-		DispatchQueue.main.async
-			{
-				[weak self] in
-				self?.uploadsWithDescriptionUpdateError.remove(upload)
-				self?.statusComposerController.updateSubmitEnabled()
+		DispatchQueue.main.async {
+			[weak self] in
+			self?.uploadsWithDescriptionUpdateError.remove(upload)
+			self?.statusComposerController.updateSubmitEnabled()
 
-				if let uploadItem = self?.collectionViewItem(for: upload)
-				{
-					uploadItem.hasFailure = false
-					uploadItem.isPendingSetDescription = false
-				}
+			if let uploadItem = self?.collectionViewItem(for: upload) {
+				uploadItem.hasFailure = false
+				uploadItem.isPendingSetDescription = false
 			}
+		}
 	}
 
-	public func attachmentUploader(_: AttachmentUploader, failedUpdatingDescriptionFor upload: Upload, previousValue: String?)
+	public func attachmentUploader(_: AttachmentUploader, failedUpdatingDescriptionFor upload: Upload, previousValue _: String?)
 	{
-		DispatchQueue.main.async
-			{
-				[weak self] in
-				self?.uploadsWithDescriptionUpdateError.insert(upload)
-				self?.statusComposerController.updateSubmitEnabled()
+		DispatchQueue.main.async {
+			[weak self] in
+			self?.uploadsWithDescriptionUpdateError.insert(upload)
+			self?.statusComposerController.updateSubmitEnabled()
 
-				if let uploadItem = self?.collectionViewItem(for: upload)
-				{
-					uploadItem.hasFailure = true
-					uploadItem.isPendingSetDescription = false
-				}
+			if let uploadItem = self?.collectionViewItem(for: upload) {
+				uploadItem.hasFailure = true
+				uploadItem.isPendingSetDescription = false
 			}
+		}
 	}
 }
 
-public extension AttachmentsSubcontroller
-{
-	func addAttachments(pasteboard: NSPasteboard) -> Bool
-	{
+public extension AttachmentsSubcontroller {
+	func addAttachments(pasteboard: NSPasteboard) -> Bool {
 		let types = AttachmentUploader.supportedAttachmentTypes as [String]
 
 		if let fileUrls = pasteboard.readObjects(forClasses: [NSURL.self],
-												 options: [.urlReadingContentsConformToTypes: types,
-														   .urlReadingFileURLsOnly: true]) as? [URL],
+		                                         options: [.urlReadingContentsConformToTypes: types,
+		                                                   .urlReadingFileURLsOnly: true]) as? [URL],
 			!fileUrls.isEmpty
 		{
 			addAttachments(fileUrls)
@@ -451,8 +389,8 @@ public extension AttachmentsSubcontroller
 
 		// Avoid reading Finder file icons from the pasteboard because that makes no sense
 		if pasteboard.types?.contains(.fileURL) == false,
-			let images = pasteboard.readObjects(forClasses: [NSImage.self], options: [:]) as? [NSImage],
-			!images.isEmpty
+		   let images = pasteboard.readObjects(forClasses: [NSImage.self], options: [:]) as? [NSImage],
+		   !images.isEmpty
 		{
 			addAttachments(images)
 			return true

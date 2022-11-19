@@ -19,25 +19,22 @@
 
 import Foundation
 
-public class PostingService: NSObject
-{
+public class PostingService: NSObject {
 	public let client: ClientType
 
-	@objc dynamic public private(set) var characterCount: Int = 0
-	@objc dynamic public private(set) var submitTaskFuture: FutureTask?
+	@objc public private(set) dynamic var characterCount: Int = 0
+	@objc public private(set) dynamic var submitTaskFuture: FutureTask?
 
 	public var isSubmiting: Bool { return submitTaskFuture != nil }
 
 	private var status: String = ""
-	private var contentWarning: String? = nil
+	private var contentWarning: String?
 
-	public init(client: ClientType)
-	{
+	public init(client: ClientType) {
 		self.client = client
 	}
 
-	public func reset()
-	{
+	public func reset() {
 		status = ""
 		contentWarning = nil
 		submitTaskFuture?.task?.cancel()
@@ -45,65 +42,58 @@ public class PostingService: NSObject
 		updateCharacterCount()
 	}
 
-	public func set(status: String)
-	{
+	public func set(status: String) {
 		self.status = status
 		updateCharacterCount()
 	}
 
-	public func set(contentWarning: String?)
-	{
+	public func set(contentWarning: String?) {
 		self.contentWarning = contentWarning
 		updateCharacterCount()
 	}
 
 	public func post(visibility: Visibility,
-					 isSensitive: Bool,
-					 attachmentIds: [String],
-					 replyStatusId: String?,
-					 poll: PollPayload?,
-					 completion: @escaping (Swift.Result<Status, Error>) -> Void)
+	                 isSensitive: Bool,
+	                 attachmentIds: [String],
+	                 replyStatusId: String?,
+	                 poll: PollPayload?,
+	                 completion: @escaping (Swift.Result<Status, Error>) -> Void)
 	{
 		let isSensitive = attachmentIds.count > 0 && isSensitive
 
 		let createStatusRequest = Statuses.create(status: status,
-												  replyToID: replyStatusId,
-												  mediaIDs: attachmentIds,
-												  sensitive: isSensitive,
-												  spoilerText: contentWarning,
-												  poll: poll,
-												  visibility: visibility)
+		                                          replyToID: replyStatusId,
+		                                          mediaIDs: attachmentIds,
+		                                          sensitive: isSensitive,
+		                                          spoilerText: contentWarning,
+		                                          poll: poll,
+		                                          visibility: visibility)
 
 		let taskPromise = Promise<URLSessionTask>()
-		guard let future = client.run(createStatusRequest, resumeImmediately: false, completion:
-			{
-				[weak self] result in
+		guard let future = client.run(createStatusRequest, resumeImmediately: false, completion: {
+			[weak self] result in
 
-				DispatchQueue.main.async
-					{
-						guard let self = self else { return }
+			DispatchQueue.main.async {
+				guard let self = self else { return }
 
-						if self.submitTaskFuture === taskPromise.value
-						{
-							self.submitTaskFuture = nil
-						}
+				if self.submitTaskFuture === taskPromise.value {
+					self.submitTaskFuture = nil
+				}
 
-						switch result
-						{
-						case .success(let status, _):
-							completion(.success(status))
+				switch result {
+				case let .success(status, _):
+					completion(.success(status))
 
-						case .failure(let error):
-							completion(.failure(error))
-						}
-					}
+				case let .failure(error):
+					completion(.failure(error))
+				}
+			}
 		})
-			else
-		{
+		else {
 			return
 		}
 
-		self.submitTaskFuture = future
+		submitTaskFuture = future
 
 		future.resolutionHandler = { task in
 			taskPromise.value = task
@@ -111,48 +101,44 @@ public class PostingService: NSObject
 		}
 	}
 
-	private func updateCharacterCount()
-	{
+	private func updateCharacterCount() {
 		characterCount = status.mastodonCount + (contentWarning?.count ?? 0)
 	}
 }
 
-private extension String
-{
+private extension String {
 	static let linkPlaceholder = String(repeating: "x", count: 23)
 
-	var mastodonCount: Int
-	{
+	var mastodonCount: Int {
 		let mutableCopy = (self as NSString).mutableCopy() as! NSMutableString
 		var replacementRanges: [NSRange: String] = [:]
 
 		// Mastodon counts any sequence joined by a ZWJ as a single character, regardless of whether the characters are
 		// joinable. This regex replaces all groups with a single char to reproduce this behavior.
 		NSRegularExpression.zwjGroupRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-		{
-			(result, flags, stop) in
+			{
+				result, _, _ in
 
-			guard let result = result else { return }
+				guard let result = result else { return }
 
-			replacementRanges[result.range] = "x"
-		}
+				replacementRanges[result.range] = "x"
+			}
 
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
 
 		// Mastodon always counts every link URL as having 23 characters, regardless of the actual length of the URL.
 		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-		{
-			(result, flags, stop) in
-
-			guard let result = result, result.numberOfRanges > 1 else
 			{
-				return
-			}
+				result, _, _ in
 
-			let prefix = mutableCopy.substring(with: result.range(at: 1))
-			replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)"
-		}
+				guard let result = result, result.numberOfRanges > 1 else {
+					return
+				}
+
+				let prefix = mutableCopy.substring(with: result.range(at: 1))
+				replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)"
+			}
 
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
@@ -160,16 +146,15 @@ private extension String
 		// Mastodon only counts the username part of a mention towards the character limit, so we drop the instance URI
 		// in case it is present.
 		NSRegularExpression.mentionRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-		{
-			(result, flags, stop) in
-
-			guard let result = result, result.numberOfRanges > 1 else
 			{
-				return
-			}
+				result, _, _ in
 
-			replacementRanges[result.range] = "@\(mutableCopy.substring(with: result.range(at: 3)))"
-		}
+				guard let result = result, result.numberOfRanges > 1 else {
+					return
+				}
+
+				replacementRanges[result.range] = "@\(mutableCopy.substring(with: result.range(at: 3)))"
+			}
 
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		return (mutableCopy as String).count

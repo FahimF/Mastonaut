@@ -1,7 +1,7 @@
-import Foundation
 import CoreTootin
+import Foundation
 
-private var avatarImageCache = [UUID:NSImage]()
+private var avatarImageCache = [UUID: NSImage]()
 private var resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
 extension AuthorizedAccount {
@@ -23,19 +23,15 @@ extension AuthorizedAccount {
 			placeholderImg.size = NSSize(width: 16, height: 16)
 			avatarImageCache[uuid] = placeholderImg
 		}
-		
+
 		return placeholderImg
 	}
-	
-	private func fetchImageOrFallback(url: URL, completion: @escaping (NSImage) -> Void)
-	{
-		resourcesFetcher.fetchImage(with: url) { (result) in
-			if case .success(let image) = result
-			{
+
+	private func fetchImageOrFallback(url: URL, completion: @escaping (NSImage) -> Void) {
+		resourcesFetcher.fetchImage(with: url) { result in
+			if case let .success(image) = result {
 				completion(image)
-			}
-			else
-			{
+			} else {
 				completion(#imageLiteral(resourceName: "missing"))
 			}
 		}

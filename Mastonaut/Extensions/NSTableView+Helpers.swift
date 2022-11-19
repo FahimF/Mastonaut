@@ -19,10 +19,8 @@
 
 import Cocoa
 
-extension NSTableView
-{
-	func insertRowsAnimatingIfVisible(at rowIndices: IndexSet)
-	{
+extension NSTableView {
+	func insertRowsAnimatingIfVisible(at rowIndices: IndexSet) {
 		guard rowIndices.count > 0 else { return }
 
 		let visibleRows = rows(in: visibleRect)
@@ -31,15 +29,14 @@ extension NSTableView
 		insertRows(at: rowIndices, withAnimation: firstRowVisible ? .effectGap : [])
 
 		if !firstRowVisible, rowIndices.max()! < visibleRows.lowerBound,
-			let contentView = enclosingScrollView?.contentView
+		   let contentView = enclosingScrollView?.contentView
 		{
 			let count = CGFloat(rowIndices.count)
 			contentView.bounds.origin.y += (rowHeight + intercellSpacing.height) * count
 		}
 	}
 
-	func removeRowsAnimatingIfVisible(at rowIndices: IndexSet)
-	{
+	func removeRowsAnimatingIfVisible(at rowIndices: IndexSet) {
 		guard rowIndices.count > 0 else { return }
 
 		let visibleRows = rows(in: visibleRect)
@@ -48,8 +45,7 @@ extension NSTableView
 
 		removeRows(at: rowIndices, withAnimation: anyRowVisible ? .effectFade : [])
 
-		if !anyRowVisible, let contentView = enclosingScrollView?.contentView
-		{
+		if !anyRowVisible, let contentView = enclosingScrollView?.contentView {
 			contentView.bounds.origin.y -= removedRowsHeight
 		}
 	}
@@ -58,10 +54,11 @@ extension NSTableView
 		let visibleRectMinY = visibleRect.minY
 		var topmostVisibleRow: (minY: CGFloat, index: Int) = (.greatestFiniteMagnitude, -1)
 
-		enumerateAvailableRowViews { (rowView, rowIndex) in
+		enumerateAvailableRowViews { rowView, rowIndex in
 			let minY = rowView.frame.minY
 			if minY >= max(visibleRectMinY - 1, 0), minY < topmostVisibleRow.minY,
-			   delegate?.tableView?(self, shouldSelectRow: rowIndex) != false {
+			   delegate?.tableView?(self, shouldSelectRow: rowIndex) != false
+			{
 				topmostVisibleRow = (minY, rowIndex)
 			}
 		}
@@ -71,13 +68,11 @@ extension NSTableView
 		}
 	}
 
-	private func effectiveScrollHeightForRows(at indexSet: IndexSet) -> CGFloat
-	{
+	private func effectiveScrollHeightForRows(at indexSet: IndexSet) -> CGFloat {
 		return indexSet.reduce(CGFloat(0)) { $0 + effectiveHeight(forRowView: $1) + intercellSpacing.height }
 	}
 
-	private func effectiveHeight(forRowView row: Int) -> CGFloat
-	{
+	private func effectiveHeight(forRowView row: Int) -> CGFloat {
 		return view(atColumn: 0, row: row, makeIfNecessary: false)?.frame.height ?? rowHeight
 	}
 }

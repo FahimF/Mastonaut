@@ -22,56 +22,46 @@ import CoreTootin
 
 typealias ColumnViewController = NSViewController & ColumnPresentable
 
-class TimelinesViewController: NSViewController
-{
-	@IBOutlet private weak var stackView: NSStackView!
+class TimelinesViewController: NSViewController {
+	@IBOutlet private var stackView: NSStackView!
 
 	var timelinesSplitViewController: TimelinesSplitViewController {
 		return parent as! TimelinesSplitViewController
 	}
 
-	var mainContentView: NSView
-	{
+	var mainContentView: NSView {
 		return stackView
 	}
 
-	internal var timelinesWindowController: TimelinesWindowController?
-	{
+	internal var timelinesWindowController: TimelinesWindowController? {
 		return view.window?.windowController as? TimelinesWindowController
 	}
 
-	internal var sidebarViewController: SidebarViewController?
-	{
+	internal var sidebarViewController: SidebarViewController? {
 		return timelinesSplitViewController.sidebarViewController
 	}
 
 	// MARK: Column Management
 
-	@objc dynamic var columnViewControllersCount: Int
-	{
+	@objc dynamic var columnViewControllersCount: Int {
 		return columnViewControllers.count
 	}
 
-	private(set) var columnViewControllers: [ColumnViewController] = []
-	{
+	private(set) var columnViewControllers: [ColumnViewController] = [] {
 		willSet { willChangeValue(for: \TimelinesViewController.columnViewControllersCount) }
 		didSet { didChangeValue(for: \TimelinesViewController.columnViewControllersCount) }
 	}
 
-	var canAppendStatusList: Bool
-	{
-		guard let screenSize = view.window?.screen?.frame.size else
-		{
+	var canAppendStatusList: Bool {
+		guard let screenSize = view.window?.screen?.frame.size else {
 			return false
 		}
 
 		return screenSize.width >= ListViewControllerMinimumWidth * CGFloat(columnViewControllers.count + 1)
 	}
 
-	func appendColumnIfFitting(model: ColumnModel, expand: Bool = true) -> ColumnViewController?
-	{
-		guard canAppendStatusList else
-		{
+	func appendColumnIfFitting(model: ColumnModel, expand: Bool = true) -> ColumnViewController? {
+		guard canAppendStatusList else {
 			return nil
 		}
 
@@ -82,44 +72,35 @@ class TimelinesViewController: NSViewController
 		return columnViewController
 	}
 
-	private func appendColumn(_ columnViewController: ColumnViewController, expand: Bool)
-	{
+	private func appendColumn(_ columnViewController: ColumnViewController, expand: Bool) {
 		if expand, Preferences.timelinesResizeMode == .expandWindowFirst,
-			let windowController = timelinesWindowController,
-			let statusListWidth = columnViewControllers.first?.view.frame.width
+		   let windowController = timelinesWindowController,
+		   let statusListWidth = columnViewControllers.first?.view.frame.width
 		{
-			NSAnimationContext.runAnimationGroup()
-				{
-					context in
+			NSAnimationContext.runAnimationGroup {
+				context in
 
-					context.allowsImplicitAnimation = true
-					installColumn(columnViewController)
+				context.allowsImplicitAnimation = true
+				installColumn(columnViewController)
 
-					let neededWidth = statusListWidth + stackView.spacing
-					windowController.adjustWindowFrame(adjustment: .expand(by: neededWidth))
-				}
-		}
-		else if columnViewControllers.isEmpty
-		{
+				let neededWidth = statusListWidth + stackView.spacing
+				windowController.adjustWindowFrame(adjustment: .expand(by: neededWidth))
+			}
+		} else if columnViewControllers.isEmpty {
 			// No animations in case this is the first column
 			installColumn(columnViewController, animated: false)
-		}
-		else
-		{
-			NSAnimationContext.runAnimationGroup()
-				{
-					context in
+		} else {
+			NSAnimationContext.runAnimationGroup {
+				context in
 
-					context.allowsImplicitAnimation = true
-					installColumn(columnViewController)
-				}
+				context.allowsImplicitAnimation = true
+				installColumn(columnViewController)
+			}
 		}
 	}
 
-	private func installColumn(_ columnViewController: ColumnViewController, animated: Bool = true)
-	{
-		guard animated else
-		{
+	private func installColumn(_ columnViewController: ColumnViewController, animated: Bool = true) {
+		guard animated else {
 			addChild(columnViewController)
 			stackView.addArrangedSubview(columnViewController.view)
 			columnViewControllers.append(columnViewController)
@@ -139,11 +120,10 @@ class TimelinesViewController: NSViewController
 
 		columnView.alphaValue = 0.0
 
-		stackView?.setArrangedSubview(columnView, hidden: false, animated: true)
-			{
-				helperConstraint.isActive = false
-				columnView.animator().alphaValue = 1.0
-			}
+		stackView?.setArrangedSubview(columnView, hidden: false, animated: true) {
+			helperConstraint.isActive = false
+			columnView.animator().alphaValue = 1.0
+		}
 	}
 
 	func replaceColumn(at index: Int, with newColumnViewController: ColumnViewController) -> ColumnViewController
@@ -164,25 +144,23 @@ class TimelinesViewController: NSViewController
 		return oldColumnViewController
 	}
 
-	func removeColumn(at index: Int, contract: Bool) -> ColumnViewController
-	{
+	func removeColumn(at index: Int, contract: Bool) -> ColumnViewController {
 		let oldColumnViewController = columnViewControllers[index]
 
 		columnViewControllers.remove(at: index)
 
 		if contract, Preferences.timelinesResizeMode == .expandWindowFirst,
-			let windowController = timelinesWindowController,
-			let statusListWidth = columnViewControllers.first?.view.frame.width
+		   let windowController = timelinesWindowController,
+		   let statusListWidth = columnViewControllers.first?.view.frame.width
 		{
 			windowController.adjustWindowFrame(adjustment: .contract(by: statusListWidth + stackView.spacing,
-																	 poppingPreservedFrameIfPossible: true))
+			                                                         poppingPreservedFrameIfPossible: true))
 		}
 
-		stackView.setArrangedSubview(oldColumnViewController.view, hidden: true, animated: true)
-			{
-				oldColumnViewController.removeFromParent()
-				oldColumnViewController.view.removeFromSuperview()
-			}
+		stackView.setArrangedSubview(oldColumnViewController.view, hidden: true, animated: true) {
+			oldColumnViewController.removeFromParent()
+			oldColumnViewController.view.removeFromSuperview()
+		}
 
 		return oldColumnViewController
 	}
@@ -203,8 +181,8 @@ class TimelinesViewController: NSViewController
 		let columns: [BaseColumnViewController] = (columnViewControllers + [sidebarViewController]).compacted()
 
 		if let firstResponder = firstResponder,
-			let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder }) {
-
+		   let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder })
+		{
 			let nextIndex = columns.index(after: activeIndex)
 
 			if nextIndex == columns.endIndex {
@@ -213,7 +191,7 @@ class TimelinesViewController: NSViewController
 			}
 
 			makeTimelineColumnFirstResponder(columns[nextIndex],
-											 currentFocusRegion: columns[activeIndex].currentFocusRegion)
+			                                 currentFocusRegion: columns[activeIndex].currentFocusRegion)
 		} else if let column = columns.first {
 			makeTimelineColumnFirstResponder(column, currentFocusRegion: nil)
 		}
@@ -229,8 +207,8 @@ class TimelinesViewController: NSViewController
 		let columns: [BaseColumnViewController] = (columnViewControllers + [sidebarViewController]).compacted()
 
 		if let firstResponder = firstResponder,
-			let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder }) {
-
+		   let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder })
+		{
 			if activeIndex == columns.startIndex {
 				NSSound.beep()
 				return
@@ -239,24 +217,22 @@ class TimelinesViewController: NSViewController
 			let previousIndex = columns.index(before: activeIndex)
 
 			makeTimelineColumnFirstResponder(columns[previousIndex],
-											 currentFocusRegion: columns[activeIndex].currentFocusRegion)
+			                                 currentFocusRegion: columns[activeIndex].currentFocusRegion)
 		} else if let column = columns.first {
 			makeTimelineColumnFirstResponder(column, currentFocusRegion: nil)
 		}
 	}
 
 	private func makeTimelineColumnFirstResponder(_ columnViewController: BaseColumnViewController,
-												  currentFocusRegion: NSRect?) {
-
+	                                              currentFocusRegion: NSRect?)
+	{
 		view.window?.makeFirstResponder(columnViewController.mainResponder)
 		columnViewController.activateKeyboardNavigation(preferredFocusRegion: currentFocusRegion)
 	}
 }
 
-extension TimelinesViewController: AttachmentPresenting
-{
-	func present(attachment: Attachment, from group: AttachmentGroup, senderWindow: NSWindow)
-	{
+extension TimelinesViewController: AttachmentPresenting {
+	func present(attachment: Attachment, from group: AttachmentGroup, senderWindow: NSWindow) {
 		let controller = AppDelegate.shared.attachmentWindowController
 		controller.set(attachment: attachment, attachmentGroup: group, senderWindow: senderWindow)
 		controller.showWindow(nil)
@@ -278,7 +254,6 @@ protocol ColumnModel {
 }
 
 protocol ColumnPresentable: BaseColumnViewController {
-
 	var modelRepresentation: ColumnModel? { get }
 
 	var client: ClientType? { get set }
@@ -288,46 +263,38 @@ protocol ColumnPresentable: BaseColumnViewController {
 	func containerWindowOcclusionStateDidChange(_ occlusionState: NSWindow.OcclusionState)
 }
 
-protocol SidebarModel
-{
+protocol SidebarModel {
 	func makeViewController(client: ClientType,
-							currentAccount: AuthorizedAccount?,
-							currentInstance: Instance) -> SidebarViewController
+	                        currentAccount: AuthorizedAccount?,
+	                        currentInstance: Instance) -> SidebarViewController
 
 	var rawValue: String { get }
 }
 
-indirect enum SidebarTitleMode
-{
+indirect enum SidebarTitleMode {
 	case none
 	case title(NSAttributedString)
 	case subtitle(title: NSAttributedString, subtitle: NSAttributedString)
 	case button(SidebarTitleButtonStateBindable, SidebarTitleMode)
 
-	static func title(_ string: String) -> SidebarTitleMode
-	{
+	static func title(_ string: String) -> SidebarTitleMode {
 		return .title(NSAttributedString(string: string))
 	}
 
-	static func subtitle(title: String, subtitle: String) -> SidebarTitleMode
-	{
+	static func subtitle(title: String, subtitle: String) -> SidebarTitleMode {
 		return .subtitle(title: NSAttributedString(string: title), subtitle: NSAttributedString(string: subtitle))
 	}
 }
 
-@objc class SidebarTitleButtonStateBindable: NSObject
-{
-	@objc dynamic var icon: NSImage? = nil
-	@objc dynamic var accessibilityLabel: String? = nil
-	@objc dynamic var accessibilityTitle: String? = nil
+@objc class SidebarTitleButtonStateBindable: NSObject {
+	@objc dynamic var icon: NSImage?
+	@objc dynamic var accessibilityLabel: String?
+	@objc dynamic var accessibilityTitle: String?
 
-	@objc func didClickButton(_ sender: Any?)
-	{
-	}
+	@objc func didClickButton(_: Any?) {}
 }
 
 protocol SidebarPresentable: BaseColumnViewController {
-
 	var sidebarModelValue: SidebarModel { get }
 
 	var client: ClientType? { get set }
@@ -337,10 +304,8 @@ protocol SidebarPresentable: BaseColumnViewController {
 	func containerWindowOcclusionStateDidChange(_ occlusionState: NSWindow.OcclusionState)
 }
 
-extension SidebarPresentable
-{
-	func invalidateSidebarTitleMode()
-	{
+extension SidebarPresentable {
+	func invalidateSidebarTitleMode() {
 		(view.window?.windowController as? TimelinesWindowController)?.reloadSidebarTitleMode()
 	}
 }

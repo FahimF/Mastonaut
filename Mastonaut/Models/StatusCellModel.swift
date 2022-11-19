@@ -17,52 +17,47 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class StatusCellModel: NSObject
-{
+class StatusCellModel: NSObject {
 	let status: Status
 
 	unowned let interactionHandler: StatusInteractionHandling
 
-	@objc dynamic
-	private(set) var isFavorited: Bool
+	@objc private(set) dynamic
+	var isFavorited: Bool
 
-	@objc dynamic
-	private(set) var isReblogged: Bool
+	@objc private(set) dynamic
+	var isReblogged: Bool
 
-	@objc dynamic
-	private(set) var authorAvatar: NSImage
+	@objc private(set) dynamic
+	var authorAvatar: NSImage
 
-	@objc dynamic
-	private(set) var agentAvatar: NSImage? = nil
+	@objc private(set) dynamic
+	var agentAvatar: NSImage?
 
-	@objc dynamic
-	private(set) var contextIcon: NSImage? = nil
+	@objc private(set) dynamic
+	var contextIcon: NSImage?
 
-	var visibleStatus: Status
-	{
+	var visibleStatus: Status {
 		return status.reblog ?? status
 	}
 
-	var author: Account
-	{
+	var author: Account {
 		return visibleStatus.account
 	}
 
-	var agent: Account
-	{
+	var agent: Account {
 		return status.account
 	}
 
-	init(status: Status, interactionHandler: StatusInteractionHandling)
-	{
+	init(status: Status, interactionHandler: StatusInteractionHandling) {
 		self.status = status
 		self.interactionHandler = interactionHandler
 
-		self.isFavorited = status.favourited == true
-		self.isReblogged = status.reblogged == true
+		isFavorited = status.favourited == true
+		isReblogged = status.reblogged == true
 
 		authorAvatar = #imageLiteral(resourceName: "missing")
 
@@ -71,51 +66,38 @@ class StatusCellModel: NSObject
 		loadAvatars()
 	}
 
-	func showAuthor()
-	{
+	func showAuthor() {
 		interactionHandler.show(account: author)
 	}
 
-	func showAgent()
-	{
+	func showAgent() {
 		interactionHandler.show(account: agent)
 	}
 
-	func showTootDetails()
-	{
+	func showTootDetails() {
 		interactionHandler.show(status: visibleStatus)
 	}
 
-	func setupContextButton(_ button: NSButton, attributes: [NSAttributedString.Key: AnyObject])
-	{
-		if status.pinned == true
-		{
+	func setupContextButton(_ button: NSButton, attributes: [NSAttributedString.Key: AnyObject]) {
+		if status.pinned == true {
 			contextIcon = #imageLiteral(resourceName: "thumbtack")
 			button.set(stringValue: 🔠("status.context.pinned"), applyingAttributes: attributes, applyingEmojis: [])
 			button.isEnabled = false
-		}
-		else if status.reblog != nil
-		{
+		} else if status.reblog != nil {
 			contextIcon = #imageLiteral(resourceName: "retooted")
 			button.set(stringValue: 🔠("status.context.boost", agent.bestDisplayName),
-					   applyingAttributes: attributes,
-					   applyingEmojis: agent.cacheableEmojis)
+			           applyingAttributes: attributes,
+			           applyingEmojis: agent.cacheableEmojis)
 			button.isEnabled = true
-		}
-		else if status.inReplyToAccountID == status.account.id
-		{
+		} else if status.inReplyToAccountID == status.account.id {
 			contextIcon = #imageLiteral(resourceName: "thread")
 			button.set(stringValue: 🔠("status.context.thread"), applyingAttributes: attributes, applyingEmojis: [])
 			button.isEnabled = true
-		}
-		else if status.inReplyToID != nil
-		{
+		} else if status.inReplyToID != nil {
 			contextIcon = #imageLiteral(resourceName: "replied")
 			button.set(stringValue: 🔠("status.context.reply"), applyingAttributes: attributes, applyingEmojis: [])
 			button.isEnabled = true
-		}
-		else
-		{
+		} else {
 			contextIcon = nil
 			button.stringValue = ""
 			button.removeAllEmojiSubviews()
@@ -123,35 +105,29 @@ class StatusCellModel: NSObject
 		}
 	}
 
-	func handle(interaction: Interaction)
-	{
-		switch interaction
-		{
+	func handle(interaction: Interaction) {
+		switch interaction {
 		case .favorite:
 			isFavorited = true
-			interactionHandler.favoriteStatus(with: status.id)
-			{
+			interactionHandler.favoriteStatus(with: status.id) {
 				[weak self] success in DispatchQueue.main.async { self?.isFavorited = success }
 			}
 
 		case .unfavorite:
 			isFavorited = false
-			interactionHandler.unfavoriteStatus(with: status.id)
-			{
+			interactionHandler.unfavoriteStatus(with: status.id) {
 				[weak self] success in DispatchQueue.main.async { self?.isFavorited = !success }
 			}
 
 		case .reblog:
 			isReblogged = true
-			interactionHandler.reblogStatus(with: status.id)
-			{
+			interactionHandler.reblogStatus(with: status.id) {
 				[weak self] success in DispatchQueue.main.async { self?.isReblogged = success }
 			}
 
 		case .unreblog:
 			isReblogged = false
-			interactionHandler.unreblogStatus(with: status.id)
-			{
+			interactionHandler.unreblogStatus(with: status.id) {
 				[weak self] success in DispatchQueue.main.async { self?.isReblogged = !success }
 			}
 
@@ -160,33 +136,27 @@ class StatusCellModel: NSObject
 		}
 	}
 
-	func openCardLink()
-	{
+	func openCardLink() {
 		guard let linkURL = visibleStatus.card?.url else { return }
 		interactionHandler.handle(linkURL: linkURL, knownTags: visibleStatus.tags)
 	}
 
-	func loadAvatars()
-	{
-		if let rebloggedStatus = status.reblog
-		{
+	func loadAvatars() {
+		if let rebloggedStatus = status.reblog {
 			loadAccountAvatar(for: rebloggedStatus) { [weak self] in self?.authorAvatar = $0 }
 			loadAccountAvatar(for: status) { [weak self] in self?.agentAvatar = $0 }
-		}
-		else
-		{
+		} else {
 			loadAccountAvatar(for: status) { [weak self] in self?.authorAvatar = $0 }
 		}
 	}
 
-	func loadAccountAvatar(for status: Status, completion: @escaping (NSImage) -> Void)
-	{
+	func loadAccountAvatar(for status: Status, completion: @escaping (NSImage) -> Void) {
 		AppDelegate.shared.avatarImageCache.fetchImage(account: status.account) { result in
 			switch result {
-			case .inCache(let avatarImage):
+			case let .inCache(avatarImage):
 				assert(Thread.isMainThread)
 				completion(avatarImage)
-			case .loaded(let avatarImage):
+			case let .loaded(avatarImage):
 				DispatchQueue.main.async { completion(avatarImage) }
 			case .noImage:
 				DispatchQueue.main.async { completion(#imageLiteral(resourceName: "missing")) }
@@ -194,50 +164,39 @@ class StatusCellModel: NSObject
 		}
 	}
 
-	func showContextDetails()
-	{
-		if status.pinned == true
-		{
+	func showContextDetails() {
+		if status.pinned == true {
 			// NOP
-		}
-		else if status.reblog != nil
-		{
+		} else if status.reblog != nil {
 			showAgent()
-		}
-		else if status.inReplyToAccountID == status.account.id
-		{
+		} else if status.inReplyToAccountID == status.account.id {
 			showTootDetails()
-		}
-		else if status.inReplyToID != nil
-		{
+		} else if status.inReplyToID != nil {
 			showTootDetails()
 		}
 	}
 
-	enum Interaction
-	{
+	enum Interaction {
 		case favorite, unfavorite, reblog, unreblog, reply
 	}
 }
 
-extension StatusCellModel: PollViewControllerDelegate
-{
+extension StatusCellModel: PollViewControllerDelegate {
 	func pollViewController(_ viewController: PollViewController,
-							userDidVote optionIndexSet: IndexSet,
-							completion: @escaping (Poll?) -> Void)
+	                        userDidVote optionIndexSet: IndexSet,
+	                        completion: @escaping (Poll?) -> Void)
 	{
 		guard let poll = viewController.poll else { return }
 
 		interactionHandler.voteOn(poll: poll,
-								  statusID: visibleStatus.id,
-								  options: optionIndexSet) { [weak self] result in
+		                          statusID: visibleStatus.id,
+		                          options: optionIndexSet) { [weak self] result in
 
-			switch result
-			{
-			case .success(let updatedPoll):
+			switch result {
+			case let .success(updatedPoll):
 				completion(updatedPoll)
 
-			case .failure(let error):
+			case let .failure(error):
 				completion(nil)
 				DispatchQueue.main.async {
 					self?.interactionHandler.handle(interactionError: UserLocalizedDescriptionError(error))
@@ -247,10 +206,8 @@ extension StatusCellModel: PollViewControllerDelegate
 	}
 }
 
-extension StatusCellModel: AttributedLabelLinkHandler
-{
-	func handle(linkURL: URL)
-	{
+extension StatusCellModel: AttributedLabelLinkHandler {
+	func handle(linkURL: URL) {
 		interactionHandler.handle(linkURL: linkURL, knownTags: visibleStatus.tags)
 	}
 }

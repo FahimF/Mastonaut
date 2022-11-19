@@ -19,22 +19,20 @@
 
 import AppKit
 
-public extension NSImage
-{
-	func resizedImage(withSize newSize: NSSize) -> NSImage
-	{
+public extension NSImage {
+	func resizedImage(withSize newSize: NSSize) -> NSImage {
 		assert(!Thread.isMainThread)
 
 		let resizedImageRepresentation = NSBitmapImageRep(bitmapDataPlanes: nil,
-														  pixelsWide: Int(newSize.width),
-														  pixelsHigh: Int(newSize.height),
-														  bitsPerSample: 8,
-														  samplesPerPixel: 4,
-														  hasAlpha: true,
-														  isPlanar: false,
-														  colorSpaceName: .calibratedRGB,
-														  bytesPerRow: 0,
-														  bitsPerPixel: 0)!
+		                                                  pixelsWide: Int(newSize.width),
+		                                                  pixelsHigh: Int(newSize.height),
+		                                                  bitsPerSample: 8,
+		                                                  samplesPerPixel: 4,
+		                                                  hasAlpha: true,
+		                                                  isPlanar: false,
+		                                                  colorSpaceName: .calibratedRGB,
+		                                                  bytesPerRow: 0,
+		                                                  bitsPerPixel: 0)!
 
 		resizedImageRepresentation.size = newSize
 
@@ -42,11 +40,11 @@ public extension NSImage
 		NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: resizedImageRepresentation)
 
 		draw(in: NSRect(origin: .zero, size: newSize),
-			 from: NSRect(origin: .zero, size: size),
-			 operation: .copy,
-			 fraction: 1.0,
-			 respectFlipped: true,
-			 hints: [.interpolation : NSNumber(value: NSImageInterpolation.medium.rawValue)])
+		     from: NSRect(origin: .zero, size: size),
+		     operation: .copy,
+		     fraction: 1.0,
+		     respectFlipped: true,
+		     hints: [.interpolation: NSNumber(value: NSImageInterpolation.medium.rawValue)])
 
 		NSGraphicsContext.restoreGraphicsState()
 
@@ -55,10 +53,8 @@ public extension NSImage
 		return resizedImage
 	}
 
-	var pixelSize: NSSize
-	{
-		guard let bitmapRep = largestBitmapImageRep else
-		{
+	var pixelSize: NSSize {
+		guard let bitmapRep = largestBitmapImageRep else {
 			NSLog("pixelSize should not be called on non-bitmap backed images")
 			abort()
 		}
@@ -66,10 +62,9 @@ public extension NSImage
 		return NSSize(width: bitmapRep.pixelsWide, height: bitmapRep.pixelsHigh)
 	}
 
-	private var largestBitmapImageRep: NSBitmapImageRep?
-	{
-		return representations.compactMap({ $0 as? NSBitmapImageRep })
-							  .max(by: { ($0.pixelsWide * $0.pixelsHigh) < ($1.pixelsWide * $1.pixelsHigh) })
+	private var largestBitmapImageRep: NSBitmapImageRep? {
+		return representations.compactMap { $0 as? NSBitmapImageRep }
+			.max(by: { ($0.pixelsWide * $0.pixelsHigh) < ($1.pixelsWide * $1.pixelsHigh) })
 	}
 
 	private static let utiTypeMap: [CFString: NSBitmapImageRep.FileType] = [
@@ -78,31 +73,26 @@ public extension NSImage
 		kUTTypeJPEG2000: .jpeg2000,
 		kUTTypeGIF: .gif,
 		kUTTypeBMP: .bmp,
-		kUTTypeTIFF: .tiff
+		kUTTypeTIFF: .tiff,
 	]
 
-	func dataUsingRepresentation(for UTI: CFString?) throws -> Data
-	{
-		guard let rawData = tiffRepresentation, let bitmap = NSBitmapImageRep(data: rawData) else
-		{
+	func dataUsingRepresentation(for UTI: CFString?) throws -> Data {
+		guard let rawData = tiffRepresentation, let bitmap = NSBitmapImageRep(data: rawData) else {
 			throw EncodeErrors.noRawData
 		}
 
-		guard let fileType = NSImage.utiTypeMap[UTI ?? kUTTypePNG] else
-		{
+		guard let fileType = NSImage.utiTypeMap[UTI ?? kUTTypePNG] else {
 			throw EncodeErrors.unknownExpectedFormat
 		}
 
-		guard let formattedData = bitmap.representation(using: fileType, properties: [:]) else
-		{
+		guard let formattedData = bitmap.representation(using: fileType, properties: [:]) else {
 			throw EncodeErrors.bitmapEncoderReturnedNil
 		}
 
 		return formattedData
 	}
 
-	enum EncodeErrors: Error
-	{
+	enum EncodeErrors: Error {
 		case noRawData
 		case unknownExpectedFormat
 		case bitmapEncoderReturnedNil

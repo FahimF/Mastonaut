@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 protocol AccountBound {
-
 	var account: Account? { get }
 
 	func setRecreatedAccount(_ account: Account)

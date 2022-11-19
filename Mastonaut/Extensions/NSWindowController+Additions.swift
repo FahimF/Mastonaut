@@ -20,37 +20,34 @@
 import Cocoa
 import CoreTootin
 
-extension NSWindowController
-{
-	func loadWindowIfNeeded()
-	{
+extension NSWindowController {
+	func loadWindowIfNeeded() {
 		_ = window
 	}
 
 	func displayError<T: UserDescriptionError>(_ error: T,
-											   title: String = 🔠("Error"),
-											   dialogMode: DialogMode? = nil,
-											   completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
+	                                           title: String = 🔠("Error"),
+	                                           dialogMode: DialogMode? = nil,
+	                                           completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
 	{
-		guard let window = self.window else {
+		guard let window = window else {
 			presentError(error)
 			return
 		}
 
 		let alert = NSAlert.makeAlert(style: .warning, title: title,
-									  message: error.userDescription,
-									  dialogMode: dialogMode)
+		                              message: error.userDescription,
+		                              dialogMode: dialogMode)
 
 		alert.beginSheetModal(for: window, completionHandler: handler)
 	}
 
 	func showAlert(style: NSAlert.Style = .informational,
-				   title: String, message: String,
-				   dialogMode: DialogMode? = nil,
-				   completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
+	               title: String, message: String,
+	               dialogMode: DialogMode? = nil,
+	               completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
 	{
-		guard let window = self.window else
-		{
+		guard let window = window else {
 			return
 		}
 

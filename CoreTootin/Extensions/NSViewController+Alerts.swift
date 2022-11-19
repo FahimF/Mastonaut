@@ -19,16 +19,15 @@
 
 import Cocoa
 
-public extension NSViewController
-{
+public extension NSViewController {
 	func displayError<T: UserDescriptionError>(_ error: T,
-											   title: String = 🔠("Error"),
-											   dialogMode: DialogMode? = nil,
-											   completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
+	                                           title: String = 🔠("Error"),
+	                                           dialogMode: DialogMode? = nil,
+	                                           completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
 	{
 		let alert = NSAlert.makeAlert(style: .warning, title: title,
-									  message: error.userDescription,
-									  dialogMode: dialogMode)
+		                              message: error.userDescription,
+		                              dialogMode: dialogMode)
 
 		let result = alert.runModal()
 
@@ -36,9 +35,9 @@ public extension NSViewController
 	}
 
 	func showAlert(style: NSAlert.Style = .informational,
-				   title: String, message: String,
-				   dialogMode: DialogMode? = nil,
-				   completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
+	               title: String, message: String,
+	               dialogMode: DialogMode? = nil,
+	               completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
 	{
 		let alert = NSAlert.makeAlert(style: style, title: title, message: message, dialogMode: dialogMode)
 		let result = alert.runModal()

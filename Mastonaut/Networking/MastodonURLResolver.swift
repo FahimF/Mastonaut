@@ -17,31 +17,23 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-struct MastodonURLResolver
-{
+struct MastodonURLResolver {
 	static func resolve(url: URL, knownTags: [Tag]?, source windowController: TimelinesWindowController?)
 	{
-		var modeToPresent: SidebarMode? = nil
+		var modeToPresent: SidebarMode?
 
-		if let annotations = (url as? AnnotatedURL)?.annotation?.split(separator: " ")
-		{
-			if annotations.contains("mention")
-			{
-				if annotations.contains("u-url")
-				{
+		if let annotations = (url as? AnnotatedURL)?.annotation?.split(separator: " ") {
+			if annotations.contains("mention") {
+				if annotations.contains("u-url") {
 					modeToPresent = .profile(uri: url.mastodonHandleFromAccountURI)
-				}
-				else if annotations.contains("hashtag")
-				{
-					if let tag = knownTags?.first(where: { $0.url == url })
-					{
+				} else if annotations.contains("hashtag") {
+					if let tag = knownTags?.first(where: { $0.url == url }) {
 						modeToPresent = .tag(tag.name)
-					}
-					else if let leadIndex = url.pathComponents.firstIndex(where: { $0 == "tag" || $0 == "tags" }),
-						leadIndex < url.pathComponents.count
+					} else if let leadIndex = url.pathComponents.firstIndex(where: { $0 == "tag" || $0 == "tags" }),
+					          leadIndex < url.pathComponents.count
 					{
 						modeToPresent = .tag(url.pathComponents[leadIndex + 1])
 					}
@@ -49,12 +41,9 @@ struct MastodonURLResolver
 			}
 		}
 
-		if let mode = modeToPresent, let windowController = windowController
-		{
+		if let mode = modeToPresent, let windowController = windowController {
 			windowController.presentInSidebar(mode)
-		}
-		else
-		{
+		} else {
 			NSWorkspace.shared.open(url)
 		}
 	}

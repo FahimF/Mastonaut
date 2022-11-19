@@ -9,31 +9,31 @@
 import Foundation
 
 public struct Pagination {
-    /// The request range for fetching the next page.
-    public let next: RequestRange?
-    /// The request range for fetching the previous page.
-    public let previous: RequestRange?
+	/// The request range for fetching the next page.
+	public let next: RequestRange?
+	/// The request range for fetching the previous page.
+	public let previous: RequestRange?
 }
 
 extension Pagination {
-    init(string: String) {
-        let links = string
-            .components(separatedBy: ",")
-            .compactMap(PaginationItem.init)
+	init(string: String) {
+		let links = string
+			.components(separatedBy: ",")
+			.compactMap(PaginationItem.init)
 
-        var nextLink: RequestRange?
-        var previousLink: RequestRange?
+		var nextLink: RequestRange?
+		var previousLink: RequestRange?
 
-        for link in links {
-            switch link.type {
-            case .next: nextLink = .max(id: link.id, limit: link.limit)
-            case .prev: previousLink = .since(id: link.id, limit: link.limit)
-            }
-        }
+		for link in links {
+			switch link.type {
+			case .next: nextLink = .max(id: link.id, limit: link.limit)
+			case .prev: previousLink = .since(id: link.id, limit: link.limit)
+			}
+		}
 
-        self.next = nextLink
-        self.previous = previousLink
-    }
+		next = nextLink
+		previous = previousLink
+	}
 }
 
 // MARK: - Equatable

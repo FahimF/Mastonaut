@@ -20,65 +20,58 @@
 import Cocoa
 
 @IBDesignable
-class InsetTextFieldCell: NSTextFieldCell
-{
+class InsetTextFieldCell: NSTextFieldCell {
 	@IBInspectable var insetLeft: CGFloat = 0
 	@IBInspectable var insetRight: CGFloat = 0
 	@IBInspectable var insetTop: CGFloat = 0
 	@IBInspectable var insetBottom: CGFloat = 0
 
-	private var contentInset: NSSize
-	{
+	private var contentInset: NSSize {
 		return NSSize(width: insetLeft + insetRight,
-					  height: insetTop + insetBottom)
+		              height: insetTop + insetBottom)
 	}
 
-	override func cellSize(forBounds rect: NSRect) -> NSSize
-	{
+	override func cellSize(forBounds rect: NSRect) -> NSSize {
 		var size = super.cellSize(forBounds: rect)
 		size.height += contentInset.height * 2
 		return size
 	}
 
-	override func titleRect(forBounds rect: NSRect) -> NSRect
-	{
+	override func titleRect(forBounds rect: NSRect) -> NSRect {
 		return rect.insetBy(left: insetLeft, right: insetRight,
-							top: insetTop, bottom: insetBottom)
+		                    top: insetTop, bottom: insetBottom)
 	}
 
 	override func edit(withFrame rect: NSRect, in controlView: NSView,
-					   editor textObj: NSText, delegate: Any?, event: NSEvent?)
+	                   editor textObj: NSText, delegate: Any?, event: NSEvent?)
 	{
 		let insetRect = rect.insetBy(left: insetLeft, right: insetRight,
-									 top: insetTop, bottom: insetBottom)
+		                             top: insetTop, bottom: insetBottom)
 
 		super.edit(withFrame: insetRect, in: controlView,
-				   editor: textObj, delegate: delegate, event: event)
+		           editor: textObj, delegate: delegate, event: event)
 	}
 
 	override func select(withFrame rect: NSRect, in controlView: NSView,
-						 editor textObj: NSText, delegate: Any?, start selStart: Int, length selLength: Int)
+	                     editor textObj: NSText, delegate: Any?, start selStart: Int, length selLength: Int)
 	{
 		let insetRect = rect.insetBy(left: insetLeft, right: insetRight,
-									 top: insetTop, bottom: insetBottom)
+		                             top: insetTop, bottom: insetBottom)
 
 		super.select(withFrame: insetRect, in: controlView, editor: textObj,
-					 delegate: delegate, start: selStart, length: selLength)
+		             delegate: delegate, start: selStart, length: selLength)
 	}
 
-	override func drawInterior(withFrame cellFrame: NSRect, in controlView: NSView)
-	{
+	override func drawInterior(withFrame cellFrame: NSRect, in controlView: NSView) {
 		let insetRect = cellFrame.insetBy(left: insetLeft, right: insetRight,
-										  top: insetTop, bottom: insetBottom)
+		                                  top: insetTop, bottom: insetBottom)
 
 		super.drawInterior(withFrame: insetRect, in: controlView)
 	}
 }
 
-extension NSRect
-{
-	nonmutating func insetBy(left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat) -> NSRect
-	{
+extension NSRect {
+	nonmutating func insetBy(left: CGFloat, right: CGFloat, top: CGFloat, bottom: CGFloat) -> NSRect {
 		var rect = self
 		rect.origin.x += left
 		rect.origin.y += top

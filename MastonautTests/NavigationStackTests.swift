@@ -17,25 +17,21 @@
 //  GNU General Public License for more details.
 //
 
-import XCTest
 import CoreTootin
+import XCTest
 
-class NavigationStackTests: XCTestCase
-{
+class NavigationStackTests: XCTestCase {
 	private var navigationStack: NavigationStack<MockItem>!
 
-	override func setUp()
-	{
+	override func setUp() {
 		navigationStack = NavigationStack<MockItem>(currentItem: "1")
 	}
 
-	func testBasicSetup()
-	{
+	func testBasicSetup() {
 		XCTAssertEqual(navigationStack.currentItem, "1")
 	}
 
-	func testPushingNewItems()
-	{
+	func testPushingNewItems() {
 		navigationStack.set(currentItem: "2")
 		XCTAssertEqual(navigationStack.currentItem, "2")
 		navigationStack.set(currentItem: "3")
@@ -47,8 +43,7 @@ class NavigationStackTests: XCTestCase
 		XCTAssertTrue(navigationStack.canGoBackward)
 	}
 
-	func testBackwardNavigation()
-	{
+	func testBackwardNavigation() {
 		navigationStack.set(currentItem: "2")
 		navigationStack.set(currentItem: "3")
 		navigationStack.set(currentItem: "4")
@@ -65,8 +60,7 @@ class NavigationStackTests: XCTestCase
 		XCTAssertFalse(navigationStack.canGoBackward)
 	}
 
-	func testForwardNavigation()
-	{
+	func testForwardNavigation() {
 		navigationStack.set(currentItem: "2")
 		navigationStack.set(currentItem: "3")
 		navigationStack.set(currentItem: "4")
@@ -86,8 +80,7 @@ class NavigationStackTests: XCTestCase
 		XCTAssertEqual(navigationStack.currentItem, "5")
 	}
 
-	func testForwardAndBackwardNavigation()
-	{
+	func testForwardAndBackwardNavigation() {
 		navigationStack.set(currentItem: "2")
 		navigationStack.set(currentItem: "3")
 		navigationStack.set(currentItem: "4")
@@ -109,25 +102,21 @@ class NavigationStackTests: XCTestCase
 	}
 }
 
-private struct MockItem: RawRepresentable, ExpressibleByStringLiteral, Equatable
-{
+private struct MockItem: RawRepresentable, ExpressibleByStringLiteral, Equatable {
 	typealias RawValue = String
 	typealias StringLiteralType = String
 
 	let value: String
 
-	var rawValue: String
-	{
+	var rawValue: String {
 		return value
 	}
 
-	init?(rawValue: Self.RawValue)
-	{
-		self.value = rawValue
+	init?(rawValue: Self.RawValue) {
+		value = rawValue
 	}
 
-	init(stringLiteral value: Self.StringLiteralType)
-	{
+	init(stringLiteral value: Self.StringLiteralType) {
 		self.value = value
 	}
 }

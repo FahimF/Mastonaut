@@ -19,15 +19,12 @@
 
 import Foundation
 
-class NonVibrantPopUpButton: NSPopUpButton
-{
-	override var allowsVibrancy: Bool
-	{
+class NonVibrantPopUpButton: NSPopUpButton {
+	override var allowsVibrancy: Bool {
 		return false
 	}
 
-	override var effectiveAppearance: NSAppearance
-	{
+	override var effectiveAppearance: NSAppearance {
 		let defaultAppearance = super.effectiveAppearance
 
 		if #available(OSX 10.14, *), defaultAppearance.name == NSAppearance.Name.vibrantDark {

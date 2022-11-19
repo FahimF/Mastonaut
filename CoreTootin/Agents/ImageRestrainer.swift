@@ -50,17 +50,17 @@ public class ImageRestrainer {
 
 		// Check if animated image needs to be resized or converted
 		guard originalSize.area >= maximumImageSize.area || restrainedFileUTI != fileUTI,
-			  let destinationData = CFDataCreateMutable(kCFAllocatorDefault, originalData.count),
-			  let imageDestination = CGImageDestinationCreateWithData(destinationData,
-																	  restrainedFileUTI,
-																	  frameCount, nil)
+		      let destinationData = CFDataCreateMutable(kCFAllocatorDefault, originalData.count),
+		      let imageDestination = CGImageDestinationCreateWithData(destinationData,
+		                                                              restrainedFileUTI,
+		                                                              frameCount, nil)
 		else {
 			return originalData
 		}
 
 		let newSize = originalSize.fitting(on: maximumImageSize)
 
-		for frameIndex in 0..<frameCount {
+		for frameIndex in 0 ..< frameCount {
 			guard
 				let originalFrame = CGImageSourceCreateImageAtIndex(imageSource, frameIndex, nil),
 				let resizedFrame = originalFrame.resizedImage(newSize: newSize)
@@ -77,8 +77,7 @@ public class ImageRestrainer {
 	}
 
 	func restrain(staticImage: NSImage) -> NSImage {
-		guard staticImage.isValid, let representation = staticImage.representations.first else
-		{
+		guard staticImage.isValid, let representation = staticImage.representations.first else {
 			return staticImage
 		}
 

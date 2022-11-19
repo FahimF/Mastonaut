@@ -19,37 +19,32 @@
 
 import Cocoa
 
-class WelcomePlaceholderController: NSViewController
-{
-	@IBOutlet private weak var imageView: NSImageView!
+class WelcomePlaceholderController: NSViewController {
+	@IBOutlet private var imageView: NSImageView!
 
-	private var svgSourceCode: String? = nil
-	private var effectiveAppearanceObserver: NSObjectProtocol? = nil
+	private var svgSourceCode: String?
+	private var effectiveAppearanceObserver: NSObjectProtocol?
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		guard
 			let svgUrl = Bundle.main.url(forResource: "welcome", withExtension: "svg"),
 			let svgSourceCode = try? String(contentsOf: svgUrl)
-		else
-		{
+		else {
 			return
 		}
 
 		self.svgSourceCode = svgSourceCode
 
-		effectiveAppearanceObserver = view.observe(\NSView.effectiveAppearance)
-			{
-				[weak self] (view, change) in
+		effectiveAppearanceObserver = view.observe(\NSView.effectiveAppearance) {
+			[weak self] _, _ in
 
-				self?.updatePlaceholderImage()
-			}
+			self?.updatePlaceholderImage()
+		}
 	}
 
-	private func updatePlaceholderImage()
-	{
+	private func updatePlaceholderImage() {
 		guard
 			let tintColor = NSColor.safeControlTintColor.rgbHexString,
 			let tintedSource = svgSourceCode?.replacingOccurrences(of: "#A1B2C3", with: tintColor),
@@ -59,8 +54,7 @@ class WelcomePlaceholderController: NSViewController
 		imageView.image = svgImage.nsImage
 	}
 
-	@IBAction private func createAccount(_ sender: Any?)
-	{
+	@IBAction private func createAccount(_: Any?) {
 		NSWorkspace.shared.open(URL(string: "https://joinmastodon.org")!)
 	}
 }

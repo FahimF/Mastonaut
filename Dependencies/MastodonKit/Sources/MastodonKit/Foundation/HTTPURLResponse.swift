@@ -9,7 +9,7 @@
 import Foundation
 
 extension HTTPURLResponse {
-    var pagination: Pagination? {
-        return allHeaderFields["Link"].flatMap { $0 as? String }.map(Pagination.init)
-    }
+	var pagination: Pagination? {
+		return allHeaderFields["Link"].flatMap { $0 as? String }.map(Pagination.init)
+	}
 }

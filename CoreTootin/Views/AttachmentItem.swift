@@ -19,53 +19,44 @@
 
 import Cocoa
 
-public class AttachmentItem: NSCollectionViewItem
-{
-	var descriptionButtonAction: (() -> Void)? = nil
-	var removeButtonAction: (() -> Void)? = nil
+public class AttachmentItem: NSCollectionViewItem {
+	var descriptionButtonAction: (() -> Void)?
+	var removeButtonAction: (() -> Void)?
 
-	@IBOutlet private weak var itemImageView: AttachmentImageView!
-	@IBOutlet private weak var itemDetailIcon: NSImageView!
-	@IBOutlet private weak var itemDetailLabel: NSTextField!
-	@IBOutlet private weak var itemDetailContainer: NSView!
-	@IBOutlet private weak var failureIndicatorImageView: NSImageView!
+	@IBOutlet private var itemImageView: AttachmentImageView!
+	@IBOutlet private var itemDetailIcon: NSImageView!
+	@IBOutlet private var itemDetailLabel: NSTextField!
+	@IBOutlet private var itemDetailContainer: NSView!
+	@IBOutlet private var failureIndicatorImageView: NSImageView!
 
-	@IBOutlet private weak var showDescriptionEditorButton: NSButton!
+	@IBOutlet private var showDescriptionEditorButton: NSButton!
 
-	@IBOutlet private weak var progressIndicator: NSProgressIndicator!
-	@IBOutlet private weak var descriptionProgressIndicator: NSProgressIndicator!
+	@IBOutlet private var progressIndicator: NSProgressIndicator!
+	@IBOutlet private var descriptionProgressIndicator: NSProgressIndicator!
 
-	var displayedItemHashValue: Int? = nil
+	var displayedItemHashValue: Int?
 
-	public override var nibBundle: Bundle?
-	{
+	override public var nibBundle: Bundle? {
 		return Bundle(for: AttachmentItem.self)
 	}
 
-	var hasFailure: Bool = false
-	{
+	var hasFailure: Bool = false {
 		didSet { failureIndicatorImageView.isHidden = !hasFailure }
 	}
 
-	var isPendingSetDescription: Bool = false
-	{
-		didSet
-		{
-			if isPendingSetDescription
-			{
+	var isPendingSetDescription: Bool = false {
+		didSet {
+			if isPendingSetDescription {
 				descriptionProgressIndicator.startAnimation(nil)
 				showDescriptionEditorButton.isEnabled = false
-			}
-			else
-			{
+			} else {
 				descriptionProgressIndicator.stopAnimation(nil)
 				showDescriptionEditorButton.isEnabled = true
 			}
 		}
 	}
 
-	public override func awakeFromNib()
-	{
+	override public func awakeFromNib() {
 		super.awakeFromNib()
 
 		itemImageView.unregisterDraggedTypes()
@@ -73,16 +64,14 @@ public class AttachmentItem: NSCollectionViewItem
 		itemDetailIcon.unregisterDraggedTypes()
 	}
 
-	func set(progressIndicatorState state: UploadState)
-	{
-		switch state
-		{
+	func set(progressIndicatorState state: UploadState) {
+		switch state {
 		case .waitingToUpload:
 			progressIndicator.isIndeterminate = true
 			progressIndicator.isHidden = false
 			progressIndicator.startAnimation(nil)
 
-		case .uploading(let progress):
+		case let .uploading(progress):
 			progressIndicator.stopAnimation(nil)
 			progressIndicator.isIndeterminate = false
 			progressIndicator.isHidden = false
@@ -95,15 +84,13 @@ public class AttachmentItem: NSCollectionViewItem
 		}
 	}
 
-	func set(itemMetadata: Metadata?)
-	{
-		switch itemMetadata
-		{
-		case .some(.picture(let byteCount)):
+	func set(itemMetadata: Metadata?) {
+		switch itemMetadata {
+		case let .some(.picture(byteCount)):
 			detailIcon = Bundle(for: AttachmentItem.self).image(forResource: "tiny_camera")
 			detail = ByteCountFormatter().string(fromByteCount: byteCount)
 
-		case .some(.movie(let duration)):
+		case let .some(.movie(duration)):
 			detailIcon = Bundle(for: AttachmentItem.self).image(forResource: "tiny_film")
 			detail = duration.formattedStringValue
 
@@ -113,86 +100,68 @@ public class AttachmentItem: NSCollectionViewItem
 		}
 	}
 
-	var image: NSImage?
-	{
+	var image: NSImage? {
 		get { return itemImageView.image }
-		set { itemImageView.image = newValue}
+		set { itemImageView.image = newValue }
 	}
 
-	var detail: String?
-	{
+	var detail: String? {
 		get { return itemDetailLabel.stringValue }
-		set
-		{
-			if let detail = newValue
-			{
+		set {
+			if let detail = newValue {
 				itemDetailLabel.stringValue = detail
 				itemDetailContainer.isHidden = false
-			}
-			else
-			{
+			} else {
 				itemDetailLabel.stringValue = ""
 				itemDetailContainer.isHidden = true
 			}
 		}
 	}
 
-	var detailIcon: NSImage?
-	{
+	var detailIcon: NSImage? {
 		get { return itemDetailIcon.image }
-		set { itemDetailIcon.image = newValue}
+		set { itemDetailIcon.image = newValue }
 	}
 
-	@IBAction private func descriptionButtonClicked(_ sender: Any?)
-	{
+	@IBAction private func descriptionButtonClicked(_: Any?) {
 		descriptionButtonAction?()
 	}
 
-	@IBAction private func removeButtonClicked(_ sender: Any?)
-	{
+	@IBAction private func removeButtonClicked(_: Any?) {
 		removeButtonAction?()
 	}
 
-	enum UploadState
-	{
+	enum UploadState {
 		case waitingToUpload
 		case uploading(progress: Double)
 		case uploaded
 	}
 }
 
-class AttachmentItemImageView: NSImageView
-{
+class AttachmentItemImageView: NSImageView {
 	@IBInspectable
-	var cornerRadius: CGFloat = 0.0
-	{
-		didSet
-		{
-			if let layer = self.layer
-			{
+	var cornerRadius: CGFloat = 0.0 {
+		didSet {
+			if let layer = layer {
 				layer.cornerRadius = cornerRadius
 			}
 		}
 	}
 }
 
-class ShowOnHoverView: HoverView
-{
-	required init?(coder: NSCoder)
-	{
+class ShowOnHoverView: HoverView {
+	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		alphaValue = 0.001
 	}
 
-	override func mouseEntered(with event: NSEvent)
-	{
+	override func mouseEntered(with event: NSEvent) {
 		super.mouseEntered(with: event)
 
 		animator().alphaValue = 1.0
 	}
 
-	override func mouseExited(with event: NSEvent)
-	{
+	override func mouseExited(with event: NSEvent) {
 		super.mouseExited(with: event)
 
 		animator().alphaValue = 0.001

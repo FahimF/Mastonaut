@@ -19,70 +19,57 @@
 
 import Cocoa
 
-class AttachmentDescriptionViewController: NSViewController
-{
-	@IBOutlet private(set) weak var imageDescriptionPopover: NSPopover!
-	@IBOutlet private(set) weak var imageDescriptionPopoverTextField: NSTextField!
-	@IBOutlet private(set) weak var imageDescriptionCountLabel: NSTextField!
-	@IBOutlet private(set) weak var imageDescriptionButton: NSButton!
-	@IBOutlet private(set) weak var imageDescriptionFailureIndicator: NSView!
+class AttachmentDescriptionViewController: NSViewController {
+	@IBOutlet private(set) var imageDescriptionPopover: NSPopover!
+	@IBOutlet private(set) var imageDescriptionPopoverTextField: NSTextField!
+	@IBOutlet private(set) var imageDescriptionCountLabel: NSTextField!
+	@IBOutlet private(set) var imageDescriptionButton: NSButton!
+	@IBOutlet private(set) var imageDescriptionFailureIndicator: NSView!
 
 	var descriptionStringValueDidChangeHandler: (() -> Void)?
 	var didClickSubmitChangeHandler: (() -> Void)?
 
-	override var nibBundle: Bundle?
-	{
+	override var nibBundle: Bundle? {
 		return Bundle(for: AttachmentDescriptionViewController.self)
 	}
 
-	override var nibName: NSNib.Name?
-	{
+	override var nibName: NSNib.Name? {
 		return "AttachmentDescriptionViewController"
 	}
 
-	var descriptionStringValue: String
-	{
+	var descriptionStringValue: String {
 		return imageDescriptionPopoverTextField.stringValue
 	}
 
-	func set(description: String, hasError: Bool)
-	{
+	func set(description: String, hasError: Bool) {
 		imageDescriptionPopoverTextField.stringValue = description
 		imageDescriptionFailureIndicator.isHidden = !hasError
 	}
 
-	func set(remainingCount: Int)
-	{
+	func set(remainingCount: Int) {
 		imageDescriptionCountLabel.integerValue = remainingCount
 		imageDescriptionCountLabel.textColor = .labelColor(for: remainingCount)
 	}
 
-	func set(submitEnabled: Bool)
-	{
+	func set(submitEnabled: Bool) {
 		imageDescriptionButton.isEnabled = submitEnabled
 	}
 
-	func showPopover(relativeTo frame: CGRect, of view: NSView)
-	{
+	func showPopover(relativeTo frame: CGRect, of view: NSView) {
 		imageDescriptionPopover.show(relativeTo: frame, of: view, preferredEdge: .maxY)
 	}
 }
 
-extension AttachmentDescriptionViewController
-{
-	@IBAction func clickedApplyDescriptionButton(_ sender: Any?)
-	{
+extension AttachmentDescriptionViewController {
+	@IBAction func clickedApplyDescriptionButton(_ sender: Any?) {
 		imageDescriptionPopover.performClose(sender)
 		didClickSubmitChangeHandler?()
 	}
 }
 
-extension AttachmentDescriptionViewController: NSTextFieldDelegate
-{
-	public func controlTextDidChange(_ notification: Foundation.Notification)
-	{
-		if (notification.object as? NSTextField) === imageDescriptionPopoverTextField
-		{
+extension AttachmentDescriptionViewController: NSTextFieldDelegate {
+	public func controlTextDidChange(_ notification: Foundation.Notification) {
+		if (notification.object as? NSTextField) === imageDescriptionPopoverTextField {
 			descriptionStringValueDidChangeHandler?()
 		}
 	}

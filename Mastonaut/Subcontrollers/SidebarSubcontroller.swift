@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol SidebarContainer: AnyObject
-{
+protocol SidebarContainer: AnyObject {
 	var client: ClientType? { get }
 	var currentAccount: AuthorizedAccount? { get }
 	var currentInstance: Instance? { get }
@@ -34,32 +33,28 @@ protocol SidebarContainer: AnyObject
 	func didUninstallSidebar(viewController: NSViewController)
 }
 
-class SidebarSubcontroller
-{
+class SidebarSubcontroller {
 	private unowned let sidebarContainer: SidebarContainer
 	private unowned let navigationControl: NSSegmentedControl
 
 	private(set) var navigationStack: NavigationStack<SidebarMode>?
 
-	private(set) var sidebarMode: SidebarMode?
-	{
-		set
-		{
+	private(set) var sidebarMode: SidebarMode? {
+		set {
 			NSAnimationContext.runAnimationGroup { animationContext in
 				animationContext.allowsImplicitAnimation = true
 				setSidebarController(from: newValue)
 			}
 		}
 
-		get
-		{
+		get {
 			return sidebarContainer.sidebarViewController?.sidebarModelValue as? SidebarMode
 		}
 	}
 
 	init(sidebarContainer: SidebarContainer,
-		 navigationControl: NSSegmentedControl,
-		 navigationStack: NavigationStack<SidebarMode>?)
+	     navigationControl: NSSegmentedControl,
+	     navigationStack: NavigationStack<SidebarMode>?)
 	{
 		self.sidebarContainer = sidebarContainer
 		self.navigationControl = navigationControl
@@ -68,22 +63,17 @@ class SidebarSubcontroller
 		navigationControl.target = self
 		navigationControl.action = #selector(navigateSidebar(_:))
 
-		if let currentMode = navigationStack?.currentItem
-		{
+		if let currentMode = navigationStack?.currentItem {
 			sidebarMode = currentMode
 		}
 	}
 
-	func installSidebar(mode: SidebarMode)
-	{
+	func installSidebar(mode: SidebarMode) {
 		guard sidebarMode != mode else { return }
 
-		if let navigationStack = self.navigationStack
-		{
+		if let navigationStack = navigationStack {
 			navigationStack.set(currentItem: mode)
-		}
-		else
-		{
+		} else {
 			navigationStack = NavigationStack(currentItem: mode)
 		}
 
@@ -120,8 +110,8 @@ class SidebarSubcontroller
 
 		let oldViewController = sidebarContainer.sidebarViewController
 		let viewController = sidebarMode.makeViewController(client: client,
-															currentAccount: account,
-															currentInstance: instance)
+		                                                    currentAccount: account,
+		                                                    currentInstance: instance)
 
 		sidebarContainer.sidebarViewController = viewController
 
@@ -143,12 +133,10 @@ class SidebarSubcontroller
 		navigationControl.setEnabled(navigationStack?.canGoForward ?? false, forSegment: 1)
 	}
 
-	@objc private func navigateSidebar(_ sender: NSSegmentedControl)
-	{
-		guard let navigationStack = self.navigationStack else { return }
+	@objc private func navigateSidebar(_ sender: NSSegmentedControl) {
+		guard let navigationStack = navigationStack else { return }
 
-		switch sender.selectedSegment
-		{
+		switch sender.selectedSegment {
 		case 0:
 			sidebarMode = navigationStack.goBack()
 

@@ -19,18 +19,13 @@
 
 import Foundation
 
-class ReconnectModerator
-{
+class ReconnectModerator {
 	private let retryDelay: TimeInterval = 1.0
 	private let reconnectHandler: () -> Void
 
-	init(reconnectHandler: @escaping () -> Void)
-	{
+	init(reconnectHandler: @escaping () -> Void) {
 		self.reconnectHandler = reconnectHandler
 	}
 
-	func needsReconnect()
-	{
-
-	}
+	func needsReconnect() {}
 }

@@ -17,72 +17,62 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-struct PollService
-{
+struct PollService {
 	let client: ClientType
 
 	func voteOn(poll: Poll, options: IndexSet, completion: @escaping (Swift.Result<Poll, Errors>) -> Void)
 	{
-		guard !options.isEmpty && (poll.multiple || options.count == 1) else
-		{
+		guard !options.isEmpty, poll.multiple || options.count == 1 else {
 			completion(.failure(.invalidOptionsCount))
 			return
 		}
 
-		client.run(Polls.vote(pollID: poll.id, optionIndices: options))
-		{
+		client.run(Polls.vote(pollID: poll.id, optionIndices: options)) {
 			result in
 
-			switch result
-			{
-			case .failure(ClientError.badStatus(statusCode: let status)):
+			switch result {
+			case let .failure(ClientError.badStatus(statusCode: status)):
 				completion(.failure(.serverError(info: "Bad Status: \(status)")))
 
-			case .failure(let error):
+			case let .failure(error):
 				completion(.failure(.serverError(info: error.localizedDescription)))
 
-			case .success(let poll, _):
+			case let .success(poll, _):
 				completion(.success(poll))
 			}
 		}
 	}
 
-	func poll(pollID: String, completion: @escaping (Swift.Result<Poll, Errors>) -> Void)
-	{
-		client.run(Polls.poll(id: pollID))
-		{
+	func poll(pollID: String, completion: @escaping (Swift.Result<Poll, Errors>) -> Void) {
+		client.run(Polls.poll(id: pollID)) {
 			result in
 
-			switch result
-			{
-			case .failure(ClientError.badStatus(statusCode: let status)):
+			switch result {
+			case let .failure(ClientError.badStatus(statusCode: status)):
 				completion(.failure(.serverError(info: "Bad Status: \(status)")))
 
-			case .failure(let error):
+			case let .failure(error):
 				completion(.failure(.serverError(info: error.localizedDescription)))
 
-			case .success(let poll, _):
+			case let .success(poll, _):
 				completion(.success(poll))
 			}
 		}
 	}
 
-	enum Errors: Error, UserDescriptionError
-	{
+	enum Errors: Error, UserDescriptionError {
 		case invalidOptionsCount
 		case serverError(info: String)
 
-		var userDescription: String
-		{
-			switch self
-			{
+		var userDescription: String {
+			switch self {
 			case .invalidOptionsCount:
 				return 🔠("Invalid number of choices provided")
 
-			case .serverError(let info):
+			case let .serverError(info):
 				return 🔠("Server error: \(info)")
 			}
 		}

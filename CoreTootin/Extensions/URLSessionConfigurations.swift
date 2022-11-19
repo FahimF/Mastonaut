@@ -19,22 +19,19 @@
 
 import Foundation
 
-public extension URLSessionConfiguration
-{
-	static let forClients: URLSessionConfiguration =
-	{
+public extension URLSessionConfiguration {
+	static let forClients: URLSessionConfiguration = {
 		let configuration = URLSessionConfiguration.default
 		configuration.httpMaximumConnectionsPerHost = ProcessInfo().activeProcessorCount * 2
 		configuration.waitsForConnectivity = true
 		return configuration
 	}()
 
-	static var forResources: URLSessionConfiguration =
-	{
+	static var forResources: URLSessionConfiguration = {
 		let cachesURL = (try? FileManager.default.url(for: .cachesDirectory,
-													  in: .userDomainMask,
-													  appropriateFor: nil,
-													  create: false))
+		                                              in: .userDomainMask,
+		                                              appropriateFor: nil,
+		                                              create: false))
 
 		let cacheURL = cachesURL?.appendingPathComponent("Mastonaut/Resources", isDirectory: true)
 
@@ -42,8 +39,8 @@ public extension URLSessionConfiguration
 		configuration.requestCachePolicy = .returnCacheDataElseLoad
 		configuration.httpMaximumConnectionsPerHost = ProcessInfo().activeProcessorCount * 2
 		configuration.urlCache = URLCache(memoryCapacity: 268_435_456, // 256 MiB
-										  diskCapacity: 2_147_483_648, // 2 GiB
-										  diskPath: cacheURL?.path)
+		                                  diskCapacity: 2_147_483_648, // 2 GiB
+		                                  diskPath: cacheURL?.path)
 
 		return configuration
 	}()

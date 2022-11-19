@@ -20,41 +20,34 @@
 import Cocoa
 import CoreTootin
 
-class TimelineViewController: StatusListViewController
-{
-	internal var source: Source?
-	{
+class TimelineViewController: StatusListViewController {
+	internal var source: Source? {
 		didSet { if source != oldValue { sourceDidChange(source: source) }}
 	}
 
-	init(source: Source?)
-	{
+	init(source: Source?) {
 		self.source = source
 		super.init()
 		updateAccessibilityAttributes()
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	internal func sourceDidChange(source: Source?)
-	{
+	internal func sourceDidChange(source _: Source?) {
 		updateAccessibilityAttributes()
 	}
 
-	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?)
-	{
+	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
 		super.clientDidChange(client, oldClient: oldClient)
 
-		guard let source = self.source else
-		{
+		guard let source = source else {
 			return
 		}
 
-		switch source
-		{
+		switch source {
 		case .timeline:
 			setClientEventStream(.user)
 
@@ -64,21 +57,18 @@ class TimelineViewController: StatusListViewController
 		case .publicTimeline:
 			setClientEventStream(.public)
 
-		case .tag(let name):
+		case let .tag(name):
 			setClientEventStream(.hashtag(name))
 
 		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies, .favorites:
 			#if DEBUG
-			DispatchQueue.main.async { self.showStatusIndicator(state: .off) }
+				DispatchQueue.main.async { self.showStatusIndicator(state: .off) }
 			#endif
-			break
 		}
 	}
 
-	override internal func fetchEntries(for insertion: InsertionPoint)
-	{
-		guard let source = self.source else
-		{
+	override internal func fetchEntries(for insertion: InsertionPoint) {
+		guard let source = source else {
 			return
 		}
 
@@ -86,8 +76,7 @@ class TimelineViewController: StatusListViewController
 
 		let request: Request<[Status]>
 
-		switch source
-		{
+		switch source {
 		case .timeline:
 			request = Timelines.home(range: rangeForEntryFetch(for: insertion))
 
@@ -101,44 +90,38 @@ class TimelineViewController: StatusListViewController
 			let range = lastPaginationResult?.next ?? rangeForEntryFetch(for: insertion)
 			request = Favourites.all(range: range)
 
-		case .userStatuses(let account):
+		case let .userStatuses(account):
 			request = Accounts.statuses(id: account, excludeReplies: true, range: rangeForEntryFetch(for: insertion))
 
-		case .userStatusesAndReplies(let account):
+		case let .userStatusesAndReplies(account):
 			request = Accounts.statuses(id: account, excludeReplies: false, range: rangeForEntryFetch(for: insertion))
 
-		case .userMediaStatuses(let account):
+		case let .userMediaStatuses(account):
 			request = Accounts.statuses(id: account, mediaOnly: true, range: rangeForEntryFetch(for: insertion))
 
-		case .tag(let tagName):
+		case let .tag(tagName):
 			request = Timelines.tag(tagName, range: rangeForEntryFetch(for: insertion))
 		}
 
 		run(request: request, for: insertion)
 	}
 
-	override func receivedClientEvent(_ event: ClientEvent)
-	{
-		switch event
-		{
-		case .update(let status):
-			DispatchQueue.main.async
-				{
-					[weak self] in
+	override func receivedClientEvent(_ event: ClientEvent) {
+		switch event {
+		case let .update(status):
+			DispatchQueue.main.async {
+				[weak self] in
 
-					guard let self = self else { return }
+				guard let self = self else { return }
 
-					if self.entryMap[status.key] != nil
-					{
-						self.handle(updatedEntry: status)
-					}
-					else
-					{
-						self.prepareNewEntries([status], for: .above, pagination: nil)
-					}
+				if self.entryMap[status.key] != nil {
+					self.handle(updatedEntry: status)
+				} else {
+					self.prepareNewEntries([status], for: .above, pagination: nil)
 				}
+			}
 
-		case .delete(let statusID):
+		case let .delete(statusID):
 			DispatchQueue.main.async { [weak self] in self?.handle(deletedEntry: statusID) }
 
 		case .notification:
@@ -169,7 +152,7 @@ class TimelineViewController: StatusListViewController
 			tableView.setAccessibilityLabel("Public Timeline")
 		case .favorites:
 			tableView.setAccessibilityLabel("Favorites Timeline")
-		case .tag(let name):
+		case let .tag(name):
 			tableView.setAccessibilityLabel("Timeline for tag \(name)")
 		default:
 			break
@@ -194,11 +177,10 @@ class TimelineViewController: StatusListViewController
 		case .userStatusesAndReplies: currentContext = .account
 		}
 
-		return super.applicableFilters().filter({ $0.context.contains(currentContext) })
+		return super.applicableFilters().filter { $0.context.contains(currentContext) }
 	}
 
-	enum Source: Equatable
-	{
+	enum Source: Equatable {
 		case timeline
 		case localTimeline
 		case publicTimeline
@@ -210,25 +192,21 @@ class TimelineViewController: StatusListViewController
 	}
 }
 
-extension TimelineViewController: ColumnPresentable
-{
+extension TimelineViewController: ColumnPresentable {
 	var mainResponder: NSResponder {
 		return tableView
 	}
 
-	var modelRepresentation: ColumnModel?
-	{
-		guard let source = self.source else
-		{
+	var modelRepresentation: ColumnModel? {
+		guard let source = source else {
 			return nil
 		}
 
-		switch source
-		{
-		case .timeline:			return ColumnMode.timeline
-		case .localTimeline:	return ColumnMode.localTimeline
-		case .publicTimeline:	return ColumnMode.publicTimeline
-		case .tag(let name):	return ColumnMode.tag(name: name)
+		switch source {
+		case .timeline: return ColumnMode.timeline
+		case .localTimeline: return ColumnMode.localTimeline
+		case .publicTimeline: return ColumnMode.publicTimeline
+		case let .tag(name): return ColumnMode.tag(name: name)
 
 		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies, .favorites:
 			return nil

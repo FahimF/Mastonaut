@@ -20,26 +20,22 @@
 import Cocoa
 import WebKit
 
-class AuthWindowController: NSWindowController
-{
+class AuthWindowController: NSWindowController {
 	@IBOutlet private var loadingIndicator: NSProgressIndicator!
 
 	private var webView: WKWebView!
 
-	override var windowNibName: NSNib.Name?
-	{
+	override var windowNibName: NSNib.Name? {
 		return "AuthWindowController"
 	}
 
-	func loadUrl(_ url: URL)
-	{
+	func loadUrl(_ url: URL) {
 		DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
 			NSWorkspace.shared.open(url)
 		}
 	}
 
-	@IBAction func cancel(_ sender: Any?)
-	{
+	@IBAction func cancel(_: Any?) {
 		window?.dismissSheetOrClose(modalResponse: .cancel)
 		AppDelegate.shared.resetAuthorizationState()
 	}

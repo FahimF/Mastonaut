@@ -19,37 +19,31 @@
 
 import Cocoa
 
-class FileDropImageView: NSImageView
-{
-	var allowedDropFileTypes: [CFString]? = nil
+class FileDropImageView: NSImageView {
+	var allowedDropFileTypes: [CFString]?
 
-	private(set) var isReceivingDrag: Bool = false
-	{
-		didSet
-		{
+	private(set) var isReceivingDrag: Bool = false {
+		didSet {
 			layer?.cornerRadius = 6.0
 			layer?.backgroundColor = isReceivingDrag ? NSColor.safeControlTintColor.withAlphaComponent(0.5).cgColor
-													 : nil
+				: nil
 		}
 	}
 
-	required init?(coder: NSCoder)
-	{
+	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 
 		registerForDraggedTypes([.fileURL])
 	}
 
-	private var filteringOptions: [NSPasteboard.ReadingOptionKey: Any]?
-	{
+	private var filteringOptions: [NSPasteboard.ReadingOptionKey: Any]? {
 		guard let types = allowedDropFileTypes else { return nil }
 		return [.urlReadingContentsConformToTypes: types]
 	}
 
-	override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation
-	{
-		guard isEnabled, sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: filteringOptions) else
-		{
+	override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+		guard isEnabled, sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: filteringOptions)
+		else {
 			return NSDragOperation()
 		}
 
@@ -58,20 +52,17 @@ class FileDropImageView: NSImageView
 		return .copy
 	}
 
-	override func draggingExited(_ sender: NSDraggingInfo?)
-	{
+	override func draggingExited(_: NSDraggingInfo?) {
 		isReceivingDrag = false
 	}
 
-	override func performDragOperation(_ sender: NSDraggingInfo) -> Bool
-	{
+	override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
 		guard let target = target, let action = action else { return false }
 		target.performSelector(onMainThread: action, with: sender, waitUntilDone: false)
 		return true
 	}
 
-	override func concludeDragOperation(_ sender: NSDraggingInfo?)
-	{
+	override func concludeDragOperation(_: NSDraggingInfo?) {
 		isReceivingDrag = false
 	}
 }

@@ -19,27 +19,22 @@
 
 import Cocoa
 
-extension NSMenuItem
-{
-	var columnModel: ColumnMode?
-	{
+extension NSMenuItem {
+	var columnModel: ColumnMode? {
 		return representedObject as? ColumnMode
 	}
 
-	convenience init(title: String, submenu: NSMenu)
-	{
+	convenience init(title: String, submenu: NSMenu) {
 		self.init(title: title, action: nil, keyEquivalent: "")
 		self.submenu = submenu
 	}
 
-	convenience init(_ title: String?, object: Any? = nil)
-	{
+	convenience init(_ title: String?, object: Any? = nil) {
 		self.init(title: title ?? "", action: nil, keyEquivalent: "")
 		representedObject = object
 	}
 
-	func with(modifierMask: NSEvent.ModifierFlags) -> Self
-	{
+	func with(modifierMask: NSEvent.ModifierFlags) -> Self {
 		keyEquivalentModifierMask = modifierMask
 		return self
 	}

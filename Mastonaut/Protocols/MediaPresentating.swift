@@ -20,6 +20,5 @@
 import Foundation
 
 protocol MediaPresenting {
-
 	func makePresentableMediaVisible()
 }

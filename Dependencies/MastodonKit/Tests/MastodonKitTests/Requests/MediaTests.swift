@@ -6,19 +6,19 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class MediaTests: XCTestCase {
-    func testUpload() {
-        let request = Media.upload(media: .other(Data(), fileExtension: "fake", mimeType: "media/fake"))
+	func testUpload() {
+		let request = Media.upload(media: .other(Data(), fileExtension: "fake", mimeType: "media/fake"))
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/media")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/media")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNotNil(request.method.httpBody)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNotNil(request.method.httpBody)
+	}
 }

@@ -20,58 +20,46 @@
 import AppKit
 import CoreTootin
 
-class ResourcesFetcher
-{
+class ResourcesFetcher {
 	private let urlSession: URLSession
 	private var observations: [URLSessionDataTask: NSKeyValueObservation] = [:]
 
-	init(urlSession: URLSession = URLSession(configuration: .default))
-	{
+	init(urlSession: URLSession = URLSession(configuration: .default)) {
 		self.urlSession = urlSession
 	}
 
 	@discardableResult
 	func fetchData(from url: URL,
-				   acceptableStatuses: [Int] = [200],
-				   progress: ((Double) -> Void)? = nil,
-				   completion: @escaping (FetchResult<Data>) -> Void) -> URLSessionDataTask
+	               acceptableStatuses: [Int] = [200],
+	               progress: ((Double) -> Void)? = nil,
+	               completion: @escaping (FetchResult<Data>) -> Void) -> URLSessionDataTask
 	{
 		let taskPromise = Promise<URLSessionDataTask>()
 
-		let task = urlSession.dataTask(with: url)
-		{
-			[weak self] (data, response, error) in
+		let task = urlSession.dataTask(with: url) {
+			[weak self] data, response, error in
 
-			if let error = error
-			{
+			if let error = error {
 				completion(.failure(error))
-			}
-			else if let httpResponse = response as? HTTPURLResponse, !acceptableStatuses.contains(httpResponse.statusCode)
+			} else if let httpResponse = response as? HTTPURLResponse, !acceptableStatuses.contains(httpResponse.statusCode)
 			{
 				completion(.failure(FetchError.badStatus(httpResponse.statusCode)))
-			}
-			else if let data = data
-			{
+			} else if let data = data {
 				completion(.success(data))
-			}
-			else
-			{
+			} else {
 				completion(.emptyResponse)
 			}
 
-			if let task = taskPromise.value
-			{
+			if let task = taskPromise.value {
 				self?.observations.removeValue(forKey: task)
 			}
 		}
 
 		taskPromise.value = task
 
-		if let progressBlock = progress
-		{
-			observations[task] = task.observe(\URLSessionDataTask.countOfBytesReceived)
-			{
-				(task, _) in
+		if let progressBlock = progress {
+			observations[task] = task.observe(\URLSessionDataTask.countOfBytesReceived) {
+				task, _ in
 				progressBlock(Double(task.countOfBytesReceived) / Double(task.countOfBytesExpectedToReceive))
 			}
 		}
@@ -83,22 +71,19 @@ class ResourcesFetcher
 
 	@discardableResult
 	func fetchImage(with url: URL,
-					acceptableStatuses: [Int] = [200],
-					progress progressBlock: ((Double) -> Void)? = nil,
-					completion: @escaping (FetchResult<NSImage>) -> Void) -> URLSessionDataTask
+	                acceptableStatuses: [Int] = [200],
+	                progress progressBlock: ((Double) -> Void)? = nil,
+	                completion: @escaping (FetchResult<NSImage>) -> Void) -> URLSessionDataTask
 	{
-		return fetchData(from: url, acceptableStatuses: acceptableStatuses, progress: progressBlock)
-		{
+		return fetchData(from: url, acceptableStatuses: acceptableStatuses, progress: progressBlock) {
 			result in
 
-			guard case .success(let data) = result else
-			{
+			guard case let .success(data) = result else {
 				completion(result.cast(to: NSImage.self))
 				return
 			}
 
-			guard let image = NSImage(data: data) else
-			{
+			guard let image = NSImage(data: data) else {
 				completion(.failure(FetchError.badData(data)))
 				return
 			}
@@ -107,31 +92,26 @@ class ResourcesFetcher
 		}
 	}
 
-	func fetchImages(with urls: [URL], completion: @escaping ([URL: FetchResult<NSImage>]) -> Void)
-	{
+	func fetchImages(with urls: [URL], completion: @escaping ([URL: FetchResult<NSImage>]) -> Void) {
 		let dispatchGroup = DispatchGroup()
 		let completionQueue = DispatchQueue(label: "images-fetch-completion")
 		var results = [URL: FetchResult<NSImage>]()
 
-		for url in urls
-		{
+		for url in urls {
 			dispatchGroup.enter()
-			fetchImage(with: url)
-				{
-					result in
+			fetchImage(with: url) {
+				result in
 
-					completionQueue.async
-						{
-							results[url] = result
-							dispatchGroup.leave()
-						}
+				completionQueue.async {
+					results[url] = result
+					dispatchGroup.leave()
 				}
+			}
 		}
 
-		dispatchGroup.notify(queue: .main)
-			{
-				completion(results)
-			}
+		dispatchGroup.notify(queue: .main) {
+			completion(results)
+		}
 	}
 
 	func fetchDataSynchronously(from url: URL, acceptableStatuses: [Int] = [200]) -> FetchResult<Data>
@@ -142,7 +122,7 @@ class ResourcesFetcher
 		var fetchResult: FetchResult<Data>!
 
 		dispatchGroup.enter()
-		fetchData(from: url, acceptableStatuses: acceptableStatuses, progress: nil) { (result) in
+		fetchData(from: url, acceptableStatuses: acceptableStatuses, progress: nil) { result in
 			fetchResult = result
 			dispatchGroup.leave()
 		}
@@ -152,17 +132,14 @@ class ResourcesFetcher
 		return fetchResult
 	}
 
-	enum FetchResult<T>
-	{
+	enum FetchResult<T> {
 		case success(T)
 		case failure(Error)
 		case emptyResponse
 
-		fileprivate func cast<K>(to: K.Type) -> FetchResult<K>
-		{
-			switch self
-			{
-			case .failure(let error):
+		fileprivate func cast<K>(to _: K.Type) -> FetchResult<K> {
+			switch self {
+			case let .failure(error):
 				return .failure(error)
 
 			default:
@@ -171,30 +148,26 @@ class ResourcesFetcher
 		}
 	}
 
-	enum FetchError: Error
-	{
+	enum FetchError: Error {
 		case badStatus(Int)
 		case badData(Data)
 	}
 }
 
-extension ResourcesFetcher: SuggestionWindowImagesProvider
-{
-	func suggestionWindow(_ windowController: SuggestionWindowController,
-						  imageForSuggestionUsingURL imageURL: URL,
-						  completion: @escaping (NSImage?) -> Void)
+extension ResourcesFetcher: SuggestionWindowImagesProvider {
+	func suggestionWindow(_: SuggestionWindowController,
+	                      imageForSuggestionUsingURL imageURL: URL,
+	                      completion: @escaping (NSImage?) -> Void)
 	{
-		fetchImage(with: imageURL)
-			{
-				(result) in
+		fetchImage(with: imageURL) {
+			result in
 
-				guard case .success(let image) = result else
-				{
-					completion(nil)
-					return
-				}
-
-				completion(image)
+			guard case let .success(image) = result else {
+				completion(nil)
+				return
 			}
+
+			completion(image)
+		}
 	}
 }

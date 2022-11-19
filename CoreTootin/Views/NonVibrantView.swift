@@ -20,26 +20,18 @@
 import Cocoa
 
 public class NonVibrantView: NSView {
-
-	public override var allowsVibrancy: Bool
-	{
+	override public var allowsVibrancy: Bool {
 		return false
 	}
 
-	public override var effectiveAppearance: NSAppearance
-	{
+	override public var effectiveAppearance: NSAppearance {
 		let appearance = super.effectiveAppearance
 
-		if #available(OSXApplicationExtension 10.14, *), appearance.name == .vibrantDark
-		{
+		if #available(OSXApplicationExtension 10.14, *), appearance.name == .vibrantDark {
 			return NSAppearance(named: .darkAqua)!
-		}
-		else if appearance.name == .vibrantLight
-		{
+		} else if appearance.name == .vibrantLight {
 			return NSAppearance(named: .aqua)!
-		}
-		else
-		{
+		} else {
 			return appearance
 		}
 	}

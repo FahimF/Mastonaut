@@ -20,64 +20,57 @@
 import AppKit
 import CoreTootin
 
-extension UserPopUpButtonSubcontroller
-{
-	convenience init(display: UserPopUpButtonDisplaying, accountsService: AccountsService)
-	{
+extension UserPopUpButtonSubcontroller {
+	convenience init(display: UserPopUpButtonDisplaying, accountsService: AccountsService) {
 		self.init(display: display, accountsService: accountsService, itemsFactory: ItemsFactoryShim())
 	}
 }
 
-private struct ItemsFactoryShim: AccountMenuItemFactory
-{
+private struct ItemsFactoryShim: AccountMenuItemFactory {
 	func makeMenuItems(accounts: [AuthorizedAccount],
-					   currentUser: UUID?,
-					   action: Selector,
-					   target: AnyObject,
-					   emojiContainer: NSView?,
-					   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
+	                   currentUser: UUID?,
+	                   action: Selector,
+	                   target: AnyObject,
+	                   emojiContainer: NSView?,
+	                   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
 	{
 		return accounts.makeMenuItems(currentUser: currentUser,
-									  action: action,
-									  target: target,
-									  emojiContainer: emojiContainer,
-									  setKeyEquivalents: setKeyEquivalents)
+		                              action: action,
+		                              target: target,
+		                              emojiContainer: emojiContainer,
+		                              setKeyEquivalents: setKeyEquivalents)
 	}
 }
 
-private extension Array where Element == AuthorizedAccount
-{
+private extension Array where Element == AuthorizedAccount {
 	func makeMenuItems(currentUser: UUID?,
-					   action: Selector,
-					   target: AnyObject,
-					   emojiContainer: NSView?,
-					   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
+	                   action: Selector,
+	                   target: AnyObject,
+	                   emojiContainer _: NSView?,
+	                   setKeyEquivalents: Bool) -> (menuItems: [NSMenuItem], selectedItem: NSMenuItem?)
 	{
 		var menuItems = [NSMenuItem]()
-		var selectedItem: NSMenuItem? = nil
+		var selectedItem: NSMenuItem?
 
-		for (index, account) in enumerated()
-		{
+		for (index, account) in enumerated() {
 			let itemHasKeyEquivalent = setKeyEquivalents && index < 9
 			let itemTitle = account.bestDisplayName
 			let menuItem = NSMenuItem(title: itemTitle,
-									  action: action,
-									  keyEquivalent: itemHasKeyEquivalent ? "\(index + 1)" : "")
+			                          action: action,
+			                          keyEquivalent: itemHasKeyEquivalent ? "\(index + 1)" : "")
 
 			menuItem.target = target
 			menuItem.representedObject = account.uuid
 			menuItem.keyEquivalentModifierMask = itemHasKeyEquivalent ? .command : []
 			menuItems.append(menuItem)
 
-			if currentUser == account.uuid
-			{
+			if currentUser == account.uuid {
 				selectedItem = menuItem
 				menuItem.state = .on
 			}
 		}
 
-		if selectedItem == nil
-		{
+		if selectedItem == nil {
 			let menuItem = NSMenuItem(title: 🔠("Please Select…"), action: nil, keyEquivalent: "")
 			menuItem.isEnabled = false
 			menuItems.insert(menuItem, at: 0)

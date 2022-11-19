@@ -19,12 +19,9 @@
 
 import AppKit
 
-public extension Visibility
-{
-	private var icon: NSImage
-	{
-		switch self
-		{
+public extension Visibility {
+	private var icon: NSImage {
+		switch self {
 		case .public: return NSImage.CoreTootin.globe
 		case .unlisted: return NSImage.CoreTootin.padlock_open
 		case .private: return NSImage.CoreTootin.padlock
@@ -32,10 +29,8 @@ public extension Visibility
 		}
 	}
 
-	var localizedTitle: String
-	{
-		switch self
-		{
+	var localizedTitle: String {
+		switch self {
 		case .public: return 🔠("visibility.public")
 		case .unlisted: return 🔠("visibility.unlisted")
 		case .private: return 🔠("visibility.private")
@@ -43,21 +38,18 @@ public extension Visibility
 		}
 	}
 
-	func makeMenuItem() -> NSMenuItem
-	{
+	func makeMenuItem() -> NSMenuItem {
 		let item = NSMenuItem(title: localizedTitle, action: nil, keyEquivalent: "")
 		item.image = icon
 		item.representedObject = self
 		return item
 	}
 
-	static func make(from audience: MastonautPreferences.StatusAudience) -> Visibility
-	{
-		switch audience
-		{
-		case .public:	return .public
-		case .unlisted:	return .unlisted
-		case .private:	return .private
+	static func make(from audience: MastonautPreferences.StatusAudience) -> Visibility {
+		switch audience {
+		case .public: return .public
+		case .unlisted: return .unlisted
+		case .private: return .private
 		}
 	}
 }

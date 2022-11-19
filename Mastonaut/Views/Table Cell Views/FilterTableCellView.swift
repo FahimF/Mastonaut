@@ -20,11 +20,9 @@
 import Cocoa
 
 class FilterTableCellView: NSTableCellView {
+	override func draw(_ dirtyRect: NSRect) {
+		super.draw(dirtyRect)
 
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-
-        // Drawing code here.
-    }
-    
+		// Drawing code here.
+	}
 }

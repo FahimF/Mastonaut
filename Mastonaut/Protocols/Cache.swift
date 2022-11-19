@@ -19,8 +19,7 @@
 
 import Foundation
 
-protocol Cache
-{
+protocol Cache {
 	typealias Delegate = CacheDelegate
 
 	var delegate: Delegate? { get set }
@@ -29,8 +28,7 @@ protocol Cache
 	var isLoaded: Bool { get }
 }
 
-protocol CacheDelegate: AnyObject
-{
+protocol CacheDelegate: AnyObject {
 	func cacheDidFinishLoadingFromDisk(_ cache: Cache)
 	func cacheDidFinishWritingToDisk(_ cache: Cache)
 }

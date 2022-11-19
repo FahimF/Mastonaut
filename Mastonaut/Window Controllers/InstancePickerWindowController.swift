@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class InstancePickerWindowController: NSWindowController, NSWindowDelegate
-{
+class InstancePickerWindowController: NSWindowController, NSWindowDelegate {
 	@IBOutlet private unowned var nextButton: NSButton!
 	@IBOutlet private unowned var cancelButton: NSButton!
 	@IBOutlet private unowned var domainTextField: NSTextField!
@@ -46,46 +45,42 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 
 	@IBOutlet private unowned var errorPlaceholderView: NSView!
 
-	public weak var delegate: InstancePickerWindowControllerDelegate? = nil
+	public weak var delegate: InstancePickerWindowControllerDelegate?
 
 	private let directoryService = DirectoryService(urlSession: AppDelegate.shared.clientsUrlSession)
-	private var directory: [DirectoryService.Instance]? = nil
-	{
-		didSet
-		{
+	private var directory: [DirectoryService.Instance]? {
+		didSet {
 			instancesTableView.reloadData()
 			setErrorPlaceholder(visible: false)
 		}
 	}
-	
+
 	@objc public dynamic var currentInstanceDomain: String = ""
-	
+
 	private var observations: [NSKeyValueObservation] = []
 
 	private lazy var resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
 	private static let infoLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 14),
-		.underlineStyle: NSNumber(value: 0) // <-- This is a hack to prevent the label's contents from shifting
+		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
 		// vertically when clicked.
 	]
 
 	private static let infoLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
 		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
 
 	private static let infoPopoverLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor,
 		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
-	
-	private var isCurrentInstanceDomainValid: Bool = false
-	{
-		didSet
-		{
+
+	private var isCurrentInstanceDomainValid: Bool = false {
+		didSet {
 			let isValid = isCurrentInstanceDomainValid
 			nextButton.isEnabled = isValid
 			progressIndicator.stopAnimation(nil)
@@ -93,12 +88,9 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 		}
 	}
 
-	private var currentInstanceInfo: AuthController.ValidInstance? = nil
-	{
-		didSet
-		{
-			guard let info = currentInstanceInfo else
-			{
+	private var currentInstanceInfo: AuthController.ValidInstance? {
+		didSet {
+			guard let info = currentInstanceInfo else {
 				instanceControlsStackView.setArrangedSubview(instanceInfoContainerView, hidden: true, animated: true)
 				return
 			}
@@ -107,22 +99,19 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 			instanceControlsStackView.setArrangedSubview(instanceInfoContainerView, hidden: false, animated: true)
 		}
 	}
-	
-	override var windowNibName: NSNib.Name?
-	{
+
+	override var windowNibName: NSNib.Name? {
 		return "InstancePickerWindowController"
 	}
-	
-	override func windowDidLoad()
-	{
+
+	override func windowDidLoad() {
 		super.windowDidLoad()
-		
+
 		nextButton.isEnabled = false
 		validDomainImageView.image = nil
-		
-		observations.append(observe(\InstancePickerWindowController.currentInstanceDomain)
-		{
-			(_, _) in self.waitAndValidateDomain()
+
+		observations.append(observe(\InstancePickerWindowController.currentInstanceDomain) {
+			_, _ in self.waitAndValidateDomain()
 		})
 
 		instanceInfoContainerView.isHidden = true
@@ -132,69 +121,57 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 		instanceInfoPopoverLabel.textContainerInset = NSSize(width: 12, height: 12)
 
 		instancesTableView.register(NSNib(nibNamed: "InstanceTableCellView", bundle: .main),
-									forIdentifier: CellViewIdentifier.instance)
+		                            forIdentifier: CellViewIdentifier.instance)
 
 		loadInstanceList()
 	}
 
-	deinit
-	{
+	deinit {
 		InstancePickerWindowController.cancelPreviousPerformRequests(withTarget: self)
 	}
 
-	private func loadInstanceList()
-	{
-		directoryService.fetch()
-			{
-				[weak self] (result) in
+	private func loadInstanceList() {
+		directoryService.fetch {
+			[weak self] result in
 
-				if case .success(let instances) = result
-				{
-					DispatchQueue.main.async {
-						let blockedDomains = AuthController.blockedDomains
-						self?.directory = instances.filter({ blockedDomains.contains($0.name) == false })
-					}
+			if case let .success(instances) = result {
+				DispatchQueue.main.async {
+					let blockedDomains = AuthController.blockedDomains
+					self?.directory = instances.filter { blockedDomains.contains($0.name) == false }
 				}
-				else
-				{
-					DispatchQueue.main.async { self?.setErrorPlaceholder(visible: true) }
-				}
+			} else {
+				DispatchQueue.main.async { self?.setErrorPlaceholder(visible: true) }
 			}
+		}
 	}
 
-	private func setErrorPlaceholder(visible: Bool)
-	{
+	private func setErrorPlaceholder(visible: Bool) {
 		instancesTableView.enclosingScrollView?.isHidden = visible
 		errorPlaceholderView.isHidden = !visible
 	}
 
-	private func waitAndValidateDomain()
-	{
+	private func waitAndValidateDomain() {
 		nextButton.isEnabled = false
 		progressIndicator.startAnimation(nil)
 
 		InstancePickerWindowController.cancelPreviousPerformRequests(withTarget: self,
-																	 selector: #selector(validateDomain), object: nil)
+		                                                             selector: #selector(validateDomain), object: nil)
 		perform(#selector(validateDomain), with: nil, afterDelay: 0.66)
 	}
 
-	@objc func validateDomain()
-	{
-		AppDelegate.shared.authController.checkValidInstanceDomain(currentInstanceDomain)
-		{
+	@objc func validateDomain() {
+		AppDelegate.shared.authController.checkValidInstanceDomain(currentInstanceDomain) {
 			[weak self] result in
-			
-			DispatchQueue.main.async
-			{
+
+			DispatchQueue.main.async {
 				guard let self = self else { return }
 
-				switch result
-				{
+				switch result {
 				case .failure:
 					self.currentInstanceInfo = nil
 					self.isCurrentInstanceDomainValid = false
 
-				case .success(let instanceInfo):
+				case let .success(instanceInfo):
 					self.currentInstanceInfo = instanceInfo
 					self.isCurrentInstanceDomainValid = true
 				}
@@ -202,8 +179,7 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 		}
 	}
 
-	private func updateInstanceInfoControls(_ instance: AuthController.ValidInstance)
-	{
+	private func updateInstanceInfoControls(_ instance: AuthController.ValidInstance) {
 		guard let info = instance.instance else {
 			instanceNameLabel.stringValue = instance.baseURL.host ?? instance.baseURL.absoluteString
 			instanceInfoLabel.stringValue = 🔠("instance.info.no-info")
@@ -218,7 +194,7 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 
 		instanceNameLabel.stringValue = info.title
 		instanceInfoLabel.set(attributedStringValue: info.attributedDescription,
-							  applyingAttributes: InstancePickerWindowController.infoLabelAttributes)
+		                      applyingAttributes: InstancePickerWindowController.infoLabelAttributes)
 
 		instanceStatusCountLabel.stringValue = (info.stats?.statusCount).map { "\($0)" } ?? "?"
 		instanceUserCountLabel.stringValue = (info.stats?.userCount).map { "\($0)" } ?? "?"
@@ -226,63 +202,51 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate
 
 		instanceImageView.image = #imageLiteral(resourceName: "missing")
 
-		guard let imageUrl = info.thumbnail else
-		{
+		guard let imageUrl = info.thumbnail else {
 			instanceImageView.isHidden = true
 			return
 		}
 
-		resourcesFetcher.fetchImage(with: imageUrl)
-			{
-				[weak self] (result) in
+		resourcesFetcher.fetchImage(with: imageUrl) {
+			[weak self] result in
 
-				DispatchQueue.main.async
-					{
-						switch result
-						{
-						case .success(let image):
-							self?.instanceImageView.image = image
+			DispatchQueue.main.async {
+				switch result {
+				case let .success(image):
+					self?.instanceImageView.image = image
 
-						case .failure, .emptyResponse:
-							self?.instanceImageView.isHidden = true
-						}
-					}
+				case .failure, .emptyResponse:
+					self?.instanceImageView.isHidden = true
+				}
 			}
+		}
 	}
 
-	fileprivate struct CellViewIdentifier
-	{
+	fileprivate enum CellViewIdentifier {
 		static let instance = NSUserInterfaceItemIdentifier("instance")
 	}
 }
 
-extension InstancePickerWindowController: AttributedLabelLinkHandler
-{
-	func handle(linkURL: URL)
-	{
+extension InstancePickerWindowController: AttributedLabelLinkHandler {
+	func handle(linkURL: URL) {
 		NSWorkspace.shared.open(linkURL)
 	}
 }
 
-extension InstancePickerWindowController: NSTextFieldDelegate
-{
-	func controlTextDidChange(_ obj: Foundation.Notification)
-	{
+extension InstancePickerWindowController: NSTextFieldDelegate {
+	func controlTextDidChange(_: Foundation.Notification) {
 		instancesTableView.deselectAll(nil)
 	}
 }
 
 extension InstancePickerWindowController // Actions
 {
-	@IBAction func cancel(_ sender: Any?)
-	{
+	@IBAction func cancel(_: Any?) {
 		window?.dismissSheetOrClose(modalResponse: .cancel)
 	}
-	
-	@IBAction func next(_ sender: Any?)
-	{
-		if let window = self.window, let instanceURI = currentInstanceInfo?.baseURL.host
-		{
+
+	@IBAction func next(_: Any?) {
+		if let window = window, let instanceURI = currentInstanceInfo?.baseURL.host {
 			let baseDomain = URL(string: instanceURI)?.host ?? instanceURI
 			delegate?.authWindow(window, didPickValidBaseDomain: baseDomain)
 		}
@@ -290,40 +254,33 @@ extension InstancePickerWindowController // Actions
 		window?.dismissSheetOrClose(modalResponse: .continue)
 	}
 
-	@IBAction func showInfoPopover(_ sender: NSButton)
-	{
+	@IBAction func showInfoPopover(_ sender: NSButton) {
 		instanceInfoPopoverLabel.undoManager?.removeAllActions()
 		instanceInfoPopoverLabel.textStorage?.setAttributedString(instanceInfoLabel.attributedStringValue)
 		instanceInfoPopover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .maxX)
 	}
 
-	@IBAction func reloadInstanceList(_ sender: NSButton)
-	{
+	@IBAction func reloadInstanceList(_: NSButton) {
 		loadInstanceList()
 	}
 }
 
-extension InstancePickerWindowController: NSTableViewDataSource, NSTableViewDelegate
-{
-	func numberOfRows(in tableView: NSTableView) -> Int
-	{
+extension InstancePickerWindowController: NSTableViewDataSource, NSTableViewDelegate {
+	func numberOfRows(in _: NSTableView) -> Int {
 		return directory?.count ?? 0
 	}
 
-	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView?
-	{
+	func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
 		let cellView = tableView.makeView(withIdentifier: CellViewIdentifier.instance, owner: nil)
 
-		if let instance = directory?[row], let instanceCellView = cellView as? InstanceTableCellView
-		{
+		if let instance = directory?[row], let instanceCellView = cellView as? InstanceTableCellView {
 			instanceCellView.set(instance: instance)
 		}
 
 		return cellView
 	}
 
-	func tableViewSelectionDidChange(_ notification: Foundation.Notification)
-	{
+	func tableViewSelectionDidChange(_: Foundation.Notification) {
 		let selectedRow = instancesTableView.selectedRow
 
 		guard selectedRow >= 0, let instance = directory?[selectedRow] else { return }
@@ -332,7 +289,6 @@ extension InstancePickerWindowController: NSTableViewDataSource, NSTableViewDele
 	}
 }
 
-protocol InstancePickerWindowControllerDelegate: AnyObject
-{
+protocol InstancePickerWindowControllerDelegate: AnyObject {
 	func authWindow(_ window: NSWindow, didPickValidBaseDomain: String)
 }

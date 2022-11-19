@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class NotificationsPreferencesViewController: BaseAccountsPreferencesViewController
-{
+class NotificationsPreferencesViewController: BaseAccountsPreferencesViewController {
 	@IBOutlet unowned var showNotificationsAlwaysRadioButton: NSButton!
 	@IBOutlet unowned var showNotificationsNeverRadioButton: NSButton!
 	@IBOutlet unowned var showNotificationsWhenActiveRadioButton: NSButton!
@@ -30,8 +29,7 @@ class NotificationsPreferencesViewController: BaseAccountsPreferencesViewControl
 	@IBOutlet unowned var notificationsDetailsNeverRadioButton: NSButton!
 	@IBOutlet unowned var notificationsDetailsWhenActiveRadioButton: NSButton!
 
-	@objc dynamic private var accountPreferences: AccountPreferences?
-	{
+	@objc private dynamic var accountPreferences: AccountPreferences? {
 		didSet { updatePropertyObservers() }
 	}
 
@@ -41,26 +39,22 @@ class NotificationsPreferencesViewController: BaseAccountsPreferencesViewControl
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		accountCountObserver = AppDelegate.shared.accountsService.observe(\.authorizedAccountsCount)
-			{
-				[weak self] (service, _) in
-				self?.tableView.deselectAll(nil)
-				self?.accountPreferences = nil
-				self?.accounts = service.authorizedAccounts
-			}
+		accountCountObserver = AppDelegate.shared.accountsService.observe(\.authorizedAccountsCount) {
+			[weak self] service, _ in
+			self?.tableView.deselectAll(nil)
+			self?.accountPreferences = nil
+			self?.accounts = service.authorizedAccounts
+		}
 	}
 
-	override func viewWillDisappear()
-	{
+	override func viewWillDisappear() {
 		super.viewWillDisappear()
 
 		AppDelegate.shared.saveContext()
 	}
 
-	private func updatePropertyObservers()
-	{
-		guard let preferences = self.accountPreferences else
-		{
+	private func updatePropertyObservers() {
+		guard let preferences = accountPreferences else {
 			preferenceObservers = []
 			return
 		}
@@ -68,32 +62,30 @@ class NotificationsPreferencesViewController: BaseAccountsPreferencesViewControl
 		let displayModeButtonMap: [AccountPreferences.NotificationDisplayMode: NSButton] = [
 			.always: showNotificationsAlwaysRadioButton,
 			.never: showNotificationsNeverRadioButton,
-			.whenActive: showNotificationsWhenActiveRadioButton
+			.whenActive: showNotificationsWhenActiveRadioButton,
 		]
 
 		preferenceObservers.append(PropertyEnumRadioObserver(object: preferences,
-												   keyPath: \AccountPreferences.notificationDisplayMode,
-												   buttonMap: displayModeButtonMap))
+		                                                     keyPath: \AccountPreferences.notificationDisplayMode,
+		                                                     buttonMap: displayModeButtonMap))
 
 		let displayDetailButtonMap: [AccountPreferences.NotificationDetailMode: NSButton] = [
 			.always: notificationsDetailsAlwaysRadioButton,
 			.never: notificationsDetailsNeverRadioButton,
-			.whenClean: notificationsDetailsWhenActiveRadioButton
+			.whenClean: notificationsDetailsWhenActiveRadioButton,
 		]
 
 		preferenceObservers.append(PropertyEnumRadioObserver(object: preferences,
-												   keyPath: \AccountPreferences.notificationDetailMode,
-												   buttonMap: displayDetailButtonMap))
+		                                                     keyPath: \AccountPreferences.notificationDetailMode,
+		                                                     buttonMap: displayDetailButtonMap))
 	}
 
 	// MARK: - Table View Delegate
 
-	func tableViewSelectionDidChange(_ notification: Foundation.Notification)
-	{
+	func tableViewSelectionDidChange(_: Foundation.Notification) {
 		let row = tableView.selectedRow
 
-		guard row >= 0 else
-		{
+		guard row >= 0 else {
 			accountPreferences = nil
 			return
 		}

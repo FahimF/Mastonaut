@@ -20,27 +20,22 @@
 import Foundation
 
 /// This struct wraps network errors, which are known to be NSErrors, meaning `localizedDescription` works properly.
-public struct NetworkError: UserDescriptionError
-{
+public struct NetworkError: UserDescriptionError {
 	public let error: Error
 
-	public init(_ error: Error)
-	{
+	public init(_ error: Error) {
 		self.error = error
 	}
 
-	public var userDescription: String
-	{
+	public var userDescription: String {
 		return 🔠("error.network", error.localizedDescription)
 	}
 }
 
-public struct UserLocalizedDescriptionError: UserDescriptionError, LocalizedError
-{
+public struct UserLocalizedDescriptionError: UserDescriptionError, LocalizedError {
 	private let descritpion: String
 
-	public init(_ error: Error)
-	{
+	public init(_ error: Error) {
 		descritpion = (error as? LocalizedError)?.localizedDescription ?? error.localizedDescription
 	}
 

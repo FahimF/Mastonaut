@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class ProfileTableCellView: MastonautTableCellView
-{
+class ProfileTableCellView: MastonautTableCellView {
 	@IBOutlet private unowned var avatarImageView: NSImageView!
 	@IBOutlet private unowned var headerImageView: NSImageView!
 
@@ -44,35 +43,32 @@ class ProfileTableCellView: MastonautTableCellView
 
 	private static let bioLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 14),
-		.underlineStyle: NSNumber(value: 0) // <-- This is a hack to prevent the label's contents from shifting
-											// vertically when clicked.
+		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
+		// vertically when clicked.
 	]
 
 	private static let bioLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
 		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
 
 	private static let displayNameAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 14, weight: .semibold)
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 14, weight: .semibold),
 	]
 
-	var profileDisplayModeDidChange: ((ProfileViewController.ProfileDisplayMode) -> Void)? = nil
-	var relationshipInteractionHandler: ((RelationshipInteraction) -> Void)? = nil
+	var profileDisplayModeDidChange: ((ProfileViewController.ProfileDisplayMode) -> Void)?
+	var relationshipInteractionHandler: ((RelationshipInteraction) -> Void)?
 
-	func setProfileDisplayMode(_ mode: ProfileViewController.ProfileDisplayMode)
-	{
-		switch mode
-		{
-		case .statuses: 			listSourceSegmentedControl.setSelected(true, forSegment: 0)
-		case .statusesAndReplies:	listSourceSegmentedControl.setSelected(true, forSegment: 1)
-		case .mediaOnly:			listSourceSegmentedControl.setSelected(true, forSegment: 2)
+	func setProfileDisplayMode(_ mode: ProfileViewController.ProfileDisplayMode) {
+		switch mode {
+		case .statuses: listSourceSegmentedControl.setSelected(true, forSegment: 0)
+		case .statusesAndReplies: listSourceSegmentedControl.setSelected(true, forSegment: 1)
+		case .mediaOnly: listSourceSegmentedControl.setSelected(true, forSegment: 2)
 		}
 	}
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		userBioLabel.linkTextAttributes = ProfileTableCellView.bioLabelLinkAttributes
@@ -81,8 +77,7 @@ class ProfileTableCellView: MastonautTableCellView
 		relationshipLabel.isHidden = true
 	}
 
-	func clear()
-	{
+	func clear() {
 		fieldsController.set(account: nil)
 		userBioLabel.stringValue = ""
 		userBioLabel.isHidden = true
@@ -93,22 +88,18 @@ class ProfileTableCellView: MastonautTableCellView
 		relationshipLabel.isHidden = true
 	}
 
-	func updateAccountControls(with account: Account)
-	{
+	func updateAccountControls(with account: Account) {
 		fieldsController.set(account: account)
 
 		let attributedNote = account.attributedNote
 
-		if attributedNote.isEmpty
-		{
+		if attributedNote.isEmpty {
 			userBioLabel.isHidden = true
-		}
-		else
-		{
+		} else {
 			userBioLabel.isHidden = false
 			userBioLabel.set(attributedStringValue: attributedNote,
-							 applyingAttributes: ProfileTableCellView.bioLabelAttributes,
-							 applyingEmojis: account.cacheableEmojis)
+			                 applyingAttributes: ProfileTableCellView.bioLabelAttributes,
+			                 applyingEmojis: account.cacheableEmojis)
 
 			userBioLabel.selectableAfterFirstClick = true
 		}
@@ -118,21 +109,16 @@ class ProfileTableCellView: MastonautTableCellView
 		followersCountLabel.stringValue = "\(account.followersCount)"
 	}
 
-	func set(linkHandler: AttributedLabelLinkHandler)
-	{
+	func set(linkHandler: AttributedLabelLinkHandler) {
 		userBioLabel.linkHandler = linkHandler
 		fieldsController.set(linkHandler: linkHandler)
 	}
 
-	func setRelationship(_ relationship: RelationshipSet)
-	{
-		if let description = relationship.userDescription, !description.isEmpty
-		{
+	func setRelationship(_ relationship: RelationshipSet) {
+		if let description = relationship.userDescription, !description.isEmpty {
 			relationshipLabel.stringValue = description
 			relationshipLabel.isHidden = false
-		}
-		else
-		{
+		} else {
 			relationshipLabel.stringValue = ""
 			relationshipLabel.isHidden = true
 		}
@@ -148,44 +134,37 @@ class ProfileTableCellView: MastonautTableCellView
 		followButton.isEnabled = true
 		followButton.title = relationship.contains(.following) ? 🔠("Unfollow") : 🔠("Follow")
 		followButton.action = relationship.contains(.following) ? #selector(unfollowAccount(_:))
-																: #selector(followAccount(_:))
+			: #selector(followAccount(_:))
 
 		blockButton.target = self
 		blockButton.isEnabled = true
 		blockButton.title = relationship.contains(.blocked) ? 🔠("Unblock") : 🔠("Block")
 		blockButton.action = relationship.contains(.blocked) ? #selector(unblockAccount(_:))
-															 : #selector(blockAccount(_:))
+			: #selector(blockAccount(_:))
 
 		muteButton.target = self
 		muteButton.isEnabled = true
 		muteButton.title = relationship.contains(.muted) ? 🔠("Unmute") : 🔠("Mute")
 		muteButton.action = relationship.contains(.muted) ? #selector(unmuteAccount(_:))
-														  : #selector(muteAccount(_:))
+			: #selector(muteAccount(_:))
 	}
 
-	func setAvatar(with image: NSImage)
-	{
+	func setAvatar(with image: NSImage) {
 		avatarImageView.image = image
 	}
 
-	func setHeader(with image: NSImage?)
-	{
-		if let image = image
-		{
+	func setHeader(with image: NSImage?) {
+		if let image = image {
 			headerImageView.image = image
-		}
-		else
-		{
+		} else {
 			headerImageView.image = #imageLiteral(resourceName: "missing_header")
 		}
 	}
 
-	@IBAction func profileModeSegmentedControlAction(_ sender: NSSegmentedControl)
-	{
-		guard let didChangeBlock = self.profileDisplayModeDidChange else { return }
+	@IBAction func profileModeSegmentedControlAction(_ sender: NSSegmentedControl) {
+		guard let didChangeBlock = profileDisplayModeDidChange else { return }
 
-		switch sender.selectedSegment
-		{
+		switch sender.selectedSegment {
 		case 0: didChangeBlock(.statuses)
 		case 1: didChangeBlock(.statusesAndReplies)
 		case 2: didChangeBlock(.mediaOnly)
@@ -193,85 +172,69 @@ class ProfileTableCellView: MastonautTableCellView
 		}
 	}
 
-	enum RelationshipInteraction
-	{
+	enum RelationshipInteraction {
 		case follow, unfollow, block, unblock, mute, unmute
 	}
 }
 
-private extension ProfileTableCellView
-{
-	@objc func followAccount(_ sender: NSButton?)
-	{
+private extension ProfileTableCellView {
+	@objc func followAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.follow)
 		sender?.isEnabled = false
 	}
 
-	@objc func unfollowAccount(_ sender: NSButton?)
-	{
+	@objc func unfollowAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.unfollow)
 		sender?.isEnabled = false
 	}
 
-	@objc func blockAccount(_ sender: NSButton?)
-	{
+	@objc func blockAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.block)
 		sender?.isEnabled = false
 	}
 
-	@objc func unblockAccount(_ sender: NSButton?)
-	{
+	@objc func unblockAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.unblock)
 		sender?.isEnabled = false
 	}
 
-	@objc func muteAccount(_ sender: NSButton?)
-	{
+	@objc func muteAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.mute)
 		sender?.isEnabled = false
 	}
 
-	@objc func unmuteAccount(_ sender: NSButton?)
-	{
+	@objc func unmuteAccount(_ sender: NSButton?) {
 		relationshipInteractionHandler?(.unmute)
 		sender?.isEnabled = false
 	}
 }
 
-private extension RelationshipSet
-{
-	var userDescription: String?
-	{
+private extension RelationshipSet {
+	var userDescription: String? {
 		var sentences: [String] = []
 
 		if contains(.blocked) {
 			sentences.append(🔠("relationship.blocked"))
-		}
-		else if contains([.follower, .following]) {
+		} else if contains([.follower, .following]) {
 			sentences.append(🔠("relationship.mutual"))
-		}
-		else if contains(.follower) {
+		} else if contains(.follower) {
 			sentences.append(🔠("relationship.follower"))
 		}
 
-		if contains(.muted)
-		{
+		if contains(.muted) {
 			sentences.append(🔠("relationship.muted"))
 		}
 
-		if contains(.isAuthor)
-		{
+		if contains(.isAuthor) {
 			sentences.append(🔠("relationship.creator"))
 		}
 
-		return sentences.filter({!$0.isEmpty}).joined(separator: "\n")
+		return sentences.filter { !$0.isEmpty }.joined(separator: "\n")
 	}
 }
 
-extension ProfileTableCellView: RichTextCapable
-{
-	func set(shouldDisplayAnimatedContents animates: Bool)
-	{
-		userBioLabel.animatedEmojiImageViews?.forEach({ $0.animates = animates })
+extension ProfileTableCellView: RichTextCapable {
+	func set(shouldDisplayAnimatedContents animates: Bool) {
+		userBioLabel.animatedEmojiImageViews?.forEach { $0.animates = animates }
 	}
 }

@@ -19,8 +19,7 @@
 
 import Foundation
 
-public struct Stack<Element>: ExpressibleByArrayLiteral
-{
+public struct Stack<Element>: ExpressibleByArrayLiteral {
 	public typealias ArrayLiteralElement = Element
 
 	private var backingStorage: [Element]
@@ -29,28 +28,23 @@ public struct Stack<Element>: ExpressibleByArrayLiteral
 	public var isEmpty: Bool { return backingStorage.isEmpty }
 	public var allElements: [Element] { return backingStorage }
 
-	public init(_ array: [Element])
-	{
+	public init(_ array: [Element]) {
 		backingStorage = array
 	}
 
-	public init(arrayLiteral elements: Element...)
-	{
+	public init(arrayLiteral elements: Element...) {
 		backingStorage = elements
 	}
 
-	public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T]
-	{
+	public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
 		return try backingStorage.map(transform)
 	}
 
-	public mutating func push(_ element: Element)
-	{
+	public mutating func push(_ element: Element) {
 		backingStorage.insert(element, at: 0)
 	}
 
-	public mutating func pop() -> Element
-	{
+	public mutating func pop() -> Element {
 		guard !backingStorage.isEmpty else {
 			fatalError("Attempted to pop empty stack: \(self)")
 		}
@@ -58,8 +52,7 @@ public struct Stack<Element>: ExpressibleByArrayLiteral
 		return backingStorage.remove(at: 0)
 	}
 
-	public mutating func popIfNotEmpty() -> Element?
-	{
+	public mutating func popIfNotEmpty() -> Element? {
 		guard !backingStorage.isEmpty else { return nil }
 		return pop()
 	}

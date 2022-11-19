@@ -17,40 +17,36 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-extension NSString
-{
+extension NSString {
 	func applyingEmojiAttachments(_ emojis: [CacheableEmoji],
-								  staticOnly: Bool = false,
-								  font: NSFont? = nil,
-								  containerView: NSView? = nil) -> NSAttributedString
+	                              staticOnly: Bool = false,
+	                              font: NSFont? = nil,
+	                              containerView: NSView? = nil) -> NSAttributedString
 	{
 		return NSAttributedString(string: self as String).applyingEmojiAttachments(emojis,
-																				   staticOnly: staticOnly,
-																				   font: font,
-																				   containerView: containerView)
+		                                                                           staticOnly: staticOnly,
+		                                                                           font: font,
+		                                                                           containerView: containerView)
 	}
 }
 
-extension NSAttributedString
-{
+extension NSAttributedString {
 	func applyingEmojiAttachments(_ emojis: [CacheableEmoji],
-								  staticOnly: Bool = false,
-								  font overrideFont: NSFont? = nil,
-								  containerView: NSView? = nil) -> NSAttributedString
+	                              staticOnly: Bool = false,
+	                              font overrideFont: NSFont? = nil,
+	                              containerView: NSView? = nil) -> NSAttributedString
 	{
-		let mutableString = self.mutableCopy() as! NSMutableAttributedString
+		let mutableString = mutableCopy() as! NSMutableAttributedString
 		let emojiCache = AppDelegate.shared.customEmojiCache
 
-		for emoji in emojis
-		{
+		for emoji in emojis {
 			var totalOffset = 0
 			let emojiShortcode = ":\(emoji.shortcode):"
 
-			for shortcodeRange in mutableString.string.allRanges(of: emojiShortcode)
-			{
+			for shortcodeRange in mutableString.string.allRanges(of: emojiShortcode) {
 				let replacementRange = NSMakeRange(shortcodeRange.location + totalOffset, shortcodeRange.length)
 				let shortcodeLineRange = (mutableString.string as NSString).lineRange(for: replacementRange)
 				let shortcodeLine = (mutableString.string as NSString).substring(with: shortcodeLineRange)
@@ -60,33 +56,28 @@ extension NSAttributedString
 				attachment.stringRepresentation = emojiShortcode
 
 				let font = overrideFont ?? mutableString.attribute(.font,
-																   at: replacementRange.location,
-																   effectiveRange: nil) as? NSFont
+				                                                   at: replacementRange.location,
+				                                                   effectiveRange: nil) as? NSFont
 
 				let emojiURL = staticOnly ? emoji.staticURL : emoji.url
-				let emojiLoader: (@escaping (Data?) -> Void) -> Void =
-					{
-						completion in emojiCache.cachedEmoji(with: emojiURL,
-															 fetchIfNeeded: true,
-															 completion: completion)
-					}
+				let emojiLoader: (@escaping (Data?) -> Void) -> Void = {
+					completion in emojiCache.cachedEmoji(with: emojiURL,
+					                                     fetchIfNeeded: true,
+					                                     completion: completion)
+				}
 
 				let attachmentCell: AnimatableEmojiCell
 
-				if staticOnly
-				{
-
+				if staticOnly {
 					attachmentCell = StaticEmojiCell(emojiLoader: emojiLoader,
-													 lineHasMoreCharacters: hasMoreChars,
-													 lineHasEmoji: shortcodeLine.hasEmoji,
-													 font: font)
-				}
-				else
-				{
+					                                 lineHasMoreCharacters: hasMoreChars,
+					                                 lineHasEmoji: shortcodeLine.hasEmoji,
+					                                 font: font)
+				} else {
 					attachmentCell = AnimatableEmojiCell(emojiLoader: emojiLoader,
-														 lineHasMoreCharacters: hasMoreChars,
-														 lineHasEmoji: shortcodeLine.hasEmoji,
-														 font: font)
+					                                     lineHasMoreCharacters: hasMoreChars,
+					                                     lineHasEmoji: shortcodeLine.hasEmoji,
+					                                     font: font)
 				}
 
 				attachmentCell.containerView = containerView
@@ -104,39 +95,35 @@ extension NSAttributedString
 		return mutableString
 	}
 
-	func strippingEmojiAttachments(insertJoinersBetweenEmojis addJoiners: Bool) -> String
-	{
-
+	func strippingEmojiAttachments(insertJoinersBetweenEmojis addJoiners: Bool) -> String {
 		let zeroWidthJoiner = Character.zeroWidthJoiner
 		let strippedString = mutableCopy() as! NSMutableAttributedString
-		var lengthOffset: Int = 0
+		var lengthOffset = 0
 		var lastAttachmentRange: NSRange = NSMakeRange(NSNotFound, 0)
 
-		enumerateAttachments()
-			{
-				(attachment, range) in
+		enumerateAttachments {
+			attachment, range in
 
-				guard let stringAttachment = attachment as? StringCapableTextAttachment else
-				{
-					return
-				}
-
-				var shortcode = stringAttachment.stringRepresentation
-
-				if addJoiners,
-					lastAttachmentRange.upperBound != NSNotFound,
-					lastAttachmentRange.upperBound == range.lowerBound
-				{
-					shortcode.insert(zeroWidthJoiner, at: shortcode.startIndex)
-				}
-
-				strippedString.replaceCharacters(in: NSMakeRange(range.location + lengthOffset, range.length),
-												 with: shortcode)
-
-				lengthOffset += (shortcode as NSString).length - range.length
-
-				lastAttachmentRange = range
+			guard let stringAttachment = attachment as? StringCapableTextAttachment else {
+				return
 			}
+
+			var shortcode = stringAttachment.stringRepresentation
+
+			if addJoiners,
+			   lastAttachmentRange.upperBound != NSNotFound,
+			   lastAttachmentRange.upperBound == range.lowerBound
+			{
+				shortcode.insert(zeroWidthJoiner, at: shortcode.startIndex)
+			}
+
+			strippedString.replaceCharacters(in: NSMakeRange(range.location + lengthOffset, range.length),
+			                                 with: shortcode)
+
+			lengthOffset += (shortcode as NSString).length - range.length
+
+			lastAttachmentRange = range
+		}
 
 		return strippedString.string
 	}

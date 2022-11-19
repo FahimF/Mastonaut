@@ -17,13 +17,11 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-public extension AccountOrder
-{
-	static func `default`(context: NSManagedObjectContext) -> AccountOrder
-	{
+public extension AccountOrder {
+	static func `default`(context: NSManagedObjectContext) -> AccountOrder {
 		assert(Thread.isMainThread)
 		let fetchRequest: NSFetchRequest<AccountOrder> = AccountOrder.fetchRequest()
 		fetchRequest.returnsObjectsAsFaults = false
@@ -35,30 +33,24 @@ public extension AccountOrder
 		return order
 	}
 
-	var sortedAccounts: [AuthorizedAccount]
-	{
-		return (accounts!.array as! [AuthorizedAccount]).filter({ !$0.isDeleted })
+	var sortedAccounts: [AuthorizedAccount] {
+		return (accounts!.array as! [AuthorizedAccount]).filter { !$0.isDeleted }
 	}
 
-	func set(sortOrder: Int, for account: AuthorizedAccount)
-	{
+	func set(sortOrder: Int, for account: AuthorizedAccount) {
 		let accounts = self.accounts!.mutableCopy() as! NSMutableOrderedSet
 		let currentIndex = accounts.index(of: account)
 
-		if currentIndex != NSNotFound
-		{
+		if currentIndex != NSNotFound {
 			accounts.moveObjects(at: IndexSet(integer: currentIndex), to: sortOrder)
-		}
-		else
-		{
+		} else {
 			accounts.insert([account], at: sortOrder)
 		}
 
 		self.accounts = accounts
 	}
 
-	func appendAccount(_ account: AuthorizedAccount)
-	{
+	func appendAccount(_ account: AuthorizedAccount) {
 		let accounts = (self.accounts?.mutableCopy() as? NSMutableOrderedSet) ?? NSMutableOrderedSet(capacity: 1)
 		accounts.add(account)
 		self.accounts = accounts

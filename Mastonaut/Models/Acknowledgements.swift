@@ -19,49 +19,38 @@
 
 import Foundation
 
-struct Acknowledgements: Codable
-{
+struct Acknowledgements: Codable {
 	let entries: [Entry]
 
-	enum CodingKeys: String, CodingKey
-	{
+	enum CodingKeys: String, CodingKey {
 		case entries = "PreferenceSpecifiers"
 	}
 
-	struct Entry: Codable
-	{
+	struct Entry: Codable {
 		let title: String
 		let text: String
 
-		enum CodingKeys: String, CodingKey
-		{
+		enum CodingKeys: String, CodingKey {
 			case title = "Title"
 			case text = "FooterText"
 		}
 	}
 }
 
-extension Acknowledgements
-{
-	static func load(plist: String) -> Acknowledgements?
-	{
+extension Acknowledgements {
+	static func load(plist: String) -> Acknowledgements? {
 		guard
 			let plistUrl = Bundle.main.url(forResource: plist, withExtension: "plist"),
 			let plistData: Data = try? Data(contentsOf: plistUrl)
-		else
-		{
+		else {
 			return nil
 		}
 
-		do
-		{
+		do {
 			return try PropertyListDecoder().decode(Acknowledgements.self, from: plistData)
-		}
-		catch
-		{
+		} catch {
 			NSLog("Error: \(error)")
 			return nil
 		}
 	}
 }
-

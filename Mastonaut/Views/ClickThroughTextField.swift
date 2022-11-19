@@ -19,16 +19,13 @@
 
 import Cocoa
 
-class ClickThroughTextField: NSTextField
-{
-	@IBOutlet weak var clickTarget: NSResponder? = nil
+class ClickThroughTextField: NSTextField {
+	@IBOutlet var clickTarget: NSResponder? = nil
 
-	override func mouseUp(with event: NSEvent)
-	{
+	override func mouseUp(with event: NSEvent) {
 		super.mouseUp(with: event)
 
-		if let window = self.window, let clickTarget = self.clickTarget
-		{
+		if let window = window, let clickTarget = clickTarget {
 			window.makeFirstResponder(clickTarget)
 		}
 	}

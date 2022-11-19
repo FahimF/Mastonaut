@@ -19,35 +19,29 @@
 
 import Cocoa
 
-extension NSView
-{
-	func setHidden(_ shouldHide: Bool, animated: Bool)
-	{
-		if isHidden == shouldHide
-		{
+extension NSView {
+	func setHidden(_ shouldHide: Bool, animated: Bool) {
+		if isHidden == shouldHide {
 			// Nothing to do
 			return
 		}
 
-		guard animated else
-		{
+		guard animated else {
 			isHidden = shouldHide
 			return
 		}
 
-		if !shouldHide, isHidden
-		{
+		if !shouldHide, isHidden {
 			isHidden = false
 		}
 
 		NSAnimationContext.runAnimationGroup({ _ in self.animator().alphaValue = shouldHide ? 0.0 : 1.0 },
-											 completionHandler: { self.isHidden = shouldHide })
+		                                     completionHandler: { self.isHidden = shouldHide })
 	}
 
 	/// Hides a view without changing the `isHidden` property. Caution: if `isHidden` is already `true`, then
 	/// this method does nothing.
-	func setInvisible(_ shouldHide: Bool, animated: Bool)
-	{
+	func setInvisible(_ shouldHide: Bool, animated _: Bool) {
 		guard !isHidden else { return }
 		animator().alphaValue = shouldHide ? 0.0 : 1.0
 	}

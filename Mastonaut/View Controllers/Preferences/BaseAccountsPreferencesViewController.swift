@@ -17,16 +17,16 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate
 {
-	@IBOutlet private(set) weak var tableView: NSTableView!
+	@IBOutlet private(set) var tableView: NSTableView!
 
 	internal let resourceFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
-	internal var accounts: [AuthorizedAccount]? = nil {
+	internal var accounts: [AuthorizedAccount]? {
 		didSet {
 			didSetAccounts()
 			let selectedRow = tableView.selectedRow
@@ -41,67 +41,57 @@ class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSo
 
 	func didSetAccounts() {}
 
-	struct CellViewIdentifiers
-	{
+	enum CellViewIdentifiers {
 		static let account = NSUserInterfaceItemIdentifier("account")
 	}
 
 	// MARK: - View Lifecycle
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		tableView.register(NSNib(nibNamed: "AccountTableCellView", bundle: .main),
-						   forIdentifier: CellViewIdentifiers.account)
+		                   forIdentifier: CellViewIdentifiers.account)
 
 		accounts = AppDelegate.shared.accountsService.authorizedAccounts
 	}
 
 	// MARK: - Table View Data Source
 
-	func numberOfRows(in tableView: NSTableView) -> Int
-	{
+	func numberOfRows(in _: NSTableView) -> Int {
 		return accounts?.count ?? 0
 	}
 
-	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView?
-	{
+	func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
 		let view = tableView.makeView(withIdentifier: CellViewIdentifiers.account, owner: nil)
 
-		guard let cellView = view as? AccountTableCellView, let account = accounts?[row] else
-		{
+		guard let cellView = view as? AccountTableCellView, let account = accounts?[row] else {
 			return view
 		}
 
 		cellView.setUp(with: account, index: row)
 
-		guard let avatarUrl = account.avatarURL else
-		{
+		guard let avatarUrl = account.avatarURL else {
 			return cellView
 		}
 
 		let accountUUID = account.uuid
 
-		resourceFetcher.fetchImage(with: avatarUrl)
-		{
+		resourceFetcher.fetchImage(with: avatarUrl) {
 			[weak self] result in
 
-			if case .success(let image) = result
-			{
-				DispatchQueue.main.async
-					{
-						guard
-							let accountIndex = self?.accounts?.firstIndex(where: { $0.uuid == accountUUID }),
-							let view = self?.tableView.view(atColumn: 0, row: accountIndex, makeIfNecessary: false),
-							let cellView = view as? AccountTableCellView
-						else
-						{
-							return
-						}
-
-						cellView.setAvatar(image)
+			if case let .success(image) = result {
+				DispatchQueue.main.async {
+					guard
+						let accountIndex = self?.accounts?.firstIndex(where: { $0.uuid == accountUUID }),
+						let view = self?.tableView.view(atColumn: 0, row: accountIndex, makeIfNecessary: false),
+						let cellView = view as? AccountTableCellView
+					else {
+						return
 					}
+
+					cellView.setAvatar(image)
+				}
 			}
 		}
 

@@ -33,6 +33,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string></string>
+	<key>INIntentsSupported</key>
+	<array>
+		<string>Intent</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>

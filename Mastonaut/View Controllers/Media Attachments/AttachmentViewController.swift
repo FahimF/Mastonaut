@@ -20,26 +20,25 @@
 import Cocoa
 import CoreTootin
 
-class AttachmentViewController: NSViewController
-{
-	@IBOutlet private weak var firstImageView: AttachmentImageView?
-	@IBOutlet private weak var secondImageView: AttachmentImageView?
-	@IBOutlet private weak var thirdImageView: AttachmentImageView?
-	@IBOutlet private weak var fourthImageView: AttachmentImageView?
-	@IBOutlet private weak var moreLabel: NSTextField?
+class AttachmentViewController: NSViewController {
+	@IBOutlet private var firstImageView: AttachmentImageView?
+	@IBOutlet private var secondImageView: AttachmentImageView?
+	@IBOutlet private var thirdImageView: AttachmentImageView?
+	@IBOutlet private var fourthImageView: AttachmentImageView?
+	@IBOutlet private var moreLabel: NSTextField?
 
 	private let resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
 	private weak var attachmentPresenter: AttachmentPresenting?
 
 	private var imageViewAttachmentMap = NSMapTable<NSControl, Attachment>(keyOptions: .weakMemory,
-																		   valueOptions: .structPersonality)
+	                                                                       valueOptions: .structPersonality)
 
 	private(set) var sensitiveMedia: Bool
 
 	private let coverView = CoverView(backgroundColor: #colorLiteral(red: 0.05655267835, green: 0.05655267835, blue: 0.05655267835, alpha: 1),
-									  textColor: #colorLiteral(red: 0.9999966025, green: 1, blue: 1, alpha: 0.8470588235),
-									  message: 🔠("Media Hidden: Click visibility button below to toggle display."))
+	                                  textColor: #colorLiteral(red: 0.9999966025, green: 1, blue: 1, alpha: 0.8470588235),
+	                                  message: 🔠("Media Hidden: Click visibility button below to toggle display."))
 
 	let attachmentGroup: AttachmentGroup
 
@@ -49,24 +48,22 @@ class AttachmentViewController: NSViewController
 		return coverView.isHidden == false
 	}
 
-	override var nibName: NSNib.Name?
-	{
+	override var nibName: NSNib.Name? {
 		let count = attachmentGroup.attachmentCount
 
-		switch count
-		{
-		case 1:		return "SingleAttachmentView"
-		case 2:		return "DoubleAttachmentView"
-		case 3:		return "TripleAttachmentView"
-		case 4:		return "QuadrupleAttachmentView"
-		case 5...:	return "MultipleAttachmentView"
-		default:	return nil
+		switch count {
+		case 1: return "SingleAttachmentView"
+		case 2: return "DoubleAttachmentView"
+		case 3: return "TripleAttachmentView"
+		case 4: return "QuadrupleAttachmentView"
+		case 5...: return "MultipleAttachmentView"
+		default: return nil
 		}
 	}
 
 	init(attachments: [Attachment], attachmentPresenter: AttachmentPresenting, sensitiveMedia: Bool, mediaHidden: Bool?)
 	{
-		self.attachmentGroup = AttachmentGroup(attachments: attachments)
+		attachmentGroup = AttachmentGroup(attachments: attachments)
 		self.attachmentPresenter = attachmentPresenter
 		self.sensitiveMedia = sensitiveMedia
 		super.init(nibName: nil, bundle: nil)
@@ -74,35 +71,32 @@ class AttachmentViewController: NSViewController
 		mediaHidden.map { setMediaHidden($0, animated: false) }
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		let imageViews = [firstImageView, secondImageView, thirdImageView, fourthImageView].compacted()
 
 		setupCoverView()
 
-		zip(attachmentGroup.attachments, imageViews).forEach
-		{
-			(attachment, imageView) in
+		zip(attachmentGroup.attachments, imageViews).forEach {
+			attachment, imageView in
 
 			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI.
 			// This will avoid unecessary layout passes when the image is loaded and set to the image view.
 			imageView.overrideContentSize = attachment.meta?.original?.size?.limit(width: 790, height: 460)
-											?? NSSize(width: 395, height: 230)
+				?? NSSize(width: 395, height: 230)
 
 			fetchImage(with: attachment.parsedPreviewUrl ?? attachment.parsedUrl,
-					   fallbackUrl: attachment.parsedUrl,
-					   from: attachment,
-					   placingInto: imageView)
+			           fallbackUrl: attachment.parsedUrl,
+			           from: attachment,
+			           placingInto: imageView)
 
-			if [.video, .gifv].contains(attachment.type)
-			{
+			if [.video, .gifv].contains(attachment.type) {
 				let playGlyphView = NSButton(image: #imageLiteral(resourceName: "play_big"), target: self, action: #selector(presentAttachment(_:)))
 				playGlyphView.bezelStyle = .regularSquare
 				playGlyphView.isBordered = false
@@ -114,13 +108,11 @@ class AttachmentViewController: NSViewController
 					imageView.leadingAnchor.constraint(equalTo: playGlyphView.leadingAnchor),
 					imageView.trailingAnchor.constraint(equalTo: playGlyphView.trailingAnchor),
 					imageView.topAnchor.constraint(equalTo: playGlyphView.topAnchor),
-					imageView.bottomAnchor.constraint(equalTo: playGlyphView.bottomAnchor)
+					imageView.bottomAnchor.constraint(equalTo: playGlyphView.bottomAnchor),
 				])
 
 				imageViewAttachmentMap.setObject(attachment, forKey: playGlyphView)
-			}
-			else
-			{
+			} else {
 				imageViewAttachmentMap.setObject(attachment, forKey: imageView)
 			}
 		}
@@ -129,17 +121,15 @@ class AttachmentViewController: NSViewController
 	@objc func toggleMediaVisibility() {
 		setMediaHidden(!isMediaHidden)
 	}
-	
-	func setMediaHidden(_ hideMedia: Bool, animated: Bool = true)
-	{
+
+	func setMediaHidden(_ hideMedia: Bool, animated: Bool = true) {
 		let imageViews = [firstImageView, secondImageView, thirdImageView, fourthImageView].compacted()
 
 		coverView.setHidden(!hideMedia, animated: animated)
-		(imageViews + previewAttachments).forEach({ $0.setHidden(hideMedia, animated: animated) })
+		(imageViews + previewAttachments).forEach { $0.setHidden(hideMedia, animated: animated) }
 	}
 
-	private func setupCoverView()
-	{
+	private func setupCoverView() {
 		view.addSubview(coverView)
 		coverView.target = self
 		coverView.action = #selector(toggleMediaVisibility)
@@ -149,47 +139,38 @@ class AttachmentViewController: NSViewController
 			view.leftAnchor.constraint(equalTo: coverView.leftAnchor),
 			view.rightAnchor.constraint(equalTo: coverView.rightAnchor),
 			view.topAnchor.constraint(equalTo: coverView.topAnchor),
-			view.bottomAnchor.constraint(equalTo: coverView.bottomAnchor)
+			view.bottomAnchor.constraint(equalTo: coverView.bottomAnchor),
 		])
 	}
 
 	private func fetchImage(with url: URL, fallbackUrl: URL?, from attachment: Attachment, placingInto imageView: AttachmentImageView?)
 	{
-		resourcesFetcher.fetchImage(with: url)
-		{
-			[weak imageView, weak self] (result) in
+		resourcesFetcher.fetchImage(with: url) {
+			[weak imageView, weak self] result in
 
-			guard case .success(let image) = result else
-			{
-				DispatchQueue.main.async
-					{
-						imageView?.image = NSImage.previewErrorImage
+			guard case let .success(image) = result else {
+				DispatchQueue.main.async {
+					imageView?.image = NSImage.previewErrorImage
 
-						if let fallbackUrl = fallbackUrl
-						{
-							self?.fetchImage(with: fallbackUrl, fallbackUrl: nil,
-											 from: attachment, placingInto: imageView)
-						}
+					if let fallbackUrl = fallbackUrl {
+						self?.fetchImage(with: fallbackUrl, fallbackUrl: nil,
+						                 from: attachment, placingInto: imageView)
 					}
+				}
 
 				return
 			}
 
 			let finalImage: NSImage
 
-			if image.pixelSize.area > NSSize(width: 1024, height: 1024).area
-			{
+			if image.pixelSize.area > NSSize(width: 1024, height: 1024).area {
 				finalImage = image.resizedImage(withSize: NSSize(width: 1024, height: 1024))
-			}
-			else
-			{
+			} else {
 				finalImage = image
 			}
 
-			DispatchQueue.main.async
-			{
-				guard let self = self else
-				{
+			DispatchQueue.main.async {
+				guard let self = self else {
 					return
 				}
 
@@ -205,15 +186,13 @@ class AttachmentViewController: NSViewController
 		}
 	}
 
-	@objc func presentAttachment(_ sender: Any?)
-	{
+	@objc func presentAttachment(_ sender: Any?) {
 		guard
 			let control = sender as? NSControl ?? firstImageView,
 			let window = control.window,
 			let attachment = imageViewAttachmentMap.object(forKey: control),
-			let attachmentPresenter = self.attachmentPresenter
-		else
-		{
+			let attachmentPresenter = attachmentPresenter
+		else {
 			return
 		}
 
@@ -221,7 +200,6 @@ class AttachmentViewController: NSViewController
 	}
 }
 
-protocol AttachmentPresenting: AnyObject
-{
+protocol AttachmentPresenting: AnyObject {
 	func present(attachment: Attachment, from group: AttachmentGroup, senderWindow: NSWindow)
 }

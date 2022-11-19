@@ -20,27 +20,22 @@
 import Cocoa
 import CoreTootin
 
-class SearchWindowController: NSWindowController
-{
-	override func windowDidLoad()
-	{
+class SearchWindowController: NSWindowController {
+	override func windowDidLoad() {
 		super.windowDidLoad()
 
 		// Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 	}
 
-	func set(client: ClientType)
-	{
+	func set(client: ClientType) {
 		(contentViewController as? SearchViewController)?.client = client
 	}
 
-	func set(instance: Instance)
-	{
+	func set(instance: Instance) {
 		(contentViewController as? SearchViewController)?.instance = instance
 	}
 
-	func set(searchDelegate: SearchViewDelegate)
-	{
+	func set(searchDelegate: SearchViewDelegate) {
 		(contentViewController as? SearchViewController)?.searchDelegate = searchDelegate
 	}
 }

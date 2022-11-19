@@ -6,59 +6,59 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class FollowRequestsTests: XCTestCase {
-    func testAll() {
-        let request = FollowRequests.all()
+	func testAll() {
+		let request = FollowRequests.all()
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/follow_requests")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/follow_requests")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNil(request.method.httpBody)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNil(request.method.httpBody)
+	}
 
-    func testAllWithRange() {
-        let request = FollowRequests.all(range: .max(id: "12", limit: 50))
-        let expectedMaxID = URLQueryItem(name: "max_id", value: "12")
-        let expectedLimit = URLQueryItem(name: "limit", value: "50")
+	func testAllWithRange() {
+		let request = FollowRequests.all(range: .max(id: "12", limit: 50))
+		let expectedMaxID = URLQueryItem(name: "max_id", value: "12")
+		let expectedLimit = URLQueryItem(name: "limit", value: "50")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/follow_requests")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/follow_requests")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.httpBody)
-        XCTAssertEqual(request.method.queryItems?.count, 2)
-        XCTAssertTrue(request.method.queryItems!.contains(expectedMaxID))
-        XCTAssertTrue(request.method.queryItems!.contains(expectedLimit))
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.httpBody)
+		XCTAssertEqual(request.method.queryItems?.count, 2)
+		XCTAssertTrue(request.method.queryItems!.contains(expectedMaxID))
+		XCTAssertTrue(request.method.queryItems!.contains(expectedLimit))
+	}
 
-    func testAuthorize() {
-        let request = FollowRequests.authorize(id: "42")
+	func testAuthorize() {
+		let request = FollowRequests.authorize(id: "42")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/follow_requests/42/authorize")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/follow_requests/42/authorize")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNil(request.method.httpBody)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNil(request.method.httpBody)
+	}
 
-    func testReject() {
-        let request = FollowRequests.reject(id: "42")
+	func testReject() {
+		let request = FollowRequests.reject(id: "42")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/follow_requests/42/reject")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/follow_requests/42/reject")
 
-        // Method
-        XCTAssertEqual(request.method.name, "POST")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNil(request.method.httpBody)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "POST")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNil(request.method.httpBody)
+	}
 }

@@ -6,65 +6,65 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class URLRequestTests: XCTestCase {
-    func testRequestWithValidHTTPBody() {
-        let url = URL(string: "https://mastodon.technology")!
-        let mediaData = Data()
-        let method = HTTPMethod.post(.media(.gif(mediaData)))
-        let request = Request<String>(path: "/string", method: method)
+	func testRequestWithValidHTTPBody() {
+		let url = URL(string: "https://mastodon.technology")!
+		let mediaData = Data()
+		let method = HTTPMethod.post(.media(.gif(mediaData)))
+		let request = Request<String>(path: "/string", method: method)
 
-        let urlRequest = URLRequest(url: url, request: request, accessToken: nil)
+		let urlRequest = URLRequest(url: url, request: request, accessToken: nil)
 
-        XCTAssertEqual(urlRequest.timeoutInterval, 30)
-        XCTAssertEqual(urlRequest.httpMethod, "POST")
-        XCTAssertNotNil(urlRequest.httpBody)
+		XCTAssertEqual(urlRequest.timeoutInterval, 30)
+		XCTAssertEqual(urlRequest.httpMethod, "POST")
+		XCTAssertNotNil(urlRequest.httpBody)
 
-        XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Authorization"))
-        XCTAssertNotNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
-    }
+		XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Authorization"))
+		XCTAssertNotNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
+	}
 
-    func testRequestWithoutHTTPBody() {
-        let url = URL(string: "https://mastodon.technology")!
-        let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty))
+	func testRequestWithoutHTTPBody() {
+		let url = URL(string: "https://mastodon.technology")!
+		let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty))
 
-        let urlRequest = URLRequest(url: url, request: request, accessToken: nil)
+		let urlRequest = URLRequest(url: url, request: request, accessToken: nil)
 
-        XCTAssertEqual(urlRequest.timeoutInterval, 30)
-        XCTAssertEqual(urlRequest.httpMethod, "GET")
-        XCTAssertNil(urlRequest.httpBody)
+		XCTAssertEqual(urlRequest.timeoutInterval, 30)
+		XCTAssertEqual(urlRequest.httpMethod, "GET")
+		XCTAssertNil(urlRequest.httpBody)
 
-        XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Authorization"))
-        XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
-    }
+		XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Authorization"))
+		XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
+	}
 
-    func testRequestWithAccessToken() {
-        let url = URL(string: "https://mastodon.technology")!
-        let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty))
+	func testRequestWithAccessToken() {
+		let url = URL(string: "https://mastodon.technology")!
+		let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty))
 
-        let urlRequest = URLRequest(url: url, request: request, accessToken: "foo")
+		let urlRequest = URLRequest(url: url, request: request, accessToken: "foo")
 
-        XCTAssertEqual(urlRequest.timeoutInterval, 30)
-        XCTAssertEqual(urlRequest.httpMethod, "GET")
-        XCTAssertNil(urlRequest.httpBody)
+		XCTAssertEqual(urlRequest.timeoutInterval, 30)
+		XCTAssertEqual(urlRequest.httpMethod, "GET")
+		XCTAssertNil(urlRequest.httpBody)
 
-        XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Authorization"), "Bearer foo")
-        XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
-    }
+		XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Authorization"), "Bearer foo")
+		XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
+	}
 
-    func testRequestWithTimeout() {
-        let url = URL(string: "https://mastodon.technology")!
-        let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty), timeout: 120)
+	func testRequestWithTimeout() {
+		let url = URL(string: "https://mastodon.technology")!
+		let request = Request<String>(path: "/string", method: HTTPMethod.get(.empty), timeout: 120)
 
-        let urlRequest = URLRequest(url: url, request: request, accessToken: "foo")
+		let urlRequest = URLRequest(url: url, request: request, accessToken: "foo")
 
-        XCTAssertEqual(urlRequest.httpMethod, "GET")
-        XCTAssertNil(urlRequest.httpBody)
+		XCTAssertEqual(urlRequest.httpMethod, "GET")
+		XCTAssertNil(urlRequest.httpBody)
 
-        XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Authorization"), "Bearer foo")
-        XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
-        XCTAssertEqual(urlRequest.timeoutInterval, 120)
-    }
+		XCTAssertEqual(urlRequest.value(forHTTPHeaderField: "Authorization"), "Bearer foo")
+		XCTAssertNil(urlRequest.value(forHTTPHeaderField: "Content-Type"))
+		XCTAssertEqual(urlRequest.timeoutInterval, 120)
+	}
 }

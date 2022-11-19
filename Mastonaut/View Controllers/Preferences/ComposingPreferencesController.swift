@@ -20,29 +20,27 @@
 import Cocoa
 import CoreTootin
 
-class ComposingPreferencesController: NSViewController
-{
-	@IBOutlet private weak var defaultAudiencePopUpButton: NSPopUpButton!
-	@IBOutlet private weak var defaultMarkAsSensitiveButton: NSButton!
-	@IBOutlet private weak var insertDoubleNewLinesButton: NSButton!
-	@IBOutlet private weak var insertZWJCharactersButton: NSButton!
+class ComposingPreferencesController: NSViewController {
+	@IBOutlet private var defaultAudiencePopUpButton: NSPopUpButton!
+	@IBOutlet private var defaultMarkAsSensitiveButton: NSButton!
+	@IBOutlet private var insertDoubleNewLinesButton: NSButton!
+	@IBOutlet private var insertZWJCharactersButton: NSButton!
 
 	private var preferenceObservers: [AnyObject] = []
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		preferenceObservers.append(PreferenceEnumPopUpObserver(preference: \MastonautPreferences.defaultStatusAudience,
-															   popUpButton: defaultAudiencePopUpButton))
+		                                                       popUpButton: defaultAudiencePopUpButton))
 
 		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.markMediaAsSensitive,
-															  checkbox: defaultMarkAsSensitiveButton))
+		                                                      checkbox: defaultMarkAsSensitiveButton))
 
 		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertDoubleNewLines,
-															  checkbox: insertDoubleNewLinesButton))
+		                                                      checkbox: insertDoubleNewLinesButton))
 
 		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertJoinersBetweenEmojis,
-															  checkbox: insertZWJCharactersButton))
+		                                                      checkbox: insertZWJCharactersButton))
 	}
 }

@@ -19,19 +19,16 @@
 
 import Cocoa
 
-public class ProposedAttachmentItem: NSCollectionViewItem
-{
-	@IBOutlet private weak var indicatorView: NSImageView!
+public class ProposedAttachmentItem: NSCollectionViewItem {
+	@IBOutlet private var indicatorView: NSImageView!
 
-	public override func awakeFromNib()
-	{
+	override public func awakeFromNib() {
 		super.awakeFromNib()
 
 		indicatorView.unregisterDraggedTypes()
 	}
 
-	public override var nibBundle: Bundle?
-	{
+	override public var nibBundle: Bundle? {
 		return Bundle(for: ProposedAttachmentItem.self)
 	}
 }

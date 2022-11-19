@@ -19,16 +19,11 @@
 
 import Cocoa
 
-public extension NSProgressIndicator
-{
-	func setAnimating(_ animating: Bool)
-	{
-		if animating
-		{
+public extension NSProgressIndicator {
+	func setAnimating(_ animating: Bool) {
+		if animating {
 			startAnimation(nil)
-		}
-		else
-		{
+		} else {
 			stopAnimation(nil)
 		}
 	}

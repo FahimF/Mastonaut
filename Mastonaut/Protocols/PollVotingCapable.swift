@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol PollVotingCapable: StatusInteractionHandling
-{
+protocol PollVotingCapable: StatusInteractionHandling {
 	var client: ClientType? { get }
 
 	var pollRefreshTimers: [String: Timer] { get set }
@@ -31,61 +30,53 @@ protocol PollVotingCapable: StatusInteractionHandling
 	func set(hasActivePollTask: Bool, for statusID: String)
 }
 
-extension PollVotingCapable
-{
-	func setupRefreshTimer(for poll: Poll, statusID: String)
-	{
+extension PollVotingCapable {
+	func setupRefreshTimer(for poll: Poll, statusID: String) {
 		guard let refreshTime = poll.expiresAt else { return }
 
 		pollRefreshTimers[statusID]?.invalidate()
 
-		let timer = Timer(fire: refreshTime, interval: 1, repeats: false)
-			{
-				[weak self] (_) in
+		let timer = Timer(fire: refreshTime, interval: 1, repeats: false) {
+			[weak self] _ in
 
-				self?.pollRefreshTimers.removeValue(forKey: statusID)
-				self?.refreshPoll(statusID: statusID, pollID: poll.id)
-			}
+			self?.pollRefreshTimers.removeValue(forKey: statusID)
+			self?.refreshPoll(statusID: statusID, pollID: poll.id)
+		}
 
 		RunLoop.current.add(timer, forMode: .default)
 		pollRefreshTimers[statusID] = timer
 	}
 
 	func voteOn(poll: Poll, statusID: String, options: IndexSet,
-				completion: @escaping (Swift.Result<Poll, Error>) -> Void)
+	            completion: @escaping (Swift.Result<Poll, Error>) -> Void)
 	{
-		guard let client = self.client else { return }
+		guard let client = client else { return }
 
-		PollService(client: client).voteOn(poll: poll, options: options)
-		{
+		PollService(client: client).voteOn(poll: poll, options: options) {
 			[weak self] result in
-			switch result
-			{
-			case .success(let poll):
+			switch result {
+			case let .success(poll):
 				DispatchQueue.main.async { self?.updatedPolls[poll.id] = poll }
 				completion(.success(poll))
 
-			case .failure(let error):
+			case let .failure(error):
 				DispatchQueue.main.async { self?.refreshPoll(statusID: statusID, pollID: poll.id) }
 				completion(.failure(error))
 			}
 		}
 	}
 
-	func refreshPoll(statusID: String, pollID: String)
-	{
-		guard let client = self.client else { return }
+	func refreshPoll(statusID: String, pollID: String) {
+		guard let client = client else { return }
 
 		set(hasActivePollTask: true, for: statusID)
 
-		PollService(client: client).poll(pollID: pollID)
-		{
+		PollService(client: client).poll(pollID: pollID) {
 			[weak self] result in
 
 			DispatchQueue.main.async { self?.set(hasActivePollTask: false, for: statusID) }
 
-			if case .success(let poll) = result
-			{
+			if case let .success(poll) = result {
 				DispatchQueue.main.async { self?.handle(updatedPoll: poll, statusID: statusID) }
 			}
 		}

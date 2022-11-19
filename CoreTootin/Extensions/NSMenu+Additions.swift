@@ -19,23 +19,17 @@
 
 import Cocoa
 
-public extension NSMenu
-{
-	func setItems(_ items: [NSMenuItem])
-	{
-		if #available(OSX 10.14, *)
-		{
+public extension NSMenu {
+	func setItems(_ items: [NSMenuItem]) {
+		if #available(OSX 10.14, *) {
 			self.items = items
-		}
-		else
-		{
+		} else {
 			removeAllItems()
-			items.forEach({ addItem($0) })
+			items.forEach { addItem($0) }
 		}
 	}
 
-	func item<T: Comparable>(withRepresentedObject object: T?) -> NSMenuItem?
-	{
+	func item<T: Comparable>(withRepresentedObject object: T?) -> NSMenuItem? {
 		return items.first(where: { ($0.representedObject as? T) == object })
 	}
 }

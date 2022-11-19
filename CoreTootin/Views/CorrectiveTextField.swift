@@ -20,20 +20,17 @@
 import Cocoa
 
 @IBDesignable
-public class CorrectiveTextField: NSTextField
-{
+public class CorrectiveTextField: NSTextField {
 	@IBInspectable
 	public var isContinuousSpellCheckingEnabled: Bool = true
 
 	@IBInspectable
 	public var isGrammarCheckingEnabled: Bool = true
 
-	public override func becomeFirstResponder() -> Bool
-	{
+	override public func becomeFirstResponder() -> Bool {
 		guard super.becomeFirstResponder() else { return false }
 
-		if let fieldEditor = window?.fieldEditor(false, for: self) as? NSTextView
-		{
+		if let fieldEditor = window?.fieldEditor(false, for: self) as? NSTextView {
 			fieldEditor.isContinuousSpellCheckingEnabled = isContinuousSpellCheckingEnabled
 			fieldEditor.isGrammarCheckingEnabled = isGrammarCheckingEnabled
 		}

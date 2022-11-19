@@ -19,10 +19,8 @@
 
 import Foundation
 
-extension SVGKImage
-{
-	static func make(fromSVGSourceCode sourceCode: String) -> SVGKImage?
-	{
+extension SVGKImage {
+	static func make(fromSVGSourceCode sourceCode: String) -> SVGKImage? {
 		let svgData = Data(sourceCode.utf8)
 
 		guard

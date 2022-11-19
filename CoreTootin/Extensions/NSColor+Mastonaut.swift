@@ -19,13 +19,11 @@
 
 import AppKit
 
-public extension NSColor
-{
-	static let statusReblogged	= #colorLiteral(red: 0, green: 0.6039215686, blue: 1, alpha: 1)
-	static let statusFavorited	= #colorLiteral(red: 1, green: 0.6509803922, blue: 0, alpha: 1)
+public extension NSColor {
+	static let statusReblogged = #colorLiteral(red: 0, green: 0.6039215686, blue: 1, alpha: 1)
+	static let statusFavorited = #colorLiteral(red: 1, green: 0.6509803922, blue: 0, alpha: 1)
 
-	static var safeControlTintColor: NSColor
-	{
+	static var safeControlTintColor: NSColor {
 		if #available(OSX 10.14, *) {
 			return .controlAccentColor
 		} else {
@@ -33,33 +31,24 @@ public extension NSColor
 		}
 	}
 
-	static func labelColor(for remainingCount: Int) -> NSColor
-	{
-		if remainingCount > 50
-		{
+	static func labelColor(for remainingCount: Int) -> NSColor {
+		if remainingCount > 50 {
 			return .labelColor
-		}
-		else if remainingCount > 25
-		{
+		} else if remainingCount > 25 {
 			return .systemBlue
-		}
-		else if remainingCount >= 0
-		{
+		} else if remainingCount >= 0 {
 			return .systemOrange
-		}
-		else
-		{
+		} else {
 			return .systemRed
 		}
 	}
 
 	static let timelineBackground = NSColor(named: "TimelinesBackground")!
 
-	var rgbHexString: String?
-	{
+	var rgbHexString: String? {
 		guard let rgbColor = usingColorSpace(.deviceRGB) else { return nil }
 		return String(format: "#%02X%02X%02X", Int(rgbColor.redComponent * 255),
-					  						   Int(rgbColor.greenComponent * 255),
-											   Int(rgbColor.blueComponent * 255))
+		              Int(rgbColor.greenComponent * 255),
+		              Int(rgbColor.blueComponent * 255))
 	}
 }

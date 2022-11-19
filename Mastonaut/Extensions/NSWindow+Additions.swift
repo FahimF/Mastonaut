@@ -19,23 +19,15 @@
 
 import Cocoa
 
-extension NSWindow
-{
-	func dismissSheetOrClose(modalResponse: NSApplication.ModalResponse? = nil)
-	{
-		if let sheetParent = sheetParent
-		{
-			if let modalResponse = modalResponse
-			{
+extension NSWindow {
+	func dismissSheetOrClose(modalResponse: NSApplication.ModalResponse? = nil) {
+		if let sheetParent = sheetParent {
+			if let modalResponse = modalResponse {
 				sheetParent.endSheet(self, returnCode: modalResponse)
-			}
-			else
-			{
+			} else {
 				sheetParent.endSheet(self)
 			}
-		}
-		else
-		{
+		} else {
 			close()
 		}
 	}

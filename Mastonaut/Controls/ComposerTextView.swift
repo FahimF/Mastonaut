@@ -17,97 +17,79 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
 @IBDesignable
-class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate
-{
+class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate {
 	@IBInspectable
 	var allowInsertingTabs: Bool = true
 
-	@IBOutlet weak var emojiProvider: ComposerTextViewEmojiProvider? = nil
+	@IBOutlet var emojiProvider: ComposerTextViewEmojiProvider? = nil
 
-	override init(frame frameRect: NSRect)
-	{
+	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		setUp()
 	}
 
-	override init(frame frameRect: NSRect, textContainer container: NSTextContainer?)
-	{
+	override init(frame frameRect: NSRect, textContainer container: NSTextContainer?) {
 		super.init(frame: frameRect, textContainer: container)
 		setUp()
 	}
 
-	required init?(coder: NSCoder)
-	{
+	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		setUp()
 	}
 
-	private func setUp()
-	{
+	private func setUp() {
 		textStorage?.delegate = self
 	}
 
-	override func insertTab(_ sender: Any?)
-	{
-		guard suggestionWindowController.isWindowVisible == false else
-		{
+	override func insertTab(_ sender: Any?) {
+		guard suggestionWindowController.isWindowVisible == false else {
 			insertCurrentlySelectedSuggestion()
 			return
 		}
 
-		if allowInsertingTabs
-		{
+		if allowInsertingTabs {
 			super.insertTab(sender)
-		}
-		else
-		{
+		} else {
 			window?.selectNextKeyView(sender)
 		}
 	}
 
-	override func insertBacktab(_ sender: Any?)
-	{
+	override func insertBacktab(_ sender: Any?) {
 		window?.selectPreviousKeyView(sender)
 	}
 
-	override func updateDragTypeRegistration()
-	{
+	override func updateDragTypeRegistration() {
 		unregisterDraggedTypes()
 		registerForDraggedTypes([.string])
 	}
 
-	override var readablePasteboardTypes: [NSPasteboard.PasteboardType]
-	{
-		guard let pasteDelegate = self.pasteDelegate else
-		{
+	override var readablePasteboardTypes: [NSPasteboard.PasteboardType] {
+		guard let pasteDelegate = self.pasteDelegate else {
 			return super.readablePasteboardTypes
 		}
 
 		return pasteDelegate.readablePasteboardTypes(for: self, proposedTypes: super.readablePasteboardTypes)
 	}
 
-	override func paste(_ sender: Any?)
-	{
-		if pasteDelegate?.readFromPasteboard(for: self) != true
-		{
+	override func paste(_ sender: Any?) {
+		if pasteDelegate?.readFromPasteboard(for: self) != true {
 			super.paste(sender)
 		}
 	}
 
-	override func writeSelection(to pboard: NSPasteboard, types: [NSPasteboard.PasteboardType]) -> Bool
+	override func writeSelection(to pboard: NSPasteboard, types _: [NSPasteboard.PasteboardType]) -> Bool
 	{
-		guard let textStorage = self.textStorage else { return false }
+		guard let textStorage = textStorage else { return false }
 
 		let aggregateString = NSMutableAttributedString()
 
-		for range in selectedRanges.map({ $0.rangeValue })
-		{
-			if !aggregateString.isEmpty
-			{
+		for range in selectedRanges.map({ $0.rangeValue }) {
+			if !aggregateString.isEmpty {
 				aggregateString.append(NSAttributedString(string: "\n"))
 			}
 
@@ -120,26 +102,19 @@ class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate
 		return true
 	}
 
-	func submit(_ sender: Any?)
-	{
-		if let submitControl = self.submitControl
-		{
+	func submit(_ sender: Any?) {
+		if let submitControl = submitControl {
 			submitControl.performClick(sender)
 		}
 	}
 
-	override func interpretKeyEvents(_ eventArray: [NSEvent])
-	{
+	override func interpretKeyEvents(_ eventArray: [NSEvent]) {
 		var skippedEvents = [NSEvent]()
 
-		for event in eventArray
-		{
-			if event.specialKey == .carriageReturn, event.modifierFlags.contains(.command)
-			{
-				self.submit(event)
-			}
-			else
-			{
+		for event in eventArray {
+			if event.specialKey == .carriageReturn, event.modifierFlags.contains(.command) {
+				submit(event)
+			} else {
 				skippedEvents.append(event)
 			}
 		}
@@ -148,9 +123,9 @@ class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate
 	}
 
 	override func textStorage(_ textStorage: NSTextStorage,
-							  didProcessEditing editedMask: NSTextStorageEditActions,
-							  range editedRange: NSRange,
-							  changeInLength delta: Int)
+	                          didProcessEditing editedMask: NSTextStorageEditActions,
+	                          range editedRange: NSRange,
+	                          changeInLength delta: Int)
 	{
 		super.textStorage(textStorage, didProcessEditing: editedMask, range: editedRange, changeInLength: delta)
 
@@ -162,55 +137,48 @@ class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate
 			editedRange.length > 0
 		else { return }
 
-		DispatchQueue.main.async
-			{
-				self.replaceShortcodesWithEmojiIfPossible()
-			}
+		DispatchQueue.main.async {
+			self.replaceShortcodesWithEmojiIfPossible()
+		}
 	}
 
-	func replaceShortcodesWithEmojiIfPossible()
-	{
+	func replaceShortcodesWithEmojiIfPossible() {
 		assert(Thread.isMainThread)
 
 		guard
-			let emojiProvider = self.emojiProvider,
-			let textStorage = self.textStorage
+			let emojiProvider = emojiProvider,
+			let textStorage = textStorage
 		else { return }
 
 		let currentSelection = selectedRange()
 		let matches = NSRegularExpression.shortcodeRegex.matches(in: textStorage.string,
-																 options: [],
-																 range: NSMakeRange(0, textStorage.length))
+		                                                         options: [],
+		                                                         range: NSMakeRange(0, textStorage.length))
 
 		var rangeOffset = 0
 		var didReplaceStrings = false
-		for match in matches
-		{
+		for match in matches {
 			let shortcodeRange = NSMakeRange(match.range(at: 1).location + rangeOffset, match.range(at: 1).length)
 			let shortcode = textStorage.attributedSubstring(from: shortcodeRange).string
 
-			guard match.range.intersection(currentSelection) == nil else
-			{
+			guard match.range.intersection(currentSelection) == nil else {
 				// Don't replace emoji if the editor caret is in that range
 				continue
 			}
 
-			guard let emojiString = emojiProvider.composerTextView(self, emojiForShortcode: shortcode) else
-			{
+			guard let emojiString = emojiProvider.composerTextView(self, emojiForShortcode: shortcode) else {
 				continue
 			}
 
 			let replacementRange = NSMakeRange(match.range.location + rangeOffset, match.range.length)
 			let replacementString = applyTypingAttributes(to: emojiString)
 
-			if let undoManager = self.undoManager
-			{
+			if let undoManager = undoManager {
 				let undoRange = NSMakeRange(replacementRange.location, emojiString.length)
 				let undoString = textStorage.attributedSubstring(from: replacementRange)
-				undoManager.registerUndo(withTarget: textStorage)
-					{
-						(textStorage) in textStorage.replaceCharacters(in: undoRange, with: undoString)
-					}
+				undoManager.registerUndo(withTarget: textStorage) {
+					textStorage in textStorage.replaceCharacters(in: undoRange, with: undoString)
+				}
 			}
 
 			textStorage.replaceCharacters(in: replacementRange, with: replacementString)
@@ -218,14 +186,12 @@ class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate
 			didReplaceStrings = true
 		}
 
-		if didReplaceStrings
-		{
+		if didReplaceStrings {
 			didChangeText()
 		}
 	}
 }
 
-@objc protocol ComposerTextViewEmojiProvider: AnyObject
-{
+@objc protocol ComposerTextViewEmojiProvider: AnyObject {
 	func composerTextView(_ textView: ComposerTextView, emojiForShortcode: String) -> NSAttributedString?
 }

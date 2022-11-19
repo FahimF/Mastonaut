@@ -19,16 +19,13 @@
 
 import Foundation
 
-extension NSLayoutConstraint
-{
-	func with(constant: CGFloat) -> Self
-	{
+extension NSLayoutConstraint {
+	func with(constant: CGFloat) -> Self {
 		self.constant = constant
 		return self
 	}
 
-	func with(priority: NSLayoutConstraint.Priority) -> Self
-	{
+	func with(priority: NSLayoutConstraint.Priority) -> Self {
 		self.priority = priority
 		return self
 	}
@@ -39,7 +36,7 @@ extension NSLayoutConstraint
 			view.leftAnchor.constraint(equalTo: parent.leftAnchor, constant: inset.width),
 			parent.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: inset.height),
 			parent.rightAnchor.constraint(equalTo: view.rightAnchor, constant: inset.width),
-			view.topAnchor.constraint(equalTo: parent.topAnchor, constant: inset.height)
+			view.topAnchor.constraint(equalTo: parent.topAnchor, constant: inset.height),
 		]
 	}
 }

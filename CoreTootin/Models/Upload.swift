@@ -19,8 +19,7 @@
 
 import AppKit
 
-public class Upload
-{
+public class Upload {
 	public static let maxThumbnailSize = CGSize(width: 300, height: 300)
 
 	private let thumbnailProvider: () -> NSImage
@@ -28,7 +27,7 @@ public class Upload
 	private let metadataProvider: () -> Metadata
 	private let hashProvider: (inout Hasher) -> Void
 
-	private var cachedData: Data? = nil
+	private var cachedData: Data?
 
 	private lazy var thumbnail: NSImage = thumbnailProvider()
 	private lazy var metadata: Metadata = metadataProvider()
@@ -36,22 +35,18 @@ public class Upload
 	public private(set) var fileExtension: String
 	public private(set) var fileName: String?
 	public private(set) var mimeType: String
-	public private(set) var attachment: Attachment? = nil
+	public private(set) var attachment: Attachment?
 
 	public var needsUploading: Bool { return attachment == nil }
 
-	public init?(fileUrl: URL, imageRestrainer: ImageRestrainer)
-	{
+	public init?(fileUrl: URL, imageRestrainer: ImageRestrainer) {
 		guard let preferredMimeType = fileUrl.preferredMimeType, let fileUTI = fileUrl.fileUTI else { return nil }
 
-		if UTTypeConformsTo(fileUTI as CFString, kUTTypeImage)
-		{
+		if UTTypeConformsTo(fileUTI as CFString, kUTTypeImage) {
 			let restrainedType = imageRestrainer.restrain(type: fileUTI as CFString)
 			dataLoader = { try imageRestrainer.restrain(imageAtURL: fileUrl, fileUTI: restrainedType) }
 			mimeType = restrainedType as String
-		}
-		else
-		{
+		} else {
 			dataLoader = { try Data(contentsOf: fileUrl, options: .alwaysMapped) }
 			mimeType = preferredMimeType
 		}
@@ -63,8 +58,7 @@ public class Upload
 		metadataProvider = { FileMetadataGenerator.metadata(for: fileUrl) }
 	}
 
-	public init(image: NSImage)
-	{
+	public init(image: NSImage) {
 		hashProvider = { $0.combine(image) }
 		fileExtension = "png"
 		fileName = nil
@@ -74,66 +68,53 @@ public class Upload
 
 		let selfPromise = WeakPromise<Upload>()
 
-		metadataProvider =
-			{
-				if let byteCount = try? selfPromise.value?.data().count
-				{
-					return .picture(byteCount: Int64(byteCount))
-				}
-				else
-				{
-					return .unknown
-				}
+		metadataProvider = {
+			if let byteCount = try? selfPromise.value?.data().count {
+				return .picture(byteCount: Int64(byteCount))
+			} else {
+				return .unknown
 			}
+		}
 
 		selfPromise.value = self
 	}
 
-	public init(attachment: Attachment)
-	{
+	public init(attachment: Attachment) {
 		hashProvider = { $0.combine(attachment.id) }
 		fileExtension = attachment.bestUrl.pathExtension
 		fileName = nil
 		mimeType = attachment.bestUrl.preferredMimeType ?? "image/png"
 		dataLoader = { throw UploadError.remoteAttachment }
-		thumbnailProvider = { return #imageLiteral(resourceName: "missing.png") }
-		metadataProvider =
-			{
-				switch attachment.type
-				{
-				case .image: return .picture(byteCount: 0)
-				case .video: return .movie(duration: 0)
-				case .gifv: return .movie(duration: 0)
-				case .unknown: return .unknown
-				}
+		thumbnailProvider = { #imageLiteral(resourceName: "missing.png") }
+		metadataProvider = {
+			switch attachment.type {
+			case .image: return .picture(byteCount: 0)
+			case .video: return .movie(duration: 0)
+			case .gifv: return .movie(duration: 0)
+			case .unknown: return .unknown
 			}
+		}
 
 		self.attachment = attachment
 	}
 
-	public func set(thumbnail: NSImage)
-	{
+	public func set(thumbnail: NSImage) {
 		self.thumbnail = thumbnail
 	}
 
-	public func loadThumbnail(completion: @escaping (NSImage) -> Void)
-	{
-		DispatchQueue.global(qos: .utility).async
-			{
-				completion(self.thumbnail)
-			}
+	public func loadThumbnail(completion: @escaping (NSImage) -> Void) {
+		DispatchQueue.global(qos: .utility).async {
+			completion(self.thumbnail)
+		}
 	}
 
-	public func loadMetadata(completion: @escaping (Metadata) -> Void)
-	{
-		DispatchQueue.global(qos: .utility).async
-			{
-				completion(self.metadata)
-			}
+	public func loadMetadata(completion: @escaping (Metadata) -> Void) {
+		DispatchQueue.global(qos: .utility).async {
+			completion(self.metadata)
+		}
 	}
 
-	public func data() throws -> Data
-	{
+	public func data() throws -> Data {
 		assert(!Thread.isMainThread)
 
 		if let data = cachedData { return data }
@@ -144,39 +125,31 @@ public class Upload
 		return data
 	}
 
-	public func set(attachment: Attachment)
-	{
+	public func set(attachment: Attachment) {
 		self.attachment = attachment
 	}
 
-	public func hash(into hasher: inout Hasher)
-	{
+	public func hash(into hasher: inout Hasher) {
 		hashProvider(&hasher)
 	}
 
-	public func discardAttachment()
-	{
+	public func discardAttachment() {
 		attachment = nil
 	}
 
-	public enum UploadError: LocalizedError
-	{
+	public enum UploadError: LocalizedError {
 		case remoteAttachment
 
-		var localizedDescription: String
-		{
-			switch self
-			{
+		var localizedDescription: String {
+			switch self {
 			case .remoteAttachment: return 🔠("This is a remote attachment that was already uploaded")
 			}
 		}
 	}
 }
 
-extension Upload: Hashable
-{
-	public static func == (lhs: Upload, rhs: Upload) -> Bool
-	{
+extension Upload: Hashable {
+	public static func == (lhs: Upload, rhs: Upload) -> Bool {
 		return lhs.hashValue == rhs.hashValue
 	}
 }

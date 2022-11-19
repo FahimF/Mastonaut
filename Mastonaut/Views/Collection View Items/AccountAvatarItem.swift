@@ -20,34 +20,26 @@
 import Cocoa
 import CoreTootin
 
-class AccountAvatarItem: NSCollectionViewItem
-{
-	@IBOutlet private weak var avatarImageView: NSImageView!
-	@IBOutlet private weak var shortcutLabel: NSTextField!
+class AccountAvatarItem: NSCollectionViewItem {
+	@IBOutlet private var avatarImageView: NSImageView!
+	@IBOutlet private var shortcutLabel: NSTextField!
 
-	func set(account: AuthorizedAccount, index: Int)
-	{
+	func set(account: AuthorizedAccount, index: Int) {
 		view.toolTip = account.accountWithInstance
 
-		if index < 9
-		{
+		if index < 9 {
 			shortcutLabel.stringValue = "⌘\(index + 1)"
-		}
-		else
-		{
+		} else {
 			shortcutLabel.stringValue = ""
 		}
 	}
 
-	func set(avatar: NSImage)
-	{
+	func set(avatar: NSImage) {
 		avatarImageView.image = avatar
 	}
 
-	override var highlightState: NSCollectionViewItem.HighlightState
-	{
-		didSet
-		{
+	override var highlightState: NSCollectionViewItem.HighlightState {
+		didSet {
 			view.animator().alphaValue = highlightState == .forSelection ? 0.66 : 1.0
 		}
 	}

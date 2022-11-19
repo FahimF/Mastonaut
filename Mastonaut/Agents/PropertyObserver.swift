@@ -17,20 +17,17 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class PropertyObserver<Root: NSObject, Value>
-{
+class PropertyObserver<Root: NSObject, Value> {
 	private let observation: NSKeyValueObservation
 
-	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>)
-	{
+	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>) {
 		let selfPromise = WeakPromise<PropertyObserver>()
 
-		observation = object.observe(keyPath)
-		{
-			(preferences, change) in
+		observation = object.observe(keyPath) {
+			preferences, _ in
 
 			selfPromise.value?.changed(value: preferences[keyPath: keyPath])
 		}
@@ -38,14 +35,12 @@ class PropertyObserver<Root: NSObject, Value>
 		selfPromise.value = self
 	}
 
-	internal func changed(value: Value)
-	{
+	internal func changed(value _: Value) {
 		// To be overriden
 	}
 }
 
-class PreferenceCheckboxObserver: PropertyObserver<MastonautPreferences, Bool>
-{
+class PreferenceCheckboxObserver: PropertyObserver<MastonautPreferences, Bool> {
 	private let keyPath: ReferenceWritableKeyPath<MastonautPreferences, Bool>
 	private let checkbox: NSButton
 
@@ -60,8 +55,7 @@ class PreferenceCheckboxObserver: PropertyObserver<MastonautPreferences, Bool>
 		checkbox.action = #selector(PreferenceCheckboxObserver.clickedCheckbox(_:))
 	}
 
-	@objc private func clickedCheckbox(_ sender: NSButton)
-	{
+	@objc private func clickedCheckbox(_: NSButton) {
 		let preferences = Preferences
 		preferences[keyPath: keyPath] = checkbox.state == .on
 	}
@@ -76,8 +70,7 @@ class PropertyEnumPopUpObserver<Root: NSObject, Value: PopUpOptionCapable>: Prop
 
 	private weak var object: Root?
 
-	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>, popUpButton: NSPopUpButton)
-	{
+	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>, popUpButton: NSPopUpButton) {
 		self.keyPath = keyPath
 		self.popUpButton = popUpButton
 		self.object = object
@@ -85,15 +78,14 @@ class PropertyEnumPopUpObserver<Root: NSObject, Value: PopUpOptionCapable>: Prop
 
 		var menuItems = [NSMenuItem]()
 
-		for value in Value.allCases
-		{
+		for value in Value.allCases {
 			let item = NSMenuItem()
 			item.title = value.localizedTitle
 			item.image = value.icon
 			item.target = self
 			item.action = #selector(PropertyEnumPopUpObserver.selectedMenuItem(_:))
 			item.representedObject = value.rawValue
-			
+
 			menuItems.append(item)
 		}
 
@@ -103,9 +95,8 @@ class PropertyEnumPopUpObserver<Root: NSObject, Value: PopUpOptionCapable>: Prop
 		popUpButton.menu = menu
 	}
 
-	@objc private func selectedMenuItem(_ sender: NSMenuItem)
-	{
-		if let rawValue = sender.representedObject as? Value.RawValue, let newValue = Value.init(rawValue: rawValue)
+	@objc private func selectedMenuItem(_ sender: NSMenuItem) {
+		if let rawValue = sender.representedObject as? Value.RawValue, let newValue = Value(rawValue: rawValue)
 		{
 			object?[keyPath: keyPath] = newValue
 		}
@@ -120,53 +111,45 @@ class PreferenceEnumPopUpObserver<Value: PopUpOptionCapable>: PropertyEnumPopUpO
 	}
 }
 
-class PropertyEnumRadioObserver<Root: NSObject, Value: Hashable>: PropertyObserver<Root, Value>
-{
+class PropertyEnumRadioObserver<Root: NSObject, Value: Hashable>: PropertyObserver<Root, Value> {
 	private let buttonMap: [Value: NSButton]
 	private let valueMap: [NSButton: Value]
 	private let keyPath: ReferenceWritableKeyPath<Root, Value>
 	private weak var object: Root?
 
-	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>, buttonMap: [Value: NSButton])
-	{
+	init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Value>, buttonMap: [Value: NSButton]) {
 		self.buttonMap = buttonMap
 		self.keyPath = keyPath
 		self.object = object
 
 		var valueMap: [NSButton: Value] = [:]
 
-		for (buttonValue, button) in buttonMap
-		{
+		for (buttonValue, button) in buttonMap {
 			valueMap[button] = buttonValue
 		}
 
 		self.valueMap = valueMap
 
 		super.init(object: object, keyPath: keyPath)
-		self.updateAllButtons()
+		updateAllButtons()
 
-		for (_, button) in buttonMap
-		{
+		for (_, button) in buttonMap {
 			button.target = self
 			button.action = #selector(PropertyEnumRadioObserver.clickedButton(_:))
 		}
 	}
 
-	override func changed(value: Value)
-	{
-		for (buttonValue, button) in buttonMap
-		{
+	override func changed(value: Value) {
+		for (buttonValue, button) in buttonMap {
 			button.state = buttonValue == value ? .on : .off
 		}
 	}
 
-	func updateAllButtons()
-	{
+	func updateAllButtons() {
 		object.map { changed(value: $0[keyPath: self.keyPath]) }
 	}
 
-	@objc private func clickedButton(_ sender: NSButton)
-	{
+	@objc private func clickedButton(_ sender: NSButton) {
 		guard let buttonValue = valueMap[sender] else { return }
 		object?[keyPath: keyPath] = buttonValue
 	}

@@ -17,20 +17,15 @@
 //  GNU General Public License for more details.
 //
 
-public extension Client
-{
+public extension Client {
 	static func create(for account: AuthorizedAccount,
-					   keychainController: KeychainController,
-					   reauthAgent: ReauthorizationAgent,
-					   urlSession: URLSession) -> ClientType?
+	                   keychainController: KeychainController,
+	                   reauthAgent: ReauthorizationAgent,
+	                   urlSession: URLSession) -> ClientType?
 	{
-
-		do
-		{
-			guard let token = try keychainController.query(authorizedAccount: account) else
-			{
-				if account.needsAuthorization == false
-				{
+		do {
+			guard let token = try keychainController.query(authorizedAccount: account) else {
+				if account.needsAuthorization == false {
 					account.needsAuthorization = true
 				}
 
@@ -38,26 +33,23 @@ public extension Client
 			}
 
 			#if MOCK
-			typealias FinalClient = MockClient
+				typealias FinalClient = MockClient
 			#else
-			typealias FinalClient = Client
+				typealias FinalClient = Client
 			#endif
 
 			let client = FinalClient(baseURL: "https://\(account.baseDomain!)",
-									 accessToken: token.accessToken,
-									 session: urlSession,
-									 delegate: reauthAgent)
+			                         accessToken: token.accessToken,
+			                         session: urlSession,
+			                         delegate: reauthAgent)
 
 			#if MOCK
-			registerMockResponses(for: client)
+				registerMockResponses(for: client)
 			#endif
 
 			return client
-		}
-		catch
-		{
-			if account.needsAuthorization == false
-			{
+		} catch {
+			if account.needsAuthorization == false {
 				account.needsAuthorization = true
 			}
 
@@ -68,55 +60,48 @@ public extension Client
 	}
 }
 
-public extension ClientType
-{
+public extension ClientType {
 	@discardableResult
 	func fetchAccountAndInstance(completion: @escaping (Swift.Result<(Account, Instance), ClientError>) -> Void) -> Set<FutureTask>
 	{
 		let dispatchGroup = DispatchGroup()
 		var futures = Set<FutureTask>()
-		var accountResult: Result<Account>? = nil
-		var instanceResult: Result<Instance>? = nil
+		var accountResult: Result<Account>?
+		var instanceResult: Result<Instance>?
 
 		dispatchGroup.enter()
-		(run(Accounts.currentUser(), resumeImmediately: true)
-		{
+		(run(Accounts.currentUser(), resumeImmediately: true) {
 			result in
 
 			accountResult = result
 
-			if case .failure(let error) = result
-			{
+			if case let .failure(error) = result {
 				NSLog("Failed getting info for current user! \(error)")
 			}
 
 			dispatchGroup.leave()
-		}).map({ _ = futures.insert($0) })
+		}).map { _ = futures.insert($0) }
 
 		dispatchGroup.enter()
-		(run(Instances.current(), resumeImmediately: true)
-		{
+		(run(Instances.current(), resumeImmediately: true) {
 			result in
 
 			instanceResult = result
 
-			if case .failure(let error) = result
-			{
+			if case let .failure(error) = result {
 				NSLog("Failed getting info for current instance! \(error)")
 			}
 
 			dispatchGroup.leave()
-		}).map({ _ = futures.insert($0) })
+		}).map { _ = futures.insert($0) }
 
-		dispatchGroup.notify(queue: .main)
-		{
-			switch (accountResult, instanceResult)
-			{
-			case (.success(let account, _), .success(let instance, _)):
+		dispatchGroup.notify(queue: .main) {
+			switch (accountResult, instanceResult) {
+			case let (.success(account, _), .success(instance, _)):
 				completion(.success((account, instance)))
 
 			default:
-				let error = [accountResult?.error, instanceResult?.error].compactMap({ $0 }).first!
+				let error = [accountResult?.error, instanceResult?.error].compactMap { $0 }.first!
 				completion(.failure(error))
 			}
 		}

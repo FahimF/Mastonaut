@@ -19,12 +19,10 @@
 
 import Cocoa
 
-public extension NSStackView
-{
+public extension NSStackView {
 	func setArrangedSubview(_ subview: NSView, hidden: Bool, animated: Bool, completion: (() -> Void)? = nil)
 	{
-		guard animated else
-		{
+		guard animated else {
 			subview.isHidden = hidden
 			completion?()
 			return
@@ -38,6 +36,7 @@ public extension NSStackView
 				context.duration = 0.25
 				subview.isHidden = hidden
 				superview?.layoutSubtreeIfNeeded()
-			}, completionHandler: completion)
+			}, completionHandler: completion
+		)
 	}
 }

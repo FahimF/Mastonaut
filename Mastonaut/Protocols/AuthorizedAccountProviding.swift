@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol AuthorizedAccountProviding: AttributedLabelLinkHandler
-{
+protocol AuthorizedAccountProviding: AttributedLabelLinkHandler {
 	var currentAccount: AuthorizedAccount? { get }
 	var currentInstance: Instance? { get }
 	var attachmentPresenter: AttachmentPresenting { get }

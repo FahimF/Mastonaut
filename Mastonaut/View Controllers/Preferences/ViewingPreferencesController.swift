@@ -20,43 +20,41 @@
 import Cocoa
 import CoreTootin
 
-class ViewingPreferencesController: NSViewController
-{
-	@IBOutlet private weak var sensitiveMediaHideSensitiveButton: NSButton!
-	@IBOutlet private weak var sensitiveMediaAlwaysRevealButton: NSButton!
-	@IBOutlet private weak var sensitiveMediaAlwaysHideButton: NSButton!
+class ViewingPreferencesController: NSViewController {
+	@IBOutlet private var sensitiveMediaHideSensitiveButton: NSButton!
+	@IBOutlet private var sensitiveMediaAlwaysRevealButton: NSButton!
+	@IBOutlet private var sensitiveMediaAlwaysHideButton: NSButton!
 
-	@IBOutlet private weak var spoilerStatusHideAllContentButton: NSButton!
-	@IBOutlet private weak var spoilerStatusRevealTextButton: NSButton!
-	@IBOutlet private weak var spoilerStatusRevealAllButton: NSButton!
+	@IBOutlet private var spoilerStatusHideAllContentButton: NSButton!
+	@IBOutlet private var spoilerStatusRevealTextButton: NSButton!
+	@IBOutlet private var spoilerStatusRevealAllButton: NSButton!
 
-	@IBOutlet private weak var autoplayVideosButton: NSButton!
+	@IBOutlet private var autoplayVideosButton: NSButton!
 
 	private var preferenceObservers: [AnyObject] = []
 
-	override func viewDidLoad()
-	{
+	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		let sensitiveMediaButtonMap: [MastonautPreferences.MediaDisplayMode: NSButton] = [
 			.alwaysHide: sensitiveMediaAlwaysHideButton,
 			.hideSensitiveMedia: sensitiveMediaHideSensitiveButton,
-			.alwaysReveal: sensitiveMediaAlwaysRevealButton
+			.alwaysReveal: sensitiveMediaAlwaysRevealButton,
 		]
 
 		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.mediaDisplayMode,
-															   buttonMap: sensitiveMediaButtonMap))
+		                                                       buttonMap: sensitiveMediaButtonMap))
 
 		let spoilerStatusButtonMap: [MastonautPreferences.SpoilerDisplayMode: NSButton] = [
 			.alwaysHide: spoilerStatusHideAllContentButton,
 			.hideMedia: spoilerStatusRevealTextButton,
-			.alwaysReveal: spoilerStatusRevealAllButton
+			.alwaysReveal: spoilerStatusRevealAllButton,
 		]
 
 		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.spoilerDisplayMode,
-															   buttonMap: spoilerStatusButtonMap))
+		                                                       buttonMap: spoilerStatusButtonMap))
 
 		preferenceObservers.append(PreferenceCheckboxObserver(preference: \.autoplayVideos,
-															  checkbox: autoplayVideosButton))
+		                                                      checkbox: autoplayVideosButton))
 	}
 }

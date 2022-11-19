@@ -6,33 +6,33 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class BlocksTests: XCTestCase {
-    func testAll() {
-        let request = Blocks.all()
+	func testAll() {
+		let request = Blocks.all()
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/blocks")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/blocks")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.httpBody)
-        XCTAssertNil(request.method.queryItems)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.httpBody)
+		XCTAssertNil(request.method.queryItems)
+	}
 
-    func testAllWithRange() {
-        let request = Blocks.all(range: .max(id: "42", limit: nil))
-        let expectedMaxID = URLQueryItem(name: "max_id", value: "42")
+	func testAllWithRange() {
+		let request = Blocks.all(range: .max(id: "42", limit: nil))
+		let expectedMaxID = URLQueryItem(name: "max_id", value: "42")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/blocks")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/blocks")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.httpBody)
-        XCTAssertEqual(request.method.queryItems?.count, 1)
-        XCTAssertTrue(request.method.queryItems!.contains(expectedMaxID))
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.httpBody)
+		XCTAssertEqual(request.method.queryItems?.count, 1)
+		XCTAssertTrue(request.method.queryItems!.contains(expectedMaxID))
+	}
 }

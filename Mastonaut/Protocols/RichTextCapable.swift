@@ -19,7 +19,6 @@
 
 import Foundation
 
-protocol RichTextCapable
-{
+protocol RichTextCapable {
 	func set(shouldDisplayAnimatedContents: Bool)
 }

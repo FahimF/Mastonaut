@@ -19,27 +19,21 @@
 
 import AppKit
 
-public extension NSImage
-{
-	enum CoreTootin
-	{
-		public static var globe: NSImage
-		{
+public extension NSImage {
+	enum CoreTootin {
+		public static var globe: NSImage {
 			return Bundle(for: Persistence.self).image(forResource: "globe")!
 		}
-		
-		public static var padlock_open: NSImage
-		{
+
+		public static var padlock_open: NSImage {
 			return Bundle(for: Persistence.self).image(forResource: "padlock_open")!
 		}
-		
-		public static var padlock: NSImage
-		{
+
+		public static var padlock: NSImage {
 			return Bundle(for: Persistence.self).image(forResource: "padlock")!
 		}
-		
-		public static var envelope: NSImage
-		{
+
+		public static var envelope: NSImage {
 			return Bundle(for: Persistence.self).image(forResource: "envelope")!
 		}
 	}

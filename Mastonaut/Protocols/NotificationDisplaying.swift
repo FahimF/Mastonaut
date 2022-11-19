@@ -17,22 +17,21 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol NotificationDisplaying
-{
+protocol NotificationDisplaying {
 	var displayedNotificationId: String? { get }
 
 	var displayedStatusId: String? { get }
 
 	func set(displayedNotification: MastodonNotification,
-			 attachmentPresenter: AttachmentPresenting,
-			 interactionHandler: NotificationInteractionHandling,
-			 activeInstance: Instance)
+	         attachmentPresenter: AttachmentPresenting,
+	         interactionHandler: NotificationInteractionHandling,
+	         activeInstance: Instance)
 }
 
-protocol NotificationInteractionHandling: AnyObject//, AttributedLabelLinkHandler
+protocol NotificationInteractionHandling: AnyObject // , AttributedLabelLinkHandler
 {
 	/// The logged-in client from which the interacted status are fetched.
 	var client: ClientType? { get }
@@ -50,13 +49,11 @@ protocol NotificationInteractionHandling: AnyObject//, AttributedLabelLinkHandle
 	func handle(linkURL: URL, knownTags: [Tag]?)
 }
 
-extension NotificationInteractionHandling
-{
+extension NotificationInteractionHandling {
 	func favoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
 	{
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
-		interact(using: Statuses.favourite(id: statusID))
-		{
+		interact(using: Statuses.favourite(id: statusID)) {
 			status in completion((status?.favourited ?? false) == true)
 		}
 	}
@@ -64,8 +61,7 @@ extension NotificationInteractionHandling
 	func unfavoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
 	{
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
-		interact(using: Statuses.unfavourite(id: statusID))
-		{
+		interact(using: Statuses.unfavourite(id: statusID)) {
 			status in completion((status?.favourited ?? true) != true)
 		}
 	}
@@ -73,8 +69,7 @@ extension NotificationInteractionHandling
 	func reblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
 	{
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
-		interact(using: Statuses.reblog(id: statusID))
-		{
+		interact(using: Statuses.reblog(id: statusID)) {
 			status in completion((status?.reblogged ?? false) == true)
 		}
 	}
@@ -82,24 +77,20 @@ extension NotificationInteractionHandling
 	func unreblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
 	{
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
-		interact(using: Statuses.unreblog(id: statusID))
-		{
+		interact(using: Statuses.unreblog(id: statusID)) {
 			status in completion((status?.reblogged ?? true) != true)
 		}
 	}
 
-	private func interact<T>(using request: Request<T>, completion: @escaping (T?) -> Void)
-	{
-		client?.run(request)
-		{
+	private func interact<T>(using request: Request<T>, completion: @escaping (T?) -> Void) {
+		client?.run(request) {
 			[weak self] result in
 
-			switch result
-			{
-			case .success(let updatedStatus, _):
+			switch result {
+			case let .success(updatedStatus, _):
 				completion(updatedStatus)
 
-			case .failure(let error):
+			case let .failure(error):
 				completion(nil)
 				self?.handle(interactionError: NetworkError(error))
 			}

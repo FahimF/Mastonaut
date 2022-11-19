@@ -17,29 +17,24 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
+import AppKit
 
-extension NSAccessibility
-{
-	static var shouldReduceMotion: Bool
-	{
+extension NSAccessibility {
+	static var shouldReduceMotion: Bool {
 		return NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
 	}
 
-	static func observeReduceMotionPreference(using block: @escaping () -> Void) -> NSObjectProtocol
-	{
+	static func observeReduceMotionPreference(using block: @escaping () -> Void) -> NSObjectProtocol {
 		let workspaceNC = NSWorkspace.shared.notificationCenter
 		return workspaceNC.addObserver(forName: .accessibilityDisplayOptionsDidChange, object: nil, queue: .main)
-		{
-			[block] _ in block()
-		}
+			{
+				[block] _ in block()
+			}
 	}
 }
 
-private extension Foundation.Notification.Name
-{
-	static var accessibilityDisplayOptionsDidChange: Foundation.Notification.Name
-	{
+private extension Foundation.Notification.Name {
+	static var accessibilityDisplayOptionsDidChange: Foundation.Notification.Name {
 		return NSWorkspace.accessibilityDisplayOptionsDidChangeNotification
 	}
 }

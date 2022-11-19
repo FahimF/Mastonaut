@@ -19,24 +19,18 @@
 
 import AppKit
 
-class ExpanderCellView: MastonautTableCellView
-{
-	@IBOutlet private weak var label: NSTextField!
-	@IBOutlet private weak var loadingIndicator: NSProgressIndicator!
+class ExpanderCellView: MastonautTableCellView {
+	@IBOutlet private var label: NSTextField!
+	@IBOutlet private var loadingIndicator: NSProgressIndicator!
 
-	var isLoading: Bool = false
-	{
-		didSet
-		{
+	var isLoading: Bool = false {
+		didSet {
 			label.setHidden(isLoading, animated: true)
 			loadingIndicator.setHidden(!isLoading, animated: true)
 
-			if isLoading
-			{
+			if isLoading {
 				loadingIndicator.startAnimation(self)
-			}
-			else
-			{
+			} else {
 				loadingIndicator.stopAnimation(self)
 			}
 		}

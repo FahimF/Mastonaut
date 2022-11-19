@@ -20,10 +20,9 @@
 import Foundation
 
 class NoInsetsTableView: NSTableView {
-	
 	override func awakeFromNib() {
 		super.awakeFromNib()
-		
+
 		if #available(OSX 11.0, *), let clipView = enclosingScrollView?.contentView {
 			clipView.automaticallyAdjustsContentInsets = false
 			clipView.contentInsets.top = -6

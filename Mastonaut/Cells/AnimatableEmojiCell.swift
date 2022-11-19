@@ -19,8 +19,7 @@
 
 import AppKit
 
-class AnimatableEmojiCell: NSTextAttachmentCell
-{
+class AnimatableEmojiCell: NSTextAttachmentCell {
 	private let referenceSize: NSSize?
 	private let referenceSpacing: CGFloat?
 	private let lineHasMoreCharacters: Bool
@@ -30,73 +29,62 @@ class AnimatableEmojiCell: NSTextAttachmentCell
 
 	@objc weak var containerView: NSView?
 	@objc weak var imageView: AnimatedImageView?
-	@objc var emojiData: Data? = nil
+	@objc var emojiData: Data?
 	@objc var lastImageViewRect: NSRect = .zero
-	@objc var toolTip: String? = nil
+	@objc var toolTip: String?
 
 	init(emojiLoader: (@escaping (Data?) -> Void) -> Void,
-		 lineHasMoreCharacters: Bool, lineHasEmoji: Bool,
-		 font: NSFont? = nil)
+	     lineHasMoreCharacters: Bool, lineHasEmoji: Bool,
+	     font: NSFont? = nil)
 	{
 		self.lineHasMoreCharacters = lineHasMoreCharacters
 		self.lineHasEmoji = lineHasEmoji
 
-		if let font = font
-		{
+		if let font = font {
 			let referenceHeight = boundingRect(for: "💾", using: font).height
-			self.referenceSize = CGSize(width: referenceHeight, height: referenceHeight)
-			self.referenceSpacing = boundingRect(for: "i", using: font).width
-		}
-		else
-		{
-			self.referenceSize = nil
-			self.referenceSpacing = nil
+			referenceSize = CGSize(width: referenceHeight, height: referenceHeight)
+			referenceSpacing = boundingRect(for: "i", using: font).width
+		} else {
+			referenceSize = nil
+			referenceSpacing = nil
 		}
 
 		super.init()
 
 		font.map { self.font = $0 }
 
-		emojiLoader()
-			{
-				[weak self] emojiData in
+		emojiLoader {
+			[weak self] emojiData in
 
-				DispatchQueue.main.async
-					{
-						if let data = emojiData, let self = self
-						{
-							self.setImage(from: data)
-						}
-					}
+			DispatchQueue.main.async {
+				if let data = emojiData, let self = self {
+					self.setImage(from: data)
+				}
 			}
-
+		}
 	}
 
-	required init(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	private func setImage(from data: Data)
-	{
-		guard let image = NSImage(data: data), image.size.area > 0 else
-		{
+	private func setImage(from data: Data) {
+		guard let image = NSImage(data: data), image.size.area > 0 else {
 			return
 		}
 
 		emojiImageSize = image.pixelSize
 		emojiData = data
 
-		if let animatedImageView = imageView
-		{
+		if let animatedImageView = imageView {
 			animatedImageView.setAnimatedImage(from: data)
 		}
 
 		informContainerViewOfUpdatedContent()
 	}
 
-	internal func informContainerViewOfUpdatedContent()
-	{
+	internal func informContainerViewOfUpdatedContent() {
 		containerView?.invalidateIntrinsicContentSize()
 		containerView?.needsDisplay = true
 	}
@@ -112,42 +100,37 @@ class AnimatableEmojiCell: NSTextAttachmentCell
 	}
 
 	override func cellFrame(for textContainer: NSTextContainer,
-							proposedLineFragment lineFragment: NSRect,
-							glyphPosition position: NSPoint,
-							characterIndex charIndex: Int) -> NSRect
+	                        proposedLineFragment lineFragment: NSRect,
+	                        glyphPosition position: NSPoint,
+	                        characterIndex _: Int) -> NSRect
 	{
 		let textView = textContainer.textView
 		let inset: NSSize = textView?.textContainerInset ?? .zero
 
 		let bounds = NSRect(x: ceil(position.x) + inset.width,
-							y: font?.descender ?? 0 + inset.height,
-							width: referenceSize?.width ?? lineFragment.width,
-							height: referenceSize?.height ?? lineFragment.height)
+		                    y: font?.descender ?? 0 + inset.height,
+		                    width: referenceSize?.width ?? lineFragment.width,
+		                    height: referenceSize?.height ?? lineFragment.height)
 
 		let rect = fittedDrawRect(forBounds: bounds)
 
 		attachment?.bounds = rect
 
-		if #available(OSX 12.0, *) {} else if let imageView = self.imageView
-		{
+		if #available(OSX 12.0, *) {} else if let imageView = imageView {
 			let spacing = referenceSpacing ?? round(bounds.height * 0.05)
 			var offsetRect = rect
 			offsetRect.size.width -= spacing
 
 			offsetRect.origin.y = inset.height + position.y
 
-			if textView != nil
-			{
+			if textView != nil {
 				offsetRect.origin.x += textContainer.lineFragmentPadding
 				offsetRect.origin.x -= spacing
-			}
-			else
-			{
+			} else {
 				offsetRect.origin.x += spacing
 
 				// FIXME: Find out why this offset varies from 10.14 to 10.15
-				if #available(OSX 10.15, *) {} else
-				{
+				if #available(OSX 10.15, *) {} else {
 					offsetRect.origin.y -= round(font?.descender ?? 0)
 				}
 			}
@@ -159,23 +142,21 @@ class AnimatableEmojiCell: NSTextAttachmentCell
 		return rect
 	}
 
-	private func fittedDrawRect(forBounds rect: NSRect) -> NSRect
-	{
+	private func fittedDrawRect(forBounds rect: NSRect) -> NSRect {
 		let spacing = referenceSpacing ?? round(rect.height * 0.05)
 		let emojiSize = emojiImageSize ?? referenceSize ?? rect.size
 		return NSRect(x: rect.origin.x + spacing,
-					  y: rect.origin.y,
-					  width: rect.height * emojiSize.ratio + spacing,
-					  height: rect.height)
+		              y: rect.origin.y,
+		              width: rect.height * emojiSize.ratio + spacing,
+		              height: rect.height)
 	}
 }
 
-private func boundingRect(for string: String, using font: NSFont) -> CGSize
-{
+private func boundingRect(for string: String, using font: NSFont) -> CGSize {
 	let referenceString = string as NSString
 	return referenceString.boundingRect(with: NSSize(width: 100, height: 100),
-										options: [.usesFontLeading,
-												  .usesLineFragmentOrigin,
-												  .usesDeviceMetrics],
-										attributes: [.font: font]).size
+	                                    options: [.usesFontLeading,
+	                                              .usesLineFragmentOrigin,
+	                                              .usesDeviceMetrics],
+	                                    attributes: [.font: font]).size
 }

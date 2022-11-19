@@ -6,35 +6,35 @@
 //  Copyright © 2017 MastodonKit. All rights reserved.
 //
 
-import XCTest
 @testable import MastodonKit
+import XCTest
 
 class MutesTests: XCTestCase {
-    func testAll() {
-        let request = Mutes.all()
+	func testAll() {
+		let request = Mutes.all()
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/mutes")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/mutes")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.queryItems)
-        XCTAssertNil(request.method.httpBody)
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.queryItems)
+		XCTAssertNil(request.method.httpBody)
+	}
 
-    func testAllWithRange() {
-        let request = Mutes.all(range: .since(id: "15", limit: 37))
-        let expectedSinceID = URLQueryItem(name: "since_id", value: "15")
-        let expectedLimit = URLQueryItem(name: "limit", value: "37")
+	func testAllWithRange() {
+		let request = Mutes.all(range: .since(id: "15", limit: 37))
+		let expectedSinceID = URLQueryItem(name: "since_id", value: "15")
+		let expectedLimit = URLQueryItem(name: "limit", value: "37")
 
-        // Endpoint
-        XCTAssertEqual(request.path, "/api/v1/mutes")
+		// Endpoint
+		XCTAssertEqual(request.path, "/api/v1/mutes")
 
-        // Method
-        XCTAssertEqual(request.method.name, "GET")
-        XCTAssertNil(request.method.httpBody)
-        XCTAssertNotNil(request.method.queryItems)
-        XCTAssertTrue(request.method.queryItems!.contains(expectedSinceID))
-        XCTAssertTrue(request.method.queryItems!.contains(expectedLimit))
-    }
+		// Method
+		XCTAssertEqual(request.method.name, "GET")
+		XCTAssertNil(request.method.httpBody)
+		XCTAssertNotNil(request.method.queryItems)
+		XCTAssertTrue(request.method.queryItems!.contains(expectedSinceID))
+		XCTAssertTrue(request.method.queryItems!.contains(expectedLimit))
+	}
 }

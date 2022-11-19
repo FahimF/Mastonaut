@@ -21,40 +21,39 @@ import Cocoa
 import CoreTootin
 
 class FilterEditorWindowController: NSWindowController {
-
 	override var windowNibName: NSNib.Name? {
 		return "FilterEditorWindowController"
 	}
 
-	@IBOutlet weak var actionPopUpButton: NSPopUpButton!
-	@IBOutlet weak var expirationDatePopUpButton: NSPopUpButton!
-	@IBOutlet weak var expirationDatePicker: NSDatePicker!
-	@IBOutlet weak var expirationDateLabel: NSTextField!
-	@IBOutlet weak var saveButton: NSButton!
+	@IBOutlet var actionPopUpButton: NSPopUpButton!
+	@IBOutlet var expirationDatePopUpButton: NSPopUpButton!
+	@IBOutlet var expirationDatePicker: NSDatePicker!
+	@IBOutlet var expirationDateLabel: NSTextField!
+	@IBOutlet var saveButton: NSButton!
 
-	@objc dynamic
-	private(set) var canSave: ObjCBool = false
+	@objc private(set) dynamic
+	var canSave: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterPhrase: String = ""
+	@objc private(set) dynamic
+	var filterPhrase: String = ""
 
-	@objc dynamic
-	private(set) var filterWholeWord: ObjCBool = false
+	@objc private(set) dynamic
+	var filterWholeWord: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterContextHome: ObjCBool = false
+	@objc private(set) dynamic
+	var filterContextHome: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterContextNotifications: ObjCBool = false
+	@objc private(set) dynamic
+	var filterContextNotifications: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterContextPublic: ObjCBool = false
+	@objc private(set) dynamic
+	var filterContextPublic: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterContextThread: ObjCBool = false
+	@objc private(set) dynamic
+	var filterContextThread: ObjCBool = false
 
-	@objc dynamic
-	private(set) var filterContextAccount: ObjCBool = false
+	@objc private(set) dynamic
+	var filterContextAccount: ObjCBool = false
 
 	var mode: Mode = .create {
 		didSet {
@@ -63,16 +62,16 @@ class FilterEditorWindowController: NSWindowController {
 			case .create:
 				resetBindings()
 				saveButton.title = "Create Filter"
-			case .edit(let filter):
+			case let .edit(filter):
 				setBindings(filter: filter)
 				saveButton.title = "Save Changes"
 			}
 		}
 	}
 
-	var dismissBlock: (() -> Void)? = nil
+	var dismissBlock: (() -> Void)?
 
-	var saveBlock: ((UserFilter, Mode) -> Void)? = nil
+	var saveBlock: ((UserFilter, Mode) -> Void)?
 
 	private var observations: [NSKeyValueObservation] = []
 
@@ -89,7 +88,7 @@ class FilterEditorWindowController: NSWindowController {
 		switch mode {
 		case .create:
 			resetBindings()
-		case .edit(let filter):
+		case let .edit(filter):
 			setBindings(filter: filter)
 		}
 	}
@@ -106,7 +105,7 @@ class FilterEditorWindowController: NSWindowController {
 		if let expirationDate = filter.expiresAt {
 			let remainingMinutes = expirationDate.timeIntervalSince(Date()) / 60
 			let availableItems = expirationDatePopUpButton.itemArray.compactMap(\.identifier?.rawValue)
-																	.compactMap(Int.init)
+				.compactMap(Int.init)
 
 			for availableItem in availableItems {
 				if Int(remainingMinutes) <= availableItem {
@@ -151,14 +150,14 @@ class FilterEditorWindowController: NSWindowController {
 		filterContextAccount = false
 	}
 
-	@IBAction func cancel(_ sender: Any) {
+	@IBAction func cancel(_: Any) {
 		dismissBlock?()
 	}
 
-	@IBAction func save(_ sender: Any) {
+	@IBAction func save(_: Any) {
 		guard let saveBlock = saveBlock,
-			  let actionIdentifier = actionPopUpButton.selectedItem?.identifier?.rawValue,
-			  let expirationIdentifier = expirationDatePopUpButton.selectedItem?.identifier?.rawValue
+		      let actionIdentifier = actionPopUpButton.selectedItem?.identifier?.rawValue,
+		      let expirationIdentifier = expirationDatePopUpButton.selectedItem?.identifier?.rawValue
 		else {
 			return
 		}
@@ -168,14 +167,11 @@ class FilterEditorWindowController: NSWindowController {
 
 		if expirationIdentifier == "never" {
 			expiration = nil
-		}
-		else if expirationIdentifier == "custom" {
+		} else if expirationIdentifier == "custom" {
 			expiration = expirationDatePicker.dateValue
-		}
-		else if let minutes = Double(expirationIdentifier), "\(minutes)" == expirationIdentifier {
+		} else if let minutes = Double(expirationIdentifier), expirationIdentifier == "\(minutes)" {
 			expiration = Date(timeIntervalSinceNow: minutes * 60)
-		}
-		else {
+		} else {
 			// Fallback
 			dismissBlock?()
 			return
@@ -189,10 +185,10 @@ class FilterEditorWindowController: NSWindowController {
 		if filterContextAccount.boolValue { filterContext.append(.account) }
 
 		saveBlock(UserFilter(id: "internal", phrase: filterPhrase, context: filterContext, expiresAt: expiration,
-							 wholeWord: filterWholeWord.boolValue, irreversible: irreversible), mode)
+		                     wholeWord: filterWholeWord.boolValue, irreversible: irreversible), mode)
 	}
 
-	@IBAction func didSelectExpirationValue(_ sender: Any) {
+	@IBAction func didSelectExpirationValue(_: Any) {
 		let showDatePicker = expirationDatePopUpButton.selectedItem?.identifier?.rawValue == "custom"
 		expirationDatePicker.isHidden = !showDatePicker
 		expirationDateLabel.isHidden = !showDatePicker

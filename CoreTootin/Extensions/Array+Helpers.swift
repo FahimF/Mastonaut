@@ -19,15 +19,12 @@
 
 import Foundation
 
-public extension Array where Element: Hashable
-{
-	func uniqueElements() -> [Element]
-	{
+public extension Array where Element: Hashable {
+	func uniqueElements() -> [Element] {
 		var set = Set<Element>()
 		var uniqueElements = [Element]()
 
-		for element in self
-		{
+		for element in self {
 			if set.contains(element) { continue }
 			set.insert(element)
 			uniqueElements.append(element)

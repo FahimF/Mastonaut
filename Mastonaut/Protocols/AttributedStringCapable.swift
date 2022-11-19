@@ -19,8 +19,7 @@
 
 import Foundation
 
-protocol AttributedStringCapable: NSView
-{
+protocol AttributedStringCapable: NSView {
 	var attributedStringValue: NSAttributedString { get set }
 	var toolTip: String? { get set }
 
@@ -29,71 +28,58 @@ protocol AttributedStringCapable: NSView
 
 extension NSTextField: AttributedStringCapable {}
 
-extension NSButton: AttributedStringCapable
-{
-	open override var attributedStringValue: NSAttributedString
-	{
-		get
-		{
+extension NSButton: AttributedStringCapable {
+	override open var attributedStringValue: NSAttributedString {
+		get {
 			return attributedTitle
 		}
 
-		set
-		{
+		set {
 			attributedTitle = newValue
 		}
 	}
 }
 
-extension AttributedStringCapable
-{
+extension AttributedStringCapable {
 	func set(stringValue string: String,
-			 applyingAttributes attributes: [NSAttributedString.Key: AnyObject],
-			 applyingEmojis emojis: [CacheableEmoji],
-			 tooltipSuffix: String? = nil,
-			 staticOnly: Bool = false)
+	         applyingAttributes attributes: [NSAttributedString.Key: AnyObject],
+	         applyingEmojis emojis: [CacheableEmoji],
+	         tooltipSuffix: String? = nil,
+	         staticOnly: Bool = false)
 	{
 		set(attributedStringValue: NSAttributedString(string: string),
-			applyingAttributes: attributes,
-			applyingEmojis: emojis,
-			tooltipSuffix: tooltipSuffix,
-			staticOnly: staticOnly)
+		    applyingAttributes: attributes,
+		    applyingEmojis: emojis,
+		    tooltipSuffix: tooltipSuffix,
+		    staticOnly: staticOnly)
 	}
 
 	func set(attributedStringValue string: NSAttributedString,
-			 applyingAttributes attributes: [NSAttributedString.Key: AnyObject],
-			 applyingEmojis emojis: [CacheableEmoji]? = nil,
-			 tooltipSuffix: String? = nil,
-			 staticOnly: Bool = false)
+	         applyingAttributes attributes: [NSAttributedString.Key: AnyObject],
+	         applyingEmojis emojis: [CacheableEmoji]? = nil,
+	         tooltipSuffix: String? = nil,
+	         staticOnly: Bool = false)
 	{
 		let attributedString = string.applyingAttributes(attributes)
-		let attributedStringWithEmoji = emojis.map({
+		let attributedStringWithEmoji = emojis.map {
 			attributedString.applyingEmojiAttachments($0, staticOnly: staticOnly, containerView: self)
-		}) ?? attributedString
+		} ?? attributedString
 
 		attributedStringValue = attributedStringWithEmoji
 		installEmojiSubviews(using: attributedStringWithEmoji)
 
-		if attributedStringWithEmoji.length != attributedString.length, staticOnly
-		{
+		if attributedStringWithEmoji.length != attributedString.length, staticOnly {
 			let plainString = attributedString.string
 			setAccessibilityLabel(plainString)
 
-			if let suffix = tooltipSuffix
-			{
+			if let suffix = tooltipSuffix {
 				toolTip = "\(plainString) \(suffix)"
-			}
-			else
-			{
+			} else {
 				toolTip = plainString
 			}
-		}
-		else if let suffix = tooltipSuffix
-		{
+		} else if let suffix = tooltipSuffix {
 			toolTip = "\(attributedString.string) \(suffix)"
-		}
-		else
-		{
+		} else {
 			toolTip = nil
 		}
 	}

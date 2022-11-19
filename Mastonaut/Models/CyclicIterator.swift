@@ -19,27 +19,22 @@
 
 import Foundation
 
-struct CyclicIterator<Base: Collection>
-{
+struct CyclicIterator<Base: Collection> {
 	private let collection: Base
 	private var currentIndex: Base.Index
 
-	init(_ collection: Base)
-	{
+	init(_ collection: Base) {
 		assert(collection.isEmpty == false, "A cyclic iterator can not be initialized with an empty collection!")
 		self.collection = collection
-		self.currentIndex = collection.startIndex
+		currentIndex = collection.startIndex
 	}
 
-	mutating func next() -> Base.Element
-	{
-		if currentIndex >= collection.endIndex
-		{
+	mutating func next() -> Base.Element {
+		if currentIndex >= collection.endIndex {
 			currentIndex = collection.startIndex
 		}
 
-		defer
-		{
+		defer {
 			currentIndex = collection.index(after: currentIndex)
 		}
 
@@ -47,10 +42,8 @@ struct CyclicIterator<Base: Collection>
 	}
 }
 
-extension Collection
-{
-	func makeCyclicIterator() -> CyclicIterator<Self>
-	{
+extension Collection {
+	func makeCyclicIterator() -> CyclicIterator<Self> {
 		return CyclicIterator(self)
 	}
 }

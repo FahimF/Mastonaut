@@ -9,20 +9,19 @@
 import Foundation
 
 public class FutureTask: NSObject {
+	public internal(set) var task: URLSessionDataTask? {
+		didSet {
+			if let task = task {
+				resolutionHandler?(task)
+			}
+		}
+	}
 
-    public internal(set) var task: URLSessionDataTask? {
-        didSet {
-            if let task = self.task {
-                resolutionHandler?(task)
-            }
-        }
-    }
-
-    public var resolutionHandler: ((URLSessionDataTask) -> Void)? {
-        didSet {
-            if let task = self.task {
-                resolutionHandler?(task)
-            }
-        }
-    }
+	public var resolutionHandler: ((URLSessionDataTask) -> Void)? {
+		didSet {
+			if let task = task {
+				resolutionHandler?(task)
+			}
+		}
+	}
 }

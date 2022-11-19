@@ -17,41 +17,32 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CommonCrypto
+import Foundation
 
-public extension String
-{
-	func sha256Hash() -> String
-	{
+public extension String {
+	func sha256Hash() -> String {
 		let data = Data(utf8)
 		var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
 
-		data.withUnsafeBytes({ _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &digest) })
+		data.withUnsafeBytes { _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &digest) }
 
-		return digest.map({ String(format: "%02hhx", $0) }).joined(separator: "")
+		return digest.map { String(format: "%02hhx", $0) }.joined(separator: "")
 	}
 
-	func substring(afterPrefix prefix: String) -> String
-	{
-		if let nextIndex = zip(self, prefix).reduce(startIndex, { (index, chars) -> Index? in
-			return (chars.0 == chars.1 && index != nil) ? self.index(after: index!) : nil
-		})
-		{
+	func substring(afterPrefix prefix: String) -> String {
+		if let nextIndex = zip(self, prefix).reduce(startIndex, { index, chars -> Index? in
+			(chars.0 == chars.1 && index != nil) ? self.index(after: index!) : nil
+		}) {
 			return String(self[nextIndex...])
-		}
-		else
-		{
+		} else {
 			return self
 		}
 	}
 
-	var hasEmoji: Bool
-	{
-		for character in self
-		{
-			if character.isEmoji
-			{
+	var hasEmoji: Bool {
+		for character in self {
+			if character.isEmoji {
 				return true
 			}
 		}
@@ -59,14 +50,10 @@ public extension String
 		return false
 	}
 
-	func ellipsedPrefix(maxLength: Int) -> String
-	{
-		if count <= maxLength
-		{
+	func ellipsedPrefix(maxLength: Int) -> String {
+		if count <= maxLength {
 			return self
-		}
-		else
-		{
+		} else {
 			return prefix(maxLength) + "…"
 		}
 	}
@@ -82,11 +69,9 @@ public extension String
 	}
 }
 
-public extension Character
-{
-	var isEmoji: Bool
-	{
-		return unicodeScalars.reduce(true, { $0 && $1.properties.isEmoji && $1.properties.isEmojiPresentation })
+public extension Character {
+	var isEmoji: Bool {
+		return unicodeScalars.reduce(true) { $0 && $1.properties.isEmoji && $1.properties.isEmojiPresentation }
 	}
 
 	static var zeroWidthJoiner = Character("\u{200D}")

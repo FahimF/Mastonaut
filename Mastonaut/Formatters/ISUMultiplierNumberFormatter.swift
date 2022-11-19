@@ -20,16 +20,15 @@
 import Foundation
 
 @IBDesignable
-@objc class ISUMultiplierNumberFormatter: NumberFormatter
-{
+@objc class ISUMultiplierNumberFormatter: NumberFormatter {
 	static let orderedMultipliers: [Double] = [
-//		1000000000000000000000000,
-		1000000000000000000000,
-		1000000000000000000,
-		1000000000000000,
-		1000000000000,
-		1000000000,
-		1000000,
+		//		1000000000000000000000000,
+		1_000_000_000_000_000_000_000,
+		1_000_000_000_000_000_000,
+		1_000_000_000_000_000,
+		1_000_000_000_000,
+		1_000_000_000,
+		1_000_000,
 		1000,
 //		100,
 //		10,
@@ -47,7 +46,7 @@ import Foundation
 	]
 
 	static let multiplierPrefixes: [String] = [
-//		"Y",
+		//		"Y",
 		"Z",
 		"E",
 		"P",
@@ -73,35 +72,25 @@ import Foundation
 	@IBInspectable
 	var unit: String = ""
 
-	override func string(for anything: Any?) -> String?
-	{
-		if let number = anything as? Int
-		{
+	override func string(for anything: Any?) -> String? {
+		if let number = anything as? Int {
 			return string(from: NSNumber(value: number))
-		}
-		else
-		{
+		} else {
 			return super.string(for: anything)
 		}
 	}
 
-	@objc override func string(from number: NSNumber) -> String?
-	{
+	@objc override func string(from number: NSNumber) -> String? {
 		let dividend: Double = number.doubleValue
 
-		for (index, multiplier) in ISUMultiplierNumberFormatter.orderedMultipliers.enumerated()
-		{
-			if multiplier <= dividend
-			{
+		for (index, multiplier) in ISUMultiplierNumberFormatter.orderedMultipliers.enumerated() {
+			if multiplier <= dividend {
 				let prefix = ISUMultiplierNumberFormatter.multiplierPrefixes[index]
 				let divided = dividend / multiplier
 
-				if Double(Int(divided)) == divided
-				{
+				if Double(Int(divided)) == divided {
 					return "\(Int(divided))\(prefix)\(unit)"
-				}
-				else
-				{
+				} else {
 					return String(format: "%.1f%@%@", divided, prefix, unit)
 				}
 			}

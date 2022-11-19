@@ -19,30 +19,24 @@
 
 import Cocoa
 
-class AcknowledgementsWindowController: NSWindowController
-{
+class AcknowledgementsWindowController: NSWindowController {
 	@IBOutlet private var textView: NSTextView!
 
-	override var windowNibName: NSNib.Name?
-	{
+	override var windowNibName: NSNib.Name? {
 		return "AcknowledgementsWindowController"
 	}
 
-	override func windowDidLoad()
-	{
+	override func windowDidLoad() {
 		super.windowDidLoad()
 
-		DispatchQueue.global(qos: .userInitiated).async
-		{
+		DispatchQueue.global(qos: .userInitiated).async {
 			[weak textView] in
 
 			let acknowledgements = Acknowledgements.load(plist: "Mastonaut-acknowledgements")
 			let acknowledgementsString = acknowledgements?.makeAttributedString()
 
-			DispatchQueue.main.async
-			{
-				guard let textView = textView, let string = acknowledgementsString else
-				{
+			DispatchQueue.main.async {
+				guard let textView = textView, let string = acknowledgementsString else {
 					return
 				}
 
@@ -50,37 +44,31 @@ class AcknowledgementsWindowController: NSWindowController
 			}
 		}
 	}
-
 }
 
-private extension Acknowledgements
-{
+private extension Acknowledgements {
 	static let titleAttributes: [NSAttributedString.Key: Any] = [
 		.font: NSFont.systemFont(ofSize: 18, weight: .semibold),
-		.foregroundColor: NSColor.labelColor
+		.foregroundColor: NSColor.labelColor,
 	]
 
 	static let textAttributes: [NSAttributedString.Key: Any] = [
 		.font: NSFont.systemFont(ofSize: 14, weight: .regular),
-		.foregroundColor: NSColor.labelColor
+		.foregroundColor: NSColor.labelColor,
 	]
 
-	func makeAttributedString() -> NSAttributedString
-	{
+	func makeAttributedString() -> NSAttributedString {
 		let string = NSMutableAttributedString()
 
-		for entry in entries
-		{
-			if !entry.title.isEmpty
-			{
+		for entry in entries {
+			if !entry.title.isEmpty {
 				string.append(NSAttributedString(string: "\(entry.title)\n\r",
-												 attributes: Acknowledgements.titleAttributes))
+				                                 attributes: Acknowledgements.titleAttributes))
 			}
 
-			if !entry.text.isEmpty
-			{
+			if !entry.text.isEmpty {
 				string.append(NSAttributedString(string: "\(entry.text)\n\r",
-												 attributes: Acknowledgements.textAttributes))
+				                                 attributes: Acknowledgements.textAttributes))
 			}
 		}
 

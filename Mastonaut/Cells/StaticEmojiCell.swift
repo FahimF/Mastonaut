@@ -19,48 +19,35 @@
 
 import Cocoa
 
-class StaticEmojiCell: AnimatableEmojiCell
-{
-	private var emojiImageStorage: NSImage? = nil
-	private var emojiImage: NSImage?
-	{
-		if let image = emojiImageStorage
-		{
+class StaticEmojiCell: AnimatableEmojiCell {
+	private var emojiImageStorage: NSImage?
+	private var emojiImage: NSImage? {
+		if let image = emojiImageStorage {
 			return image
-		}
-		else if let data = emojiData, let image = NSImage(data: data)
-		{
+		} else if let data = emojiData, let image = NSImage(data: data) {
 			emojiImageStorage = image
 			return image
-		}
-		else
-		{
+		} else {
 			return nil
 		}
 	}
 
-	internal override func informContainerViewOfUpdatedContent()
-	{
+	override internal func informContainerViewOfUpdatedContent() {
 		guard let control = containerView as? NSControl else { return }
 		let string = control.attributedStringValue
 		control.attributedStringValue = string
 	}
 
-	override func draw(withFrame cellFrame: NSRect, in controlView: NSView?)
-	{
-		guard let image = emojiImage else
-		{
+	override func draw(withFrame cellFrame: NSRect, in controlView: NSView?) {
+		guard let image = emojiImage else {
 			return
 		}
 
 		let rect: NSRect
 
-		if controlView == nil
-		{
+		if controlView == nil {
 			rect = cellFrame
-		}
-		else
-		{
+		} else {
 			rect = attachment?.bounds ?? cellFrame
 		}
 

@@ -17,18 +17,15 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-extension AccountReference
-{
-	fileprivate static func insertBlank() -> AccountReference
-	{
+extension AccountReference {
+	fileprivate static func insertBlank() -> AccountReference {
 		return AccountReference(context: AppDelegate.shared.managedObjectContext)
 	}
 
-	fileprivate static func insert(id: String) -> AccountReference
-	{
+	fileprivate static func insert(id: String) -> AccountReference {
 		let blank = AccountReference(context: AppDelegate.shared.managedObjectContext)
 		blank.identifier = id
 		return blank
@@ -38,8 +35,8 @@ extension AccountReference
 	{
 		let fetchRequest: NSFetchRequest<AccountReference> = self.fetchRequest()
 		fetchRequest.predicate = NSPredicate(format: "%K == %@ AND %K == %@",
-											 "identifier", id,
-											 "authorizedAccount", authorizedAccount.objectID)
+		                                     "identifier", id,
+		                                     "authorizedAccount", authorizedAccount.objectID)
 		return fetchRequest
 	}
 
@@ -47,8 +44,8 @@ extension AccountReference
 	{
 		let fetchRequest: NSFetchRequest<AccountReference> = self.fetchRequest()
 		fetchRequest.predicate = NSPredicate(format: "(%K IN %@) AND %K == %@",
-											 "identifier", ids,
-											 "authorizedAccount", authorizedAccount.objectID)
+		                                     "identifier", ids,
+		                                     "authorizedAccount", authorizedAccount.objectID)
 		return fetchRequest
 	}
 
@@ -73,10 +70,8 @@ extension AccountReference
 	}
 }
 
-extension AccountReference
-{
-	func relationshipSet(with anotherAccount: Account, isSelf: Bool) -> RelationshipSet
-	{
+extension AccountReference {
+	func relationshipSet(with _: Account, isSelf: Bool) -> RelationshipSet {
 		var relationship = RelationshipSet()
 
 		if isMastonautAuthor { relationship.formUnion(.isAuthor) }
@@ -89,8 +84,7 @@ extension AccountReference
 		return relationship
 	}
 
-	var isMastonautAuthor: Bool
-	{
+	var isMastonautAuthor: Bool {
 		return username == "brunoph" && host == "mastodon.technology"
 	}
 }

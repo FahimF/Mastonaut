@@ -17,23 +17,19 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-public extension Attachment
-{
-	var parsedPreviewUrl: URL?
-	{
+public extension Attachment {
+	var parsedPreviewUrl: URL? {
 		return previewURL.flatMap(URL.init(string:))
 	}
 
-	var parsedUrl: URL
-	{
+	var parsedUrl: URL {
 		return URL(string: url)!
 	}
 
-	var bestUrl: URL
-	{
+	var bestUrl: URL {
 		return URL(string: remoteURL ?? url)!
 	}
 }

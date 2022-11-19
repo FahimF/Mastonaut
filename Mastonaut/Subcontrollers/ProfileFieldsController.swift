@@ -20,8 +20,7 @@
 import AppKit
 import CoreTootin
 
-class ProfileFieldsController: NSObject
-{
+class ProfileFieldsController: NSObject {
 	@IBOutlet private unowned var stackView: NSStackView!
 
 	@IBOutlet private unowned var firstFieldNameLabel: NSTextField!
@@ -44,60 +43,56 @@ class ProfileFieldsController: NSObject
 	@IBOutlet private unowned var thirdFieldCheckmarkButton: NSButton!
 	@IBOutlet private unowned var fourthFieldCheckmarkButton: NSButton!
 
-	static let normalBackgroundColor: NSColor =
-		{
-			if #available(OSX 10.14, *) {
-				return NSColor.alternatingContentBackgroundColors.last ?? .windowBackgroundColor
-			} else {
-				return .windowBackgroundColor
-			}
-		}()
+	static let normalBackgroundColor: NSColor = {
+		if #available(OSX 10.14, *) {
+			return NSColor.alternatingContentBackgroundColors.last ?? .windowBackgroundColor
+		} else {
+			return .windowBackgroundColor
+		}
+	}()
 
 	static let normalForegroundColor: NSColor = .labelColor
 	static let verifiedForegroundColor: NSColor = .systemGreen
 
-	private static let sharedParagraphStyle: NSParagraphStyle =
-		{
-			let paragraphStyle = NSParagraphStyle.default
-			return paragraphStyle
-		}()
+	private static let sharedParagraphStyle: NSParagraphStyle = {
+		let paragraphStyle = NSParagraphStyle.default
+		return paragraphStyle
+	}()
 
 	private static let nameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let verifiedNameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 13),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let verifiedValueLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.systemGreen, .font: NSFont.labelFont(ofSize: 13),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor, .font: NSFont.systemFont(ofSize: 13, weight: .medium),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelVerifiedLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: 13, weight: .medium),
-		.paragraphStyle: sharedParagraphStyle
+		.paragraphStyle: sharedParagraphStyle,
 	]
 
-	func set(account: Account?)
-	{
+	func set(account: Account?) {
 		let fields: [VerifiableMetadataField] = account?.fields ?? []
 
-		guard !fields.isEmpty else
-		{
+		guard !fields.isEmpty else {
 			stackView.isHidden = true
 			return
 		}
@@ -108,13 +103,11 @@ class ProfileFieldsController: NSObject
 			(firstFieldContainerView, firstFieldNameLabel, firstFieldValueLabel, firstFieldCheckmarkButton),
 			(secondFieldContainerView, secondFieldNameLabel, secondFieldValueLabel, secondFieldCheckmarkButton),
 			(thirdFieldContainerView, thirdFieldNameLabel, thirdFieldValueLabel, thirdFieldCheckmarkButton),
-			(fourthFieldContainerView, fourthFieldNameLabel, fourthFieldValueLabel, fourthFieldCheckmarkButton)
+			(fourthFieldContainerView, fourthFieldNameLabel, fourthFieldValueLabel, fourthFieldCheckmarkButton),
 		]
 
-		for (index, controlSet) in controls.enumerated()
-		{
-			guard index < fields.count else
-			{
+		for (index, controlSet) in controls.enumerated() {
+			guard index < fields.count else {
 				controlSet.container.isHidden = true
 				continue
 			}
@@ -125,27 +118,24 @@ class ProfileFieldsController: NSObject
 			controlSet.container.isHidden = false
 			controlSet.name.stringValue = field.name
 
-			if isVerified
-			{
+			if isVerified {
 				controlSet.container.backgroundColor = NSColor(named: "VerifiedFieldBackground")!
 				controlSet.name.textColor = ProfileFieldsController.verifiedForegroundColor
 
 				controlSet.value.textColor = ProfileFieldsController.verifiedForegroundColor
 				controlSet.value.linkTextAttributes = ProfileFieldsController.valueLabelVerifiedLinkAttributes
 				controlSet.value.set(attributedStringValue: HTMLParsingService.shared.parse(HTML: field.value),
-									 applyingAttributes: ProfileFieldsController.verifiedValueLabelAttributes,
-									 applyingEmojis: account?.cacheableEmojis)
-			}
-			else
-			{
+				                     applyingAttributes: ProfileFieldsController.verifiedValueLabelAttributes,
+				                     applyingEmojis: account?.cacheableEmojis)
+			} else {
 				controlSet.container.backgroundColor = ProfileFieldsController.normalBackgroundColor
 				controlSet.name.textColor = ProfileFieldsController.normalForegroundColor
 
 				controlSet.value.textColor = ProfileFieldsController.normalForegroundColor
 				controlSet.value.linkTextAttributes = ProfileFieldsController.valueLabelLinkAttributes
 				controlSet.value.set(attributedStringValue: HTMLParsingService.shared.parse(HTML: field.value),
-									 applyingAttributes: ProfileFieldsController.valueLabelAttributes,
-									 applyingEmojis: account?.cacheableEmojis)
+				                     applyingAttributes: ProfileFieldsController.valueLabelAttributes,
+				                     applyingEmojis: account?.cacheableEmojis)
 			}
 
 			controlSet.name.isSelectable = true
@@ -154,18 +144,15 @@ class ProfileFieldsController: NSObject
 		}
 	}
 
-	func set(linkHandler: AttributedLabelLinkHandler)
-	{
+	func set(linkHandler: AttributedLabelLinkHandler) {
 		let labels = [firstFieldValueLabel, secondFieldValueLabel, thirdFieldValueLabel, fourthFieldValueLabel]
-		labels.forEach({ $0?.linkHandler = linkHandler })
+		labels.forEach { $0?.linkHandler = linkHandler }
 	}
 }
 
-extension ProfileFieldsController: RichTextCapable
-{
-	func set(shouldDisplayAnimatedContents animates: Bool)
-	{
+extension ProfileFieldsController: RichTextCapable {
+	func set(shouldDisplayAnimatedContents animates: Bool) {
 		let labels = [firstFieldValueLabel!, secondFieldValueLabel!, thirdFieldValueLabel!, fourthFieldValueLabel!]
-		labels.compactMap({ $0.animatedEmojiImageViews }).flatMap({ $0 }).forEach({ $0.animates = animates })
+		labels.compactMap { $0.animatedEmojiImageViews }.flatMap { $0 }.forEach { $0.animates = animates }
 	}
 }

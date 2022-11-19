@@ -19,10 +19,8 @@
 
 import Cocoa
 
-public extension NSAlert
-{
-	convenience init(style: NSAlert.Style = .informational, title: String, message: String)
-	{
+public extension NSAlert {
+	convenience init(style: NSAlert.Style = .informational, title: String, message: String) {
 		self.init()
 		alertStyle = style
 		messageText = title

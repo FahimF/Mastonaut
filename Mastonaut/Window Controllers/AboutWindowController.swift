@@ -20,14 +20,12 @@
 import Cocoa
 import CoreTootin
 
-class AboutWindowController: NSWindowController
-{
-	@IBOutlet weak var versionLabel: NSTextField!
+class AboutWindowController: NSWindowController {
+	@IBOutlet var versionLabel: NSTextField!
 
 	private lazy var acknowledgementsWindowController = AcknowledgementsWindowController()
 
-	override func windowDidLoad()
-	{
+	override func windowDidLoad() {
 		super.windowDidLoad()
 
 		// Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
@@ -39,23 +37,19 @@ class AboutWindowController: NSWindowController
 		}
 	}
 
-	override var windowNibName: NSNib.Name?
-	{
+	override var windowNibName: NSNib.Name? {
 		return "AboutWindowController"
 	}
 
-	@IBAction func openHomepage(_ sender: Any?)
-	{
+	@IBAction func openHomepage(_: Any?) {
 		NSWorkspace.shared.open(URL(string: "https://mastonaut.app")!)
 	}
 
-	@IBAction func openPrivacyPolicy(_ sender: Any?)
-	{
+	@IBAction func openPrivacyPolicy(_: Any?) {
 		NSWorkspace.shared.open(URL(string: "https://mastonaut.app/privacy")!)
 	}
 
-	@IBAction func orderFrontAcknowledgementsWindow(_ sender: Any?)
-	{
+	@IBAction func orderFrontAcknowledgementsWindow(_ sender: Any?) {
 		acknowledgementsWindowController.showWindow(sender)
 	}
 }

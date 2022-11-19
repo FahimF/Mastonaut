@@ -20,8 +20,7 @@
 import Cocoa
 
 @IBDesignable
-class BackgroundTableRowView: NSTableRowView
-{
+class BackgroundTableRowView: NSTableRowView {
 	@IBInspectable
 	var customBackgroundColor: NSColor = .clear
 
@@ -35,12 +34,10 @@ class BackgroundTableRowView: NSTableRowView
 
 	var rowIndex: Int = -1
 
-	override func updateLayer()
-	{
+	override func updateLayer() {
 		super.updateLayer()
 
-		if backgroundLayer.superlayer == nil
-		{
+		if backgroundLayer.superlayer == nil {
 			layer?.insertSublayer(backgroundLayer, at: 0)
 			backgroundColor = .clear
 		}
@@ -49,17 +46,17 @@ class BackgroundTableRowView: NSTableRowView
 		if let contentInsets = tableClipView?.contentInsets, let cellView = view(atColumn: 0) as? NSView,
 		   frame.width + (contentInsets.left + contentInsets.right) != cellView.frame.width,
 		   cellView.frame.height != frame.height - 2,
-		   rowIndex >= 0 {
+		   rowIndex >= 0
+		{
 			tableView?.noteHeightOfRows(withIndexesChanged: IndexSet(integer: rowIndex))
 		}
 
 		updateEffectiveBackgroundColor()
 	}
 
-	private lazy var backgroundLayer: CALayer = CALayer()
+	private lazy var backgroundLayer: CALayer = .init()
 
-	override func layout()
-	{
+	override func layout() {
 		super.layout()
 		CATransaction.begin()
 		CATransaction.setDisableActions(true)
@@ -69,14 +66,13 @@ class BackgroundTableRowView: NSTableRowView
 
 	override var isSelected: Bool {
 		didSet {
-			for column in 0..<numberOfColumns {
+			for column in 0 ..< numberOfColumns {
 				(view(atColumn: column) as? MastonautTableCellView)?.isSelected = isSelected
 			}
 		}
 	}
 
-	private func updateEffectiveBackgroundColor()
-	{
+	private func updateEffectiveBackgroundColor() {
 		backgroundLayer.backgroundColor = customBackgroundColor.cgColor
 	}
 }

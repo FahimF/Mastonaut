@@ -19,65 +19,52 @@
 
 import AppKit
 
-public extension NSSize
-{
-	var ratio: CGFloat
-	{
+public extension NSSize {
+	var ratio: CGFloat {
 		return height > 0 ? width / height : 0
 	}
 
-	var area: CGFloat
-	{
+	var area: CGFloat {
 		return width * height
 	}
 
 	func limit(width maxWidth: CGFloat = .greatestFiniteMagnitude,
-			   height maxHeight: CGFloat = .greatestFiniteMagnitude) -> NSSize
+	           height maxHeight: CGFloat = .greatestFiniteMagnitude) -> NSSize
 	{
 		return NSSize(width: Swift.min(width, maxWidth), height: Swift.min(height, maxHeight))
 	}
 
-	func fitting(on size: NSSize) -> NSSize
-	{
+	func fitting(on size: NSSize) -> NSSize {
 		// Avoid division by zero
 		let width = max(self.width, 1)
 		let height = max(self.height, 1)
 
-		if size.ratio < ratio
-		{
+		if size.ratio < ratio {
 			// Constrain by new size width
 			return NSSize(width: size.width, height: round(height / width * size.width))
-		}
-		else
-		{
+		} else {
 			// Constrain by new size height
 			return NSSize(width: round(width / height * size.height), height: size.height)
 		}
 	}
 
-	func rounded() -> NSSize
-	{
+	func rounded() -> NSSize {
 		return NSSize(width: round(width), height: round(height))
 	}
 
-	func multiplied(by scale: CGFloat) -> NSSize
-	{
+	func multiplied(by scale: CGFloat) -> NSSize {
 		return NSSize(width: width * scale, height: height * scale)
 	}
 }
 
-public extension NSPoint
-{
-	func offsetting(byX dx: CGFloat = 0, byY dy: CGFloat = 0) -> NSPoint
-	{
+public extension NSPoint {
+	func offsetting(byX dx: CGFloat = 0, byY dy: CGFloat = 0) -> NSPoint {
 		return NSPoint(x: x + dx, y: y + dy)
 	}
 }
 
-public extension TimeInterval
-{
-	var formattedStringValue: String
-	{
+public extension TimeInterval {
+	var formattedStringValue: String {
 		let formatter = DateComponentsFormatter()
 		formatter.allowedUnits = [.day, .hour, .minute, .second]
 		formatter.unitsStyle = .abbreviated
@@ -87,10 +74,8 @@ public extension TimeInterval
 	}
 }
 
-public extension Collection
-{
-	subscript(bounded index: Index) -> Element?
-	{
+public extension Collection {
+	subscript(bounded index: Index) -> Element? {
 		guard index >= startIndex, index < endIndex else { return nil }
 		return self[index]
 	}
@@ -98,14 +83,12 @@ public extension Collection
 
 infix operator ?==
 
-public func ?==<T: Equatable>(_ lhs: Any?, _ rhs: T) -> Bool
-{
+public func ?== <T: Equatable>(_ lhs: Any?, _ rhs: T) -> Bool {
 	return (lhs as? T) == rhs
 }
 
 infix operator ?===
 
-public func ?===<T: AnyObject>(_ lhs: AnyObject?, _ rhs: T) -> Bool
-{
+public func ?=== <T: AnyObject>(_ lhs: AnyObject?, _ rhs: T) -> Bool {
 	return (lhs as? T) === rhs
 }

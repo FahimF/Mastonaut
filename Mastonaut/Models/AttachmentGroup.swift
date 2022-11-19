@@ -17,11 +17,10 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-protocol AttachmentGroupType: AnyObject
-{
+protocol AttachmentGroupType: AnyObject {
 	var attachments: [Attachment] { get }
 	var attachmentCount: Int { get }
 
@@ -29,76 +28,62 @@ protocol AttachmentGroupType: AnyObject
 	func set(preview: NSImage, for attachment: Attachment)
 }
 
-class AttachmentGroup: AttachmentGroupType
-{
+class AttachmentGroup: AttachmentGroupType {
 	let attachments: [Attachment]
 
 	fileprivate var previewMap = [String: NSImage]()
 
-	var attachmentCount: Int
-	{
+	var attachmentCount: Int {
 		return attachments.count
 	}
 
-	init(attachments: [Attachment])
-	{
+	init(attachments: [Attachment]) {
 		self.attachments = attachments
 	}
 
-	fileprivate init(attachments: [Attachment], previews: [String: NSImage])
-	{
+	fileprivate init(attachments: [Attachment], previews: [String: NSImage]) {
 		self.attachments = attachments
 		previewMap = previews
 	}
 
-	func preview(for attachment: Attachment) -> NSImage?
-	{
+	func preview(for attachment: Attachment) -> NSImage? {
 		return previewMap[attachment.id]
 	}
 
-	func set(preview: NSImage, for attachment: Attachment)
-	{
+	func set(preview: NSImage, for attachment: Attachment) {
 		previewMap[attachment.id] = preview
 	}
 }
 
-class IndexedAttachmentGroup: AttachmentGroupType
-{
+class IndexedAttachmentGroup: AttachmentGroupType {
 	private let attachmentGroup: AttachmentGroup
 
 	var currentIndex: Array<Attachment>.Index
 
-	var attachments: [Attachment]
-	{
+	var attachments: [Attachment] {
 		return attachmentGroup.attachments
 	}
 
-	var attachmentCount: Int
-	{
+	var attachmentCount: Int {
 		return attachmentGroup.attachmentCount
 	}
 
-	fileprivate init(attachmentGroup: AttachmentGroup, initialIndex: Array<Attachment>.Index)
-	{
+	fileprivate init(attachmentGroup: AttachmentGroup, initialIndex: Array<Attachment>.Index) {
 		self.attachmentGroup = attachmentGroup
-		self.currentIndex = initialIndex
+		currentIndex = initialIndex
 	}
 
-	func preview(for attachment: Attachment) -> NSImage?
-	{
+	func preview(for attachment: Attachment) -> NSImage? {
 		return attachmentGroup.preview(for: attachment)
 	}
 
-	func set(preview: NSImage, for attachment: Attachment)
-	{
+	func set(preview: NSImage, for attachment: Attachment) {
 		attachmentGroup.set(preview: preview, for: attachment)
 	}
 }
 
-extension AttachmentGroup
-{
-	func asIndexedGroup(initialIndex: Array<Attachment>.Index) -> IndexedAttachmentGroup
-	{
+extension AttachmentGroup {
+	func asIndexedGroup(initialIndex: Array<Attachment>.Index) -> IndexedAttachmentGroup {
 		return IndexedAttachmentGroup(attachmentGroup: self, initialIndex: initialIndex)
 	}
 }

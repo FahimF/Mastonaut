@@ -17,37 +17,34 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-public class AccountsService: NSObject
-{
+public class AccountsService: NSObject {
 	public private(set) lazy var order = AccountOrder.default(context: context)
 
 	private let context: NSManagedObjectContext
 	private let urlSession = URLSession(configuration: .forClients)
 	private unowned let keychainController: KeychainController
 
-	private var countObserver: NSKeyValueObservation? = nil
+	private var countObserver: NSKeyValueObservation?
 
 	private var accountDetailsMap: [UUID: AccountDetails] = [:]
 	private var reauthorizationAgents: [UUID: ReauthorizationAgent] = [:]
 
-	@objc dynamic public var authorizedAccountsCount: Int = 0
+	@objc public dynamic var authorizedAccountsCount: Int = 0
 
-	public var authorizedAccounts: [AuthorizedAccount]
-	{
+	public var authorizedAccounts: [AuthorizedAccount] {
 		return order.sortedAccounts
 	}
 
-	public init(context: NSManagedObjectContext, keychainController: KeychainController)
-	{
+	public init(context: NSManagedObjectContext, keychainController: KeychainController) {
 		self.context = context
 		self.keychainController = keychainController
 
 		super.init()
 
-		let observer = order.observe(\.accounts, changeHandler: { [weak self] (_, _) in
+		let observer = order.observe(\.accounts, changeHandler: { [weak self] _, _ in
 			DispatchQueue.main.async {
 				guard let self = self else { return }
 				self.authorizedAccountsCount = self.authorizedAccounts.count
@@ -58,19 +55,16 @@ public class AccountsService: NSObject
 		authorizedAccountsCount = authorizedAccounts.count
 	}
 
-	public func set(sortOrder: Int, for account: AuthorizedAccount)
-	{
+	public func set(sortOrder: Int, for account: AuthorizedAccount) {
 		assert(Thread.isMainThread)
 		order.set(sortOrder: sortOrder, for: account)
 	}
 
-	public func account(with uuid: UUID) -> AuthorizedAccount?
-	{
+	public func account(with uuid: UUID) -> AuthorizedAccount? {
 		return order.sortedAccounts.first(where: { $0.uuid == uuid })
 	}
 
-	public func flushCachedDetails(for account: AuthorizedAccount)
-	{
+	public func flushCachedDetails(for account: AuthorizedAccount) {
 		accountDetailsMap.removeValue(forKey: account.uuid)
 	}
 
@@ -78,8 +72,7 @@ public class AccountsService: NSObject
 	{
 		let accountUUID = account.uuid
 
-		if let details = accountDetailsMap[accountUUID]
-		{
+		if let details = accountDetailsMap[accountUUID] {
 			completion(.success(details))
 			return
 		}
@@ -87,44 +80,37 @@ public class AccountsService: NSObject
 		let reauthAgent = reauthorizationAgent(for: account)
 
 		let client = Client.create(for: account, keychainController: keychainController,
-								   reauthAgent: reauthAgent, urlSession: urlSession)
+		                           reauthAgent: reauthAgent, urlSession: urlSession)
 
-		client?.fetchAccountAndInstance()
-			{
-				[weak self] result in
+		client?.fetchAccountAndInstance {
+			[weak self] result in
 
-				switch result
-				{
-				case .success((let account, let instance)):
-					let details = AccountDetails(account: account, instance: instance)
-					self?.accountDetailsMap[accountUUID] = details
-					completion(.success(details))
+			switch result {
+			case let .success((account, instance)):
+				let details = AccountDetails(account: account, instance: instance)
+				self?.accountDetailsMap[accountUUID] = details
+				completion(.success(details))
 
-				case .failure(let error):
-					completion(.failure(error))
-				}
+			case let .failure(error):
+				completion(.failure(error))
 			}
+		}
 	}
 
 	public func migrateAllAccountsToSharedLocalKeychain(keychainController: KeychainController) -> [MigrationError]
 	{
 		var errors = [MigrationError]()
 
-		for account in authorizedAccounts
-		{
-			do
-			{
+		for account in authorizedAccounts {
+			do {
 				try keychainController.migrateStorableToSharedLocalKeychain(account)
-			}
-			catch
-			{
-				if case KeychainController.Errors.secItemError(errSecItemNotFound) = error
-				{
+			} catch {
+				if case KeychainController.Errors.secItemError(errSecItemNotFound) = error {
 					continue
 				}
 
 				#if DEBUG
-				NSLog("Could not migrate account to group keychain: \(error)")
+					NSLog("Could not migrate account to group keychain: \(error)")
 				#endif
 				errors.append(MigrationError(account: account, underlyingError: error))
 			}
@@ -133,8 +119,7 @@ public class AccountsService: NSObject
 		return errors
 	}
 
-	public func reauthorizationAgent(for account: AuthorizedAccount) -> ReauthorizationAgent
-	{
+	public func reauthorizationAgent(for account: AuthorizedAccount) -> ReauthorizationAgent {
 		if let agent = reauthorizationAgents[account.uuid] {
 			return agent
 		}
@@ -145,15 +130,13 @@ public class AccountsService: NSObject
 		return agent
 	}
 
-	public struct MigrationError: Error
-	{
+	public struct MigrationError: Error {
 		public let account: AuthorizedAccount
 		public let underlyingError: Error
 	}
 }
 
-public struct AccountDetails
-{
+public struct AccountDetails {
 	public let account: Account
 	public let instance: Instance
 }

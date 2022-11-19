@@ -19,56 +19,47 @@
 
 import AppKit
 
-public class HoverView: BorderView
-{
-	private var hoverTrackingArea: NSTrackingArea? = nil
+public class HoverView: BorderView {
+	private var hoverTrackingArea: NSTrackingArea?
 
-	public required init?(coder: NSCoder)
-	{
+	public required init?(coder: NSCoder) {
 		super.init(coder: coder)
 
 		updateHoverTrackingArea()
 	}
 
-	private func updateHoverTrackingArea()
-	{
-		if let oldTrackingArea = hoverTrackingArea
-		{
+	private func updateHoverTrackingArea() {
+		if let oldTrackingArea = hoverTrackingArea {
 			removeTrackingArea(oldTrackingArea)
 		}
 
 		let trackingArea = NSTrackingArea(rect: bounds,
-										  options: [.activeAlways, .inVisibleRect, .mouseEnteredAndExited],
-										  owner: self,
-										  userInfo: nil)
+		                                  options: [.activeAlways, .inVisibleRect, .mouseEnteredAndExited],
+		                                  owner: self,
+		                                  userInfo: nil)
 
 		addTrackingArea(trackingArea)
 		hoverTrackingArea = trackingArea
 	}
 
-	public override var frame: NSRect
-	{
-		didSet
-		{
+	override public var frame: NSRect {
+		didSet {
 			updateHoverTrackingArea()
 		}
 	}
 }
 
-public class CallbackHoverView: HoverView
-{
-	public var mouseEntered: (() -> Void)? = nil
-	public var mouseExited: (() -> Void)? = nil
+public class CallbackHoverView: HoverView {
+	public var mouseEntered: (() -> Void)?
+	public var mouseExited: (() -> Void)?
 
-	public override func mouseEntered(with event: NSEvent)
-	{
+	override public func mouseEntered(with event: NSEvent) {
 		super.mouseEntered(with: event)
 
 		mouseEntered?()
 	}
 
-	public override func mouseExited(with event: NSEvent)
-	{
+	override public func mouseExited(with event: NSEvent) {
 		super.mouseExited(with: event)
 
 		mouseExited?()

@@ -17,72 +17,61 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class TagViewController: TimelineViewController, SidebarPresentable
-{
+class TagViewController: TimelineViewController, SidebarPresentable {
 	let tag: String
 	private let titleButtonBindable: SidebarTitleButtonStateBindable?
 	private let tagBookmarkService: TagBookmarkService?
 
-	var sidebarModelValue: SidebarModel
-	{
+	var sidebarModelValue: SidebarModel {
 		return SidebarMode.tag(tag)
 	}
 
-	var titleMode: SidebarTitleMode
-	{
+	var titleMode: SidebarTitleMode {
 		return titleButtonBindable.map { .button($0, .title("#\(tag)")) } ?? .title("#\(tag)")
 	}
 
-	init(tag: String, tagBookmarkService: TagBookmarkService?)
-	{
+	init(tag: String, tagBookmarkService: TagBookmarkService?) {
 		self.tag = tag
 
-		if let service = tagBookmarkService
-		{
-			self.titleButtonBindable = TagBookmarkButtonStateBindable(tag: tag, tagBookmarkService: service)
+		if let service = tagBookmarkService {
+			titleButtonBindable = TagBookmarkButtonStateBindable(tag: tag, tagBookmarkService: service)
 			self.tagBookmarkService = service
-		}
-		else
-		{
-			self.titleButtonBindable = nil
+		} else {
+			titleButtonBindable = nil
 			self.tagBookmarkService = nil
 		}
 
 		super.init(source: .tag(name: tag))
 	}
 
-	required init?(coder: NSCoder)
-	{
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 }
 
-private class TagBookmarkButtonStateBindable: SidebarTitleButtonStateBindable
-{
+private class TagBookmarkButtonStateBindable: SidebarTitleButtonStateBindable {
 	let tag: String
 
 	unowned let tagBookmarkService: TagBookmarkService
 
-	init(tag: String, tagBookmarkService: TagBookmarkService)
-	{
+	init(tag: String, tagBookmarkService: TagBookmarkService) {
 		self.tag = tag
 		self.tagBookmarkService = tagBookmarkService
 		super.init()
 		updateButton()
 	}
 
-	private func updateButton()
-	{
+	private func updateButton() {
 		let isBookmarked = tagBookmarkService.isTagBookmarked(tag)
 		icon = isBookmarked ? #imageLiteral(resourceName: "bookmark_active") : #imageLiteral(resourceName: "bookmark")
 		accessibilityLabel = isBookmarked ? 🔠("Unbookmark Tag") : 🔠("Bookmark Tag")
 	}
 
-	override func didClickButton(_ sender: Any?)
-	{
+	override func didClickButton(_: Any?) {
 		tagBookmarkService.toggleBookmarkedState(for: tag)
 		updateButton()
 	}

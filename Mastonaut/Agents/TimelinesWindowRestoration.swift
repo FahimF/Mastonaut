@@ -19,14 +19,12 @@
 
 import Foundation
 
-@objc class TimelinesWindowRestoration: NSObject, NSWindowRestoration
-{
+@objc class TimelinesWindowRestoration: NSObject, NSWindowRestoration {
 	static func restoreWindow(withIdentifier identifier: NSUserInterfaceItemIdentifier,
-							  state: NSCoder,
-							  completionHandler: @escaping (NSWindow?, Error?) -> Void)
+	                          state _: NSCoder,
+	                          completionHandler: @escaping (NSWindow?, Error?) -> Void)
 	{
-		guard identifier.rawValue == "Timelines" else
-		{
+		guard identifier.rawValue == "Timelines" else {
 			completionHandler(nil, Errors.unknownIdentifier)
 			return
 		}
@@ -34,8 +32,7 @@ import Foundation
 		guard
 			let controller = AppDelegate.shared.makeNewTimelinesWindow(forDecoder: true),
 			let window = controller.window
-			else
-		{
+		else {
 			completionHandler(nil, Errors.windowCreationFailed)
 			return
 		}
@@ -43,13 +40,11 @@ import Foundation
 		completionHandler(window, nil)
 	}
 
-	enum Errors: String, Error
-	{
+	enum Errors: String, Error {
 		case unknownIdentifier = "Unknown window restoration identifier."
 		case windowCreationFailed = "Could not create window."
 
-		var localizedDescription: String
-		{
+		var localizedDescription: String {
 			return rawValue
 		}
 	}

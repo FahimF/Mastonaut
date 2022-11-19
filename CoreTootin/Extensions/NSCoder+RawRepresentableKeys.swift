@@ -19,15 +19,12 @@
 
 import Foundation
 
-public extension NSCoder
-{
-	func encode<T: RawRepresentable>(_ object: Any?, forKey key: T) where T.RawValue == String
-	{
+public extension NSCoder {
+	func encode<T: RawRepresentable>(_ object: Any?, forKey key: T) where T.RawValue == String {
 		encode(object, forKey: key.rawValue)
 	}
 
-	func decodeObject<T: RawRepresentable, O>(forKey key: T) -> O? where T.RawValue == String
-	{
+	func decodeObject<T: RawRepresentable, O>(forKey key: T) -> O? where T.RawValue == String {
 		return decodeObject(forKey: key.rawValue) as? O
 	}
 }

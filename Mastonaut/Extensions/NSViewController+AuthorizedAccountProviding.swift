@@ -19,10 +19,8 @@
 
 import Foundation
 
-extension NSViewController
-{
-	var authorizedAccountProvider: AuthorizedAccountProviding?
-	{
+extension NSViewController {
+	var authorizedAccountProvider: AuthorizedAccountProviding? {
 		return view.window?.windowController as? AuthorizedAccountProviding
 	}
 }

@@ -17,56 +17,50 @@
 //  GNU General Public License for more details.
 //
 
-import Foundation
 import CoreTootin
+import Foundation
 
-class StatusSearchResultsViewController: SearchResultsViewController<Account>
-{
+class StatusSearchResultsViewController: SearchResultsViewController<Account> {
 	@IBOutlet unowned var _tableView: NSTableView!
 
 	private var instance: Instance!
 
-	override var tableView: NSTableView!
-	{
+	override var tableView: NSTableView! {
 		return _tableView
 	}
-	override internal var cellIdentifier: NSUserInterfaceItemIdentifier
-	{
+
+	override internal var cellIdentifier: NSUserInterfaceItemIdentifier {
 		return NSUserInterfaceItemIdentifier("account")
 	}
 
-	override func set(results: ResultsType, instance: Instance)
-	{
+	override func set(results: ResultsType, instance: Instance) {
 		self.instance = instance
 		elements = results.accounts
 	}
 
-	override internal func populate(cell: NSTableCellView, for account: Account)
-	{
+	override internal func populate(cell: NSTableCellView, for account: Account) {
 		(cell as? AccountResultTableCellView)?.set(account: account, instance: instance)
 	}
 
-	override internal func makeSelection(for account: Account) -> SearchResultSelection
-	{
+	override internal func makeSelection(for account: Account) -> SearchResultSelection {
 		return .account(account)
 	}
 }
 
-class StatusResultTableCellView: NSTableCellView
-{
+class StatusResultTableCellView: NSTableCellView {
 	private static let displayNameAttributes: [NSAttributedString.Key: AnyObject] = [
 		.font: NSFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: NSColor.labelColor,
-		.underlineStyle: NSNumber(value: 0)
+		.underlineStyle: NSNumber(value: 0),
 	]
 
 	private static let bioAttributes: [NSAttributedString.Key: AnyObject] = [
 		.font: NSFont.labelFont(ofSize: 11), .foregroundColor: NSColor.labelColor,
-		.underlineStyle: NSNumber(value: 0)
+		.underlineStyle: NSNumber(value: 0),
 	]
 
 	private static let bioLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.font: NSFont.labelFont(ofSize: 11), .foregroundColor: NSColor.labelColor,
-		.underlineStyle: NSNumber(value: 1)
+		.underlineStyle: NSNumber(value: 1),
 	]
 
 	@IBOutlet private unowned var avatarImageView: NSImageView!
@@ -74,24 +68,22 @@ class StatusResultTableCellView: NSTableCellView
 	@IBOutlet private unowned var handleLabel: NSTextField!
 	@IBOutlet private unowned var bioLabel: AttributedLabel!
 
-	override func awakeFromNib()
-	{
+	override func awakeFromNib() {
 		super.awakeFromNib()
 
 		bioLabel.linkTextAttributes = StatusResultTableCellView.bioLinkAttributes
 		bioLabel.linkHandler = nil
 	}
 
-	func set(account: Account, instance: Instance)
-	{
+	func set(account: Account, instance: Instance) {
 		displayNameLabel.set(stringValue: account.bestDisplayName,
-							 applyingAttributes: StatusResultTableCellView.displayNameAttributes,
-							 applyingEmojis: account.cacheableEmojis)
+		                     applyingAttributes: StatusResultTableCellView.displayNameAttributes,
+		                     applyingEmojis: account.cacheableEmojis)
 
 		handleLabel.stringValue = account.uri(in: instance)
 
 		bioLabel.set(attributedStringValue: account.attributedNote,
-					 applyingAttributes: StatusResultTableCellView.bioAttributes,
-					 applyingEmojis: account.cacheableEmojis)
+		             applyingAttributes: StatusResultTableCellView.bioAttributes,
+		             applyingEmojis: account.cacheableEmojis)
 	}
 }

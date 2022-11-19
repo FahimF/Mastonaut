@@ -9,12 +9,11 @@
 import Foundation
 
 class MockClientDelegate: ClientDelegate {
+	var isRequestingNewAccessToken: Bool = false
 
-    var isRequestingNewAccessToken: Bool = false
+	var producedUnauthorizedErrorHandler: ((ClientType) -> Void)?
 
-    var producedUnauthorizedErrorHandler: ((ClientType) -> Void)?
-
-    func clientProducedUnauthorizedError(_ client: ClientType) {
-        producedUnauthorizedErrorHandler?(client)
-    }
+	func clientProducedUnauthorizedError(_ client: ClientType) {
+		producedUnauthorizedErrorHandler?(client)
+	}
 }

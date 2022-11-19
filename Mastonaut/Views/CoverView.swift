@@ -20,46 +20,41 @@
 import Cocoa
 import CoreTootin
 
-class CoverView: BorderView
-{
+class CoverView: BorderView {
 	private var didInstallLabel: Bool = false
-	
-	var target: Any? = nil
-	var action: Selector? = nil
 
-	init(backgroundColor: NSColor, textColor: NSColor = .labelColor, message: String)
-	{
+	var target: Any?
+	var action: Selector?
+
+	init(backgroundColor: NSColor, textColor: NSColor = .labelColor, message: String) {
 		super.init(frame: .zero)
 		setUp(backgroundColor: backgroundColor,
-			  textColor: textColor,
-			  message: message)
+		      textColor: textColor,
+		      message: message)
 	}
 
-	override init(frame frameRect: NSRect)
-	{
+	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		setUp()
 	}
 
-	required init?(coder decoder: NSCoder)
-	{
+	required init?(coder decoder: NSCoder) {
 		super.init(coder: decoder)
 		setUp()
 	}
 
 	private func setUp(backgroundColor: NSColor = #colorLiteral(red: 0.8316226602, green: 0.8316226602, blue: 0.8316226602, alpha: 1),
-					   textColor: NSColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.8470588235),
-					   message: String? = nil)
+	                   textColor: NSColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.8470588235),
+	                   message: String? = nil)
 	{
 		translatesAutoresizingMaskIntoConstraints = false
-		self.borderRadius = 4.0
+		borderRadius = 4.0
 		self.backgroundColor = backgroundColor
 
 		DispatchQueue.main.async { self.delayedSetUp(message: message, textColor: textColor) }
 	}
 
-	private func delayedSetUp(message: String?, textColor: NSColor)
-	{
+	private func delayedSetUp(message: String?, textColor: NSColor) {
 		let label = NSTextField(labelWithString: message ?? "")
 		label.translatesAutoresizingMaskIntoConstraints = false
 		label.lineBreakMode = .byWordWrapping
@@ -77,12 +72,12 @@ class CoverView: BorderView
 			trailingAnchor.constraint(equalTo: label.trailingAnchor, constant: 12),
 			centerYAnchor.constraint(equalTo: label.centerYAnchor),
 			bottomAnchor.constraint(greaterThanOrEqualTo: label.bottomAnchor),
-			label.topAnchor.constraint(greaterThanOrEqualTo: topAnchor)
+			label.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
 		])
 	}
-	
-	override func mouseDown(with event: NSEvent) {
-		if let target = self.target as? NSObjectProtocol, let action = self.action {
+
+	override func mouseDown(with _: NSEvent) {
+		if let target = target as? NSObjectProtocol, let action = action {
 			target.perform(action, with: self)
 		}
 	}

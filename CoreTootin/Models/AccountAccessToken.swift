@@ -20,8 +20,7 @@
 import Foundation
 
 /// Stores the authorization key for a given used at an individual instance.
-public struct AccountAccessToken: KeychainStorable
-{
+public struct AccountAccessToken: KeychainStorable {
 	public let account: String
 	public let accessToken: String
 

@@ -19,49 +19,35 @@
 
 import Foundation
 
-struct DirectoryService
-{
+struct DirectoryService {
 	private let directoryUrl = URL(string: "https://mastonaut.app/instances/cached_fetch.php")!
 	private let urlSession: URLSession
 
-	init(urlSession: URLSession)
-	{
+	init(urlSession: URLSession) {
 		self.urlSession = urlSession
 	}
 
-	func fetch(completion: @escaping (Result<[Instance], FetchError>) -> Void)
-	{
+	func fetch(completion: @escaping (Result<[Instance], FetchError>) -> Void) {
 		let request = URLRequest(url: directoryUrl, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10)
-		let task = urlSession.dataTask(with: request) { (data, response, error) in
+		let task = urlSession.dataTask(with: request) { data, response, error in
 
-			if let error = error as NSError?
-			{
+			if let error = error as NSError? {
 				completion(.failure(.networkError(error)))
-			}
-			else if let httpResponse = response as? HTTPURLResponse, !(200..<400).contains(httpResponse.statusCode)
+			} else if let httpResponse = response as? HTTPURLResponse, !(200 ..< 400).contains(httpResponse.statusCode)
 			{
 				completion(.failure(FetchError.badStatus(httpResponse.statusCode)))
-			}
-			else if let data = data
-			{
-				do
-				{
+			} else if let data = data {
+				do {
 					let jsonDecoder = JSONDecoder()
 					jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
 
 					completion(.success(try jsonDecoder.decode(InstancesPayload.self, from: data).instances))
-				}
-				catch let error as DecodingError
-				{
+				} catch let error as DecodingError {
 					completion(.failure(.parseError(error)))
-				}
-				catch
-				{
+				} catch {
 					completion(.failure(.unknownError))
 				}
-			}
-			else
-			{
+			} else {
 				completion(.failure(.emptyResponse))
 			}
 		}
@@ -69,8 +55,7 @@ struct DirectoryService
 		task.resume()
 	}
 
-	class Instance: NSObject, Codable
-	{
+	class Instance: NSObject, Codable {
 		let id: String
 		let name: String
 		let uptime: Double
@@ -79,16 +64,14 @@ struct DirectoryService
 		let statuses: String
 		let info: Info
 
-		struct Info: Codable
-		{
+		struct Info: Codable {
 			let shortDescription: String
 			let prohibitedContent: [String]
 			let categories: [String]
 		}
 	}
 
-	enum FetchError: LocalizedError
-	{
+	enum FetchError: LocalizedError {
 		case networkError(NSError)
 		case parseError(DecodingError)
 		case badStatus(Int)
@@ -96,8 +79,7 @@ struct DirectoryService
 		case emptyResponse
 	}
 
-	private struct InstancesPayload: Codable
-	{
+	private struct InstancesPayload: Codable {
 		let instances: [Instance]
 	}
 }
