@@ -581,6 +581,7 @@
 		DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DA29291C0E00AA0ABA /* Starscream */; };
 		DD3DA7DD29291C9700AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DC29291C9700AA0ABA /* Starscream */; };
 		DD3DA7F92929304B00AA0ABA /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7F82929304B00AA0ABA /* SVGKit */; };
+		DD3DA8052929AA1A00AA0ABA /* ComposerPollViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 151199CA22BFCF05007F2AEB /* ComposerPollViewController.xib */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -2270,6 +2271,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD3DA8052929AA1A00AA0ABA /* ComposerPollViewController.xib in Resources */,
 				15E7453222372806009A1252 /* AccountAvatarItem.xib in Resources */,
 				DD3DA7D829290D0E00AA0ABA /* Mastonaut-acknowledgements.plist in Resources */,
 				15C7836C221CBCB100402C66 /* Timelines.storyboard in Resources */,
