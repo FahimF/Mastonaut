@@ -56,14 +56,11 @@ public class ResolverService: NSObject {
 		}
 	}
 
-	private func resolveStatus(uri: String,
-	                           fallbackSearch: Bool,
-	                           completion: @escaping (Swift.Result<Status, ResolverError>) -> Void)
-	{
-		if resolverFuture?.task?.state != .completed { resolverFuture?.task?.cancel() }
-
+	private func resolveStatus(uri: String, fallbackSearch: Bool, completion: @escaping (Swift.Result<Status, ResolverError>) -> Void) {
+		if resolverFuture?.task?.state != .completed {
+			resolverFuture?.task?.cancel()			
+		}
 		let request: Request<Results>
-
 		if fallbackSearch {
 			request = Search.fallbackSearch(query: uri, resolve: true)
 		} else {

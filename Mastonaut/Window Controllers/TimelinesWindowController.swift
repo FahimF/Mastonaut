@@ -522,7 +522,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 			                                                   constant: 8),
 			toolbarView.trailingAnchor.constraint(greaterThanOrEqualTo: newColumnSegmentedControl.trailingAnchor, constant: 6),
 		])
-
 		NSLayoutConstraint.activate(constraints)
 	}
 
@@ -548,11 +547,11 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 			}
 
 			let menu = NSMenu(title: "")
-			var items: [NSMenuItem] = allSelectableModels.filter { !takenModels.contains($0) }
+			var items = allSelectableModels.filter { !takenModels.contains($0) }
 				.map { $0.makeMenuItemForChanging(with: self, columnId: index) }
 
 			items.append(currentModel.makeMenuItemForChanging(with: self, columnId: index))
-			items.sort(by: { $0.columnModel! < $1.columnModel! })
+//			items.sort(by: { $0.columnModel! < $1.columnModel! })
 
 			items.append(.separator())
 
@@ -578,18 +577,13 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 			popUpButton.select(menu.item(withRepresentedObject: currentModel))
 
 			popUpButtonConstraints.append(TrackingLayoutConstraint
-				.constraint(trackingMidXOf: column.view,
-				            targetView: popUpButton,
-				            containerView: toolbarView,
-				            targetAttribute: .centerX,
-				            containerAttribute: .leading)
+				.constraint(trackingMidXOf: column.view, targetView: popUpButton, containerView: toolbarView, targetAttribute: .centerX, containerAttribute: .leading)
 				.with(priority: .defaultLow + 248))
 
 			popUpButtonConstraints.append(popUpButton.leadingAnchor.constraint(
 				greaterThanOrEqualTo: previousButton.trailingAnchor,
 				constant: 8
 			))
-
 			previousButton = popUpButton
 		}
 
@@ -882,23 +876,19 @@ extension TimelinesWindowController: AuthorizedAccountProviding {
 	}
 }
 
-extension TimelinesWindowController // IBActions
-{
+// IBActions
+extension TimelinesWindowController {
 	@IBAction func composeStatus(_ sender: Any?) {
 		AppDelegate.shared.composeStatus(sender)
 		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		guard let composerWindow = composerWindowController.window else { return }
-
 		if let composerScreen = composerWindow.screen, let timelinesScreen = window?.screen,
-		   composerScreen !== timelinesScreen
-		{
+		   composerScreen !== timelinesScreen {
 			// Move window to the inside of the screen where the current timelines window is
 			composerWindow.setFrameOrigin(timelinesScreen.visibleFrame.origin)
 		}
-
 		composerWindowController.showWindow(sender)
 		composerWindow.center()
-
 		composerWindowController.currentAccount = currentAccount
 	}
 
@@ -915,28 +905,18 @@ extension TimelinesWindowController // IBActions
 	}
 
 	@IBAction func changeColumnMode(_ sender: Any?) {
-		guard
-			let menuItem = sender as? NSMenuItem,
-			let newModel = menuItem.representedObject as? ColumnMode
-		else {
+		guard let menuItem = sender as? NSMenuItem, let newModel = menuItem.representedObject as? ColumnMode else {
 			return
 		}
-
 		let columnIndex = menuItem.tag
 		let columnViewControllers = timelinesViewController.columnViewControllers
-
 		guard columnIndex >= 0, columnIndex < columnViewControllers.count else {
 			return
 		}
-
-		guard
-			let selectableCurrentModel = columnViewControllers[columnIndex].modelRepresentation as? ColumnMode,
-			selectableCurrentModel != newModel
-		else {
+		guard let selectableCurrentModel = columnViewControllers[columnIndex].modelRepresentation as? ColumnMode, selectableCurrentModel != newModel else {
 			// Nothing to change
 			return
 		}
-
 		replaceColumn(at: columnIndex, with: newModel.makeViewController())
 	}
 
@@ -947,7 +927,6 @@ extension TimelinesWindowController // IBActions
 		else {
 			return
 		}
-
 		removeColumn(at: columnIndex, contract: true)
 	}
 

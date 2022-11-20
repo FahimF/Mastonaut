@@ -223,16 +223,37 @@ enum RemoteEventStream: Hashable {
 	case hashtagLocal(String)
 	case list(String)
 	case direct
+	case favourites
+	case bookmarks
 
 	var name: String {
 		switch self {
-		case .user: return "user"
-		case .public: return "public"
-		case .publicLocal: return "public:local"
-		case .hashtag: return "hashtag"
-		case .hashtagLocal: return "hashtag:local"
-		case .list: return "list"
-		case .direct: return "direct"
+		case .user:
+			return "user"
+			
+		case .public:
+			return "public"
+			
+		case .publicLocal:
+			return "public:local"
+			
+		case .hashtag:
+			return "hashtag"
+			
+		case .hashtagLocal:
+			return "hashtag:local"
+			
+		case .list:
+			return "list"
+			
+		case .direct:
+			return "direct"
+			
+		case .favourites:
+			return "favourites"
+			
+		case .bookmarks:
+			return "bookmarks"
 		}
 	}
 
@@ -249,7 +270,7 @@ enum RemoteEventStream: Hashable {
 		case let .list(list):
 			items.append(URLQueryItem(name: "list", value: list))
 
-		case .user, .public, .publicLocal, .direct:
+		case .user, .public, .publicLocal, .direct, .favourites, .bookmarks:
 			break
 		}
 

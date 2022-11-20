@@ -37,6 +37,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 	@IBOutlet private unowned var replyButton: NSButton!
 	@IBOutlet private unowned var reblogButton: NSButton!
 	@IBOutlet private unowned var favoriteButton: NSButton!
+	@IBOutlet private unowned var bookmarkButton: NSButton!
 	@IBOutlet private unowned var timeLabel: NSTextField!
 
 	var displayedNotificationId: String?
@@ -306,6 +307,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 
 		reblogButton.state = status.reblogged == true ? .on : .off
 		favoriteButton.state = status.favourited == true ? .on : .off
+		bookmarkButton.state = status.bookmarked == true ? .on : .off
 
 		set(authorName: status.authorName,
 		    account: status.account.uri(in: activeInstance),
@@ -351,12 +353,9 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 		guard let interactedNotificationId = displayedNotificationId else {
 			return
 		}
-
 		switch (sender, sender.state) {
 		case (favoriteButton, .on):
-			interactionHandler?.favoriteStatus(for: self) {
-				[weak self] success in
-
+			interactionHandler?.favoriteStatus(for: self) {[weak self] success in
 				DispatchQueue.main.async {
 					guard self?.displayedNotificationId == interactedNotificationId else { return }
 					self?.favoriteButton.state = success ? .on : .off
@@ -364,19 +363,31 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			}
 
 		case (favoriteButton, .off):
-			interactionHandler?.unfavoriteStatus(for: self) {
-				[weak self] success in
-
+			interactionHandler?.unfavoriteStatus(for: self) {[weak self] success in
 				DispatchQueue.main.async {
 					guard self?.displayedNotificationId == interactedNotificationId else { return }
 					self?.favoriteButton.state = success ? .off : .on
 				}
 			}
 
-		case (reblogButton, .on):
-			interactionHandler?.reblogStatus(for: self) {
-				[weak self] success in
+		case (bookmarkButton, .on):
+			interactionHandler?.bookmarkStatus(for: self) {[weak self] success in
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.bookmarkButton.state = success ? .on : .off
+				}
+			}
 
+		case (bookmarkButton, .off):
+			interactionHandler?.unbookmarkStatus(for: self) {[weak self] success in
+				DispatchQueue.main.async {
+					guard self?.displayedNotificationId == interactedNotificationId else { return }
+					self?.bookmarkButton.state = success ? .off : .on
+				}
+			}
+
+		case (reblogButton, .on):
+			interactionHandler?.reblogStatus(for: self) {[weak self] success in
 				DispatchQueue.main.async {
 					guard self?.displayedNotificationId == interactedNotificationId else { return }
 					self?.reblogButton.state = success ? .on : .off
@@ -384,9 +395,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			}
 
 		case (reblogButton, .off):
-			interactionHandler?.unreblogStatus(for: self) {
-				[weak self] success in
-
+			interactionHandler?.unreblogStatus(for: self) {[weak self] success in
 				DispatchQueue.main.async {
 					guard self?.displayedNotificationId == interactedNotificationId else { return }
 					self?.reblogButton.state = success ? .off : .on
@@ -397,7 +406,6 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			guard let statusID = displayedStatusId else {
 				return
 			}
-
 			interactionHandler?.reply(to: statusID)
 
 		case (authorNameLabel, _), (authorAvatarButton, _):

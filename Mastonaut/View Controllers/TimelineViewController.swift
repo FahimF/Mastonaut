@@ -42,14 +42,18 @@ class TimelineViewController: StatusListViewController {
 
 	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
 		super.clientDidChange(client, oldClient: oldClient)
-
 		guard let source = source else {
 			return
 		}
-
 		switch source {
 		case .timeline:
 			setClientEventStream(.user)
+
+		case .favorites:
+			setClientEventStream(.favourites)
+
+		case .bookmarks:
+			setClientEventStream(.bookmarks)
 
 		case .localTimeline:
 			setClientEventStream(.publicLocal)
@@ -60,7 +64,7 @@ class TimelineViewController: StatusListViewController {
 		case let .tag(name):
 			setClientEventStream(.hashtag(name))
 
-		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies, .favorites:
+		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies:
 			#if DEBUG
 				DispatchQueue.main.async { self.showStatusIndicator(state: .off) }
 			#endif
@@ -89,6 +93,10 @@ class TimelineViewController: StatusListViewController {
 		case .favorites:
 			let range = lastPaginationResult?.next ?? rangeForEntryFetch(for: insertion)
 			request = Favourites.all(range: range)
+
+		case .bookmarks:
+			let range = lastPaginationResult?.next ?? rangeForEntryFetch(for: insertion)
+			request = Bookmarks.all(range: range)
 
 		case let .userStatuses(account):
 			request = Accounts.statuses(id: account, excludeReplies: true, range: rangeForEntryFetch(for: insertion))
@@ -167,14 +175,14 @@ class TimelineViewController: StatusListViewController {
 		let currentContext: Filter.Context
 
 		switch source {
-		case .favorites: currentContext = .home
-		case .localTimeline: currentContext = .public
-		case .publicTimeline: currentContext = .public
-		case .tag: currentContext = .home
-		case .timeline: currentContext = .home
-		case .userMediaStatuses: currentContext = .account
-		case .userStatuses: currentContext = .account
-		case .userStatusesAndReplies: currentContext = .account
+		case .favorites, .bookmarks, .tag, .timeline:
+			currentContext = .home
+			
+		case .localTimeline, .publicTimeline:
+			currentContext = .public
+			
+		case .userMediaStatuses, .userStatuses, .userStatusesAndReplies:
+			currentContext = .account
 		}
 
 		return super.applicableFilters().filter { $0.context.contains(currentContext) }
@@ -185,6 +193,7 @@ class TimelineViewController: StatusListViewController {
 		case localTimeline
 		case publicTimeline
 		case favorites
+		case bookmarks
 		case userStatuses(id: String)
 		case userStatusesAndReplies(id: String)
 		case userMediaStatuses(id: String)
@@ -201,14 +210,26 @@ extension TimelineViewController: ColumnPresentable {
 		guard let source = source else {
 			return nil
 		}
-
 		switch source {
-		case .timeline: return ColumnMode.timeline
-		case .localTimeline: return ColumnMode.localTimeline
-		case .publicTimeline: return ColumnMode.publicTimeline
-		case let .tag(name): return ColumnMode.tag(name: name)
+		case .timeline:
+			return ColumnMode.timeline
+			
+		case .localTimeline:
+			return ColumnMode.localTimeline
+			
+		case .publicTimeline:
+			return ColumnMode.publicTimeline
+			
+		case .favorites:
+			return ColumnMode.favourites
+			
+		case .bookmarks:
+			return ColumnMode.bookmarks
+			
+		case let .tag(name):
+			return ColumnMode.tag(name: name)
 
-		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies, .favorites:
+		case .userStatuses, .userMediaStatuses, .userStatusesAndReplies:
 			return nil
 		}
 	}

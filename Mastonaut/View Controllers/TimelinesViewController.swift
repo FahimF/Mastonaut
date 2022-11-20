@@ -48,15 +48,18 @@ class TimelinesViewController: NSViewController {
 	}
 
 	private(set) var columnViewControllers: [ColumnViewController] = [] {
-		willSet { willChangeValue(for: \TimelinesViewController.columnViewControllersCount) }
-		didSet { didChangeValue(for: \TimelinesViewController.columnViewControllersCount) }
+		willSet {
+			willChangeValue(for: \TimelinesViewController.columnViewControllersCount)
+		}
+		didSet {
+			didChangeValue(for: \TimelinesViewController.columnViewControllersCount)
+		}
 	}
 
 	var canAppendStatusList: Bool {
 		guard let screenSize = view.window?.screen?.frame.size else {
 			return false
 		}
-
 		return screenSize.width >= ListViewControllerMinimumWidth * CGFloat(columnViewControllers.count + 1)
 	}
 
@@ -64,11 +67,8 @@ class TimelinesViewController: NSViewController {
 		guard canAppendStatusList else {
 			return nil
 		}
-
 		let columnViewController = model.makeViewController()
-
 		appendColumn(columnViewController, expand: expand)
-
 		return columnViewController
 	}
 
@@ -255,11 +255,9 @@ protocol ColumnModel {
 
 protocol ColumnPresentable: BaseColumnViewController {
 	var modelRepresentation: ColumnModel? { get }
-
 	var client: ClientType? { get set }
 
 	func reload()
-
 	func containerWindowOcclusionStateDidChange(_ occlusionState: NSWindow.OcclusionState)
 }
 

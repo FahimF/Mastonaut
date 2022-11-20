@@ -581,6 +581,7 @@
 		DD3DA9A6292A2BED00AA0ABA /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA95E292A2BED00AA0ABA /* HTTPMethod.swift */; };
 		DD3DA9A7292A2BED00AA0ABA /* RequestRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA95F292A2BED00AA0ABA /* RequestRange.swift */; };
 		DD3DA9A8292A2BED00AA0ABA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA960292A2BED00AA0ABA /* Client.swift */; };
+		DD3DA9AA292A40A500AA0ABA /* Bookmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1074,6 +1075,7 @@
 		DD3DA95E292A2BED00AA0ABA /* HTTPMethod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		DD3DA95F292A2BED00AA0ABA /* RequestRange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestRange.swift; sourceTree = "<group>"; };
 		DD3DA960292A2BED00AA0ABA /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmarks.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1920,6 +1922,7 @@
 			children = (
 				DD3DA932292A2BEC00AA0ABA /* Accounts.swift */,
 				DD3DA92F292A2BEC00AA0ABA /* Blocks.swift */,
+				DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */,
 				DD3DA936292A2BEC00AA0ABA /* Clients.swift */,
 				DD3DA937292A2BEC00AA0ABA /* DomainBlocks.swift */,
 				DD3DA92E292A2BEC00AA0ABA /* Favourites.swift */,
@@ -2624,6 +2627,7 @@
 				DD3DA97C292A2BED00AA0ABA /* Media.swift in Sources */,
 				15BF72C8234299D10020CE70 /* NSAlert+Factory.swift in Sources */,
 				159C217A232D316C00139BD5 /* PreferencesController.swift in Sources */,
+				DD3DA9AA292A40A500AA0ABA /* Bookmarks.swift in Sources */,
 				DD3DA971292A2BED00AA0ABA /* PaginationItem.swift in Sources */,
 				DD3DA99C292A2BED00AA0ABA /* Filter.swift in Sources */,
 				15EE2B15232EA68500155E16 /* Attachment+Shims.swift in Sources */,

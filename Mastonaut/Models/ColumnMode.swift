@@ -27,24 +27,55 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 	case localTimeline
 	case publicTimeline
 	case notifications
+	case favourites
+	case bookmarks
 	case tag(name: String)
 
 	var rawValue: RawValue {
 		switch self {
-		case .timeline: return "timeline"
-		case .localTimeline: return "localTimeline"
-		case .publicTimeline: return "publicTimeline"
-		case .notifications: return "notifications"
-		case let .tag(name): return "tag:\(name)"
+		case .timeline:
+			return "timeline"
+			
+		case .localTimeline:
+			return "localTimeline"
+			
+		case .publicTimeline:
+			return "publicTimeline"
+			
+		case .notifications:
+			return "notifications"
+			
+		case .favourites:
+			return "favourites"
+			
+		case .bookmarks:
+			return "bookmarks"
+			
+		case let .tag(name):
+			return "tag:\(name)"
 		}
 	}
 
 	init?(rawValue: RawValue) {
 		switch rawValue {
-		case "timeline": self = .timeline
-		case "localTimeline": self = .localTimeline
-		case "publicTimeline": self = .publicTimeline
-		case "notifications": self = .notifications
+		case "timeline":
+			self = .timeline
+			
+		case "localTimeline":
+			self = .localTimeline
+			
+		case "publicTimeline":
+			self = .publicTimeline
+			
+		case "notifications":
+			self = .notifications
+			
+		case "favourites":
+			self = .favourites
+			
+		case "bookmarks":
+			self = .bookmarks
+			
 		case let rawValue where rawValue.hasPrefix("tag:"):
 			let name = rawValue.suffix(from: rawValue.index(after: rawValue.range(of: "tag:")!.upperBound))
 			self = .tag(name: String(name))
@@ -56,21 +87,51 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 
 	var weight: Int {
 		switch self {
-		case .timeline: return -4
-		case .localTimeline: return -3
-		case .publicTimeline: return -2
-		case .notifications: return -1
-		case .tag: return 0
+		case .bookmarks:
+			return -6
+			
+		case .favourites:
+			return -5
+			
+		case .timeline:
+			return -4
+			
+		case .localTimeline:
+			return -3
+			
+		case .publicTimeline:
+			return -2
+			
+		case .notifications:
+			return -1
+			
+		case .tag:
+			return 0
 		}
 	}
 
 	func makeViewController() -> ColumnViewController {
 		switch self {
-		case .timeline: return TimelineViewController(source: .timeline)
-		case .localTimeline: return TimelineViewController(source: .localTimeline)
-		case .publicTimeline: return TimelineViewController(source: .publicTimeline)
-		case .notifications: return NotificationListViewController()
-		case let .tag(name): return TimelineViewController(source: .tag(name: name))
+		case .timeline:
+			return TimelineViewController(source: .timeline)
+			
+		case .favourites:
+			return TimelineViewController(source: .favorites)
+			
+		case .bookmarks:
+			return TimelineViewController(source: .bookmarks)
+			
+		case .localTimeline:
+			return TimelineViewController(source: .localTimeline)
+			
+		case .publicTimeline:
+			return TimelineViewController(source: .publicTimeline)
+			
+		case .notifications:
+			return NotificationListViewController()
+			
+		case let .tag(name):
+			return TimelineViewController(source: .tag(name: name))
 		}
 	}
 
@@ -81,25 +142,32 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 		switch self {
 		case .timeline:
 			menuItem.title = 🔠("Home")
-			menuItem.image = #imageLiteral(resourceName: "home")
+			menuItem.image = NSImage(systemSymbolName: "house", accessibilityDescription: "Home")
 
 		case .localTimeline:
 			menuItem.title = 🔠("Local Timeline")
-			menuItem.image = #imageLiteral(resourceName: "group")
+			menuItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: "Local Timeline")
 
 		case .publicTimeline:
-			menuItem.title = 🔠("Public Timeline")
+			menuItem.title = "Public Timeline"
 			menuItem.image = NSImage.CoreTootin.globe
 
 		case .notifications:
-			menuItem.title = 🔠("Notifications")
-			menuItem.image = #imageLiteral(resourceName: "bell")
+			menuItem.title = "Notifications"
+			menuItem.image = NSImage(systemSymbolName: "bell", accessibilityDescription: "Notifications")
+
+		case .favourites:
+			menuItem.title = "Favourites"
+			menuItem.image = NSImage(systemSymbolName: "star.fill", accessibilityDescription: "Favourites")
+
+		case .bookmarks:
+			menuItem.title = "Bookmarks"
+			menuItem.image = NSImage(systemSymbolName: "bookmark.fill", accessibilityDescription: "Bookmarks")
 
 		case let .tag(name):
-			menuItem.title = 🔠("Tag: %@", name)
-			menuItem.image = #imageLiteral(resourceName: "bell")
+			menuItem.title = "Tag: \(name)"
+			menuItem.image = NSImage(systemSymbolName: "tag", accessibilityDescription: "Tag: \(name)")
 		}
-
 		return menuItem
 	}
 
@@ -119,7 +187,7 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 	}
 
 	static var allItems: [ColumnMode] {
-		return [.timeline, .localTimeline, .publicTimeline, .notifications]
+		return [.timeline, .localTimeline, .publicTimeline, .notifications, .bookmarks, .favourites]
 	}
 
 	static func == (lhs: ColumnMode, rhs: ColumnMode) -> Bool {

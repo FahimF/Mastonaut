@@ -35,6 +35,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	@IBOutlet unowned var replyButton: NSButton!
 	@IBOutlet unowned var reblogButton: NSButton!
 	@IBOutlet unowned var favoriteButton: NSButton!
+	@IBOutlet unowned var bookmarkButton: NSButton!
 	@IBOutlet unowned var warningButton: NSButton!
 	@IBOutlet unowned var sensitiveContentButton: NSButton!
 
@@ -144,23 +145,16 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		}
 	}
 
-	func set(displayedStatus status: Status,
-	         poll: Poll?,
-	         attachmentPresenter: AttachmentPresenting,
-	         interactionHandler: StatusInteractionHandling,
-	         activeInstance: Instance)
-	{
+	func set(displayedStatus status: Status, poll: Poll?, attachmentPresenter: AttachmentPresenting, interactionHandler: StatusInteractionHandling, activeInstance: Instance) {
 		let cellModel = StatusCellModel(status: status, interactionHandler: interactionHandler)
 		self.cellModel = cellModel
 
 		statusLabel.linkHandler = cellModel
 		contentWarningLabel.linkHandler = cellModel
-
-		authorNameButton.set(stringValue: cellModel.visibleStatus.authorName,
-		                     applyingAttributes: authorLabelAttributes(),
-		                     applyingEmojis: cellModel.visibleStatus.account.cacheableEmojis)
-
-		contextButton.map { cellModel.setupContextButton($0, attributes: contextLabelAttributes()) }
+		authorNameButton.set(stringValue: cellModel.visibleStatus.authorName, applyingAttributes: authorLabelAttributes(), applyingEmojis: cellModel.visibleStatus.account.cacheableEmojis)
+		contextButton.map {
+			cellModel.setupContextButton($0, attributes: contextLabelAttributes())
+		}
 
 		authorAccountLabel.stringValue = cellModel.visibleStatus.account.uri(in: activeInstance)
 		timeLabel.objectValue = cellModel.visibleStatus.createdAt
@@ -181,19 +175,13 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 			statusLabel.isHidden = false
 			fullContentDisclosureView?.isHidden = false
-			statusLabel.set(attributedStringValue: truncatedString,
-			                applyingAttributes: statusLabelAttributes(),
-			                applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
+			statusLabel.set(attributedStringValue: truncatedString, applyingAttributes: statusLabelAttributes(), applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
 		} else {
 			statusLabel.isHidden = false
 			fullContentDisclosureView?.isHidden = true
-			statusLabel.set(attributedStringValue: attributedStatus,
-			                applyingAttributes: statusLabelAttributes(),
-			                applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
+			statusLabel.set(attributedStringValue: attributedStatus, applyingAttributes: statusLabelAttributes(), applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
 		}
-
 		statusLabel.isEnabled = true
-
 		if cellModel.visibleStatus.spoilerText.isEmpty {
 			contentWarningContainer.isHidden = true
 			warningButton.isHidden = true
@@ -208,16 +196,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 			hasSpoiler = true
 
-			contentWarningLabel.set(attributedStringValue: cellModel.visibleStatus.attributedSpoiler,
-			                        applyingAttributes: statusLabelAttributes(),
-			                        applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
-
+			contentWarningLabel.set(attributedStringValue: cellModel.visibleStatus.attributedSpoiler, applyingAttributes: statusLabelAttributes(), applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
 			installSpoilerCover()
 			contentWarningContainer.isHidden = false
 		}
-
 		setUpInteractions(status: cellModel.visibleStatus)
-
 		setupAttachmentsContainerView(for: cellModel.visibleStatus, poll: poll, attachmentPresenter: attachmentPresenter)
 		hasMedia = attachmentViewController != nil
 		hasSensitiveMedia = attachmentViewController?.sensitiveMedia == true
@@ -386,6 +369,12 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 		case (favoriteButton, .off):
 			cellModel?.handle(interaction: .unfavorite)
+
+		case (bookmarkButton, .on):
+			cellModel?.handle(interaction: .bookmark)
+
+		case (bookmarkButton, .off):
+			cellModel?.handle(interaction: .unbookmark)
 
 		case (reblogButton, .on):
 			cellModel?.handle(interaction: .reblog)

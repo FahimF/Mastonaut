@@ -24,6 +24,7 @@ protocol StatusInteractionPresenter {
 	var replyButton: NSButton! { get }
 	var reblogButton: NSButton! { get }
 	var favoriteButton: NSButton! { get }
+	var bookmarkButton: NSButton! { get }
 	var warningButton: NSButton! { get }
 	var sensitiveContentButton: NSButton! { get }
 }
@@ -38,19 +39,30 @@ extension StatusInteractionPresenter where Self: MastonautTableCellView {
 		favoriteButton?.toolTip = favoriteToolTip(status)
 		favoriteButton?.state = status.favourited == true ? .on : .off
 
+		bookmarkButton?.toolTip = bookmarkToolTip(status)
+		bookmarkButton?.state = status.bookmarked == true ? .on : .off
+
 		sensitiveContentButton?.isHidden = status.mediaAttachments.count == 0
 		sensitiveContentButton?.state = status.sensitive == true ? .on : .off
 
-		let buttons = [replyButton, reblogButton, favoriteButton, warningButton, sensitiveContentButton]
+		let buttons = [replyButton, reblogButton, favoriteButton, bookmarkButton, warningButton, sensitiveContentButton]
 		setAccessibilityCustomActions(buttons.compactMap { $0?.isHidden == false ? $0 : nil }
 			.map { .init(actionForButton: $0) })
 	}
 
 	private func favoriteToolTip(_ status: Status) -> String {
 		if status.favourited == true {
-			return 🔠("Unfavorite this toot")
+			return "Unfavorite this post"
 		} else {
-			return 🔠("Favorite this toot")
+			return "Favorite this post"
+		}
+	}
+	
+	private func bookmarkToolTip(_ status: Status) -> String {
+		if status.favourited == true {
+			return "Unbookmark this post"
+		} else {
+			return "Favorite this post"
 		}
 	}
 }

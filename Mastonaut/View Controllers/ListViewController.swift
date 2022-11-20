@@ -534,9 +534,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 			RemoteEventsCoordinator.shared.remove(receiver: receiver)
 			remoteEventReceiver = nil
 		}
-
 		guard let streamIdentifier = client?.makeStreamIdentifier(for: stream) else { return }
-
 		remoteEventReceiver = RemoteEventsCoordinator.shared.add(receiver: self, for: streamIdentifier)
 	}
 

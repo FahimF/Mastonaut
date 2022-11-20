@@ -17,7 +17,6 @@ public enum Favourites {
     public static func all(range: RequestRange = .default) -> Request<[Status]> {
         let parameters = range.parameters(limit: between(1, and: 40, default: 20))
         let method = HTTPMethod.get(.parameters(parameters))
-
         return Request<[Status]>(path: "/api/v1/favourites", method: method)
     }
 }

@@ -25,14 +25,10 @@ protocol NotificationDisplaying {
 
 	var displayedStatusId: String? { get }
 
-	func set(displayedNotification: MastodonNotification,
-	         attachmentPresenter: AttachmentPresenting,
-	         interactionHandler: NotificationInteractionHandling,
-	         activeInstance: Instance)
+	func set(displayedNotification: MastodonNotification, attachmentPresenter: AttachmentPresenting, interactionHandler: NotificationInteractionHandling, activeInstance: Instance)
 }
 
-protocol NotificationInteractionHandling: AnyObject // , AttributedLabelLinkHandler
-{
+protocol NotificationInteractionHandling: AnyObject {
 	/// The logged-in client from which the interacted status are fetched.
 	var client: ClientType? { get }
 
@@ -50,32 +46,42 @@ protocol NotificationInteractionHandling: AnyObject // , AttributedLabelLinkHand
 }
 
 extension NotificationInteractionHandling {
-	func favoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
-	{
+	func favoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
 		interact(using: Statuses.favourite(id: statusID)) {
 			status in completion((status?.favourited ?? false) == true)
 		}
 	}
 
-	func unfavoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
-	{
+	func unfavoriteStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
 		interact(using: Statuses.unfavourite(id: statusID)) {
 			status in completion((status?.favourited ?? true) != true)
 		}
 	}
 
-	func reblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
-	{
+	func bookmarkStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
+		guard let statusID = notificationDisplay.displayedStatusId else { return }
+		interact(using: Statuses.bookmark(id: statusID)) {
+			status in completion((status?.bookmarked ?? false) == true)
+		}
+	}
+
+	func unbookmarkStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
+		guard let statusID = notificationDisplay.displayedStatusId else { return }
+		interact(using: Statuses.unbookmark(id: statusID)) {
+			status in completion((status?.bookmarked ?? true) != true)
+		}
+	}
+
+	func reblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
 		interact(using: Statuses.reblog(id: statusID)) {
 			status in completion((status?.reblogged ?? false) == true)
 		}
 	}
 
-	func unreblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void)
-	{
+	func unreblogStatus(for notificationDisplay: NotificationDisplaying, completion: @escaping (Bool) -> Void) {
 		guard let statusID = notificationDisplay.displayedStatusId else { return }
 		interact(using: Statuses.unreblog(id: statusID)) {
 			status in completion((status?.reblogged ?? true) != true)

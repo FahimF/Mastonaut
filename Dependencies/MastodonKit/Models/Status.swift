@@ -35,6 +35,8 @@ public class Status: Codable {
     public let reblogged: Bool?
     /// Whether the authenticated user has favourited the status.
     public let favourited: Bool?
+	/// Whether the authenticated user has bookmarked the status.
+	public let bookmarked: Bool?
     /// Whether media attachments should be hidden by default.
     public let sensitive: Bool?
     /// If not empty, warning text that should be displayed before the actual content.
@@ -61,31 +63,15 @@ public class Status: Codable {
     public let poll: Poll?
 
     private enum CodingKeys: String, CodingKey {
-        case id
-        case uri
-        case url
-        case account
+        case id, uri, url, account, content, emojis, reblogged, favourited, bookmarked, sensitive, visibility
+		case mentions, tags, application, language, reblog, pinned, card, poll
         case inReplyToID = "in_reply_to_id"
         case inReplyToAccountID = "in_reply_to_account_id"
-        case content
         case createdAt = "created_at"
-        case emojis
         case reblogsCount = "reblogs_count"
         case favouritesCount = "favourites_count"
-        case reblogged
-        case favourited
-        case sensitive
-        case spoilerText = "spoiler_text"
-        case visibility
-        case mediaAttachments = "media_attachments"
-        case mentions
-        case tags
-        case application
-        case language
-        case reblog
-        case pinned
-        case card
-        case poll
+		case spoilerText = "spoiler_text"
+		case mediaAttachments = "media_attachments"
     }
 
     public func markAsPinned() {

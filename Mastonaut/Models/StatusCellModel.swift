@@ -29,6 +29,9 @@ class StatusCellModel: NSObject {
 	var isFavorited: Bool
 
 	@objc private(set) dynamic
+	var isBookmarked: Bool
+
+	@objc private(set) dynamic
 	var isReblogged: Bool
 
 	@objc private(set) dynamic
@@ -55,14 +58,11 @@ class StatusCellModel: NSObject {
 	init(status: Status, interactionHandler: StatusInteractionHandling) {
 		self.status = status
 		self.interactionHandler = interactionHandler
-
 		isFavorited = status.favourited == true
+		isBookmarked = status.bookmarked == true
 		isReblogged = status.reblogged == true
-
 		authorAvatar = #imageLiteral(resourceName: "missing")
-
 		super.init()
-
 		loadAvatars()
 	}
 
@@ -85,9 +85,7 @@ class StatusCellModel: NSObject {
 			button.isEnabled = false
 		} else if status.reblog != nil {
 			contextIcon = #imageLiteral(resourceName: "retooted")
-			button.set(stringValue: 🔠("status.context.boost", agent.bestDisplayName),
-			           applyingAttributes: attributes,
-			           applyingEmojis: agent.cacheableEmojis)
+			button.set(stringValue: 🔠("status.context.boost", agent.bestDisplayName), applyingAttributes: attributes, applyingEmojis: agent.cacheableEmojis)
 			button.isEnabled = true
 		} else if status.inReplyToAccountID == status.account.id {
 			contextIcon = #imageLiteral(resourceName: "thread")
@@ -117,6 +115,18 @@ class StatusCellModel: NSObject {
 			isFavorited = false
 			interactionHandler.unfavoriteStatus(with: status.id) {
 				[weak self] success in DispatchQueue.main.async { self?.isFavorited = !success }
+			}
+
+		case .bookmark:
+			isBookmarked = true
+			interactionHandler.bookmarkStatus(with: status.id) {
+				[weak self] success in DispatchQueue.main.async { self?.isBookmarked = success }
+			}
+
+		case .unbookmark:
+			isBookmarked = false
+			interactionHandler.unbookmarkStatus(with: status.id) {
+				[weak self] success in DispatchQueue.main.async { self?.isBookmarked = !success }
 			}
 
 		case .reblog:
@@ -177,21 +187,14 @@ class StatusCellModel: NSObject {
 	}
 
 	enum Interaction {
-		case favorite, unfavorite, reblog, unreblog, reply
+		case favorite, unfavorite, bookmark, unbookmark, reblog, unreblog, reply
 	}
 }
 
 extension StatusCellModel: PollViewControllerDelegate {
-	func pollViewController(_ viewController: PollViewController,
-	                        userDidVote optionIndexSet: IndexSet,
-	                        completion: @escaping (Poll?) -> Void)
-	{
+	func pollViewController(_ viewController: PollViewController, userDidVote optionIndexSet: IndexSet, completion: @escaping (Poll?) -> Void) {
 		guard let poll = viewController.poll else { return }
-
-		interactionHandler.voteOn(poll: poll,
-		                          statusID: visibleStatus.id,
-		                          options: optionIndexSet) { [weak self] result in
-
+		interactionHandler.voteOn(poll: poll, statusID: visibleStatus.id, options: optionIndexSet) { [weak self] result in
 			switch result {
 			case let .success(updatedPoll):
 				completion(updatedPoll)

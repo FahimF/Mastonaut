@@ -47,8 +47,7 @@ class RemoteEventsCoordinator: NSObject {
 		return streamReceiverMap.values.reduce(0) { $0 + $1.count }
 	}
 
-	func add<T: RemoteEventsReceiver>(receiver: T, for streamIdentifier: StreamIdentifier) -> ReceiverRef
-	{
+	func add<T: RemoteEventsReceiver>(receiver: T, for streamIdentifier: StreamIdentifier) -> ReceiverRef {
 		return operationQueue.sync {
 			var receivers = self.streamReceiverMap[streamIdentifier] ?? []
 			let receiver = AnyRemoteEventsReceiver(receiver, stream: streamIdentifier)
@@ -62,7 +61,6 @@ class RemoteEventsCoordinator: NSObject {
 
 	func addExisting(receiver receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
-
 		operationQueue.async {
 			if self.streamReceiverMap[receiver.streamIdentifier]?.contains(receiver) != true {
 				var receivers = self.streamReceiverMap[receiver.streamIdentifier] ?? []
@@ -72,8 +70,7 @@ class RemoteEventsCoordinator: NSObject {
 				self.createListenerIfNeeded(for: receiver.streamIdentifier, notifyingReceiverOtherwise: receiver)
 			}
 
-			if let listener = self.streamListenerMap[receiver.streamIdentifier], !listener.isSocketConnected
-			{
+			if let listener = self.streamListenerMap[receiver.streamIdentifier], !listener.isSocketConnected {
 				listener.reconnect()
 			}
 		}
@@ -81,7 +78,6 @@ class RemoteEventsCoordinator: NSObject {
 
 	func remove(receiver receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
-
 		operationQueue.sync {
 			guard var receivers = self.streamReceiverMap[receiver.streamIdentifier] else { return }
 			receivers.remove(receiver)
@@ -93,27 +89,19 @@ class RemoteEventsCoordinator: NSObject {
 
 	func reconnectListener(for receiverReference: ReceiverRef) {
 		guard let receiver = receiverReference as? AnyRemoteEventsReceiver else { return }
-
 		if let listener = streamListenerMap[receiver.streamIdentifier], !listener.isSocketConnected {
 			listener.reconnect()
 		}
 	}
 
-	private func createListenerIfNeeded(for streamIdentifier: StreamIdentifier,
-	                                    notifyingReceiverOtherwise receiver: AnyRemoteEventsReceiver)
-	{
+	private func createListenerIfNeeded(for streamIdentifier: StreamIdentifier, notifyingReceiverOtherwise receiver: AnyRemoteEventsReceiver) {
 		if let listener = streamListenerMap[streamIdentifier] {
 			if listener.isSocketConnected {
 				receiver.remoteEventsCoordinator(streamIdentifierDidConnect: streamIdentifier)
 			}
 		} else {
-			let listener = TaggedRemoteEventsListener(baseUrl: streamIdentifier.baseURL,
-			                                          accessToken: streamIdentifier.accessToken,
-			                                          streamIdentifier: streamIdentifier,
-			                                          delegate: self)
-
+			let listener = TaggedRemoteEventsListener(baseUrl: streamIdentifier.baseURL, accessToken: streamIdentifier.accessToken, streamIdentifier: streamIdentifier, delegate: self)
 			streamListenerMap[streamIdentifier] = listener
-
 			listener.set(stream: streamIdentifier.stream)
 		}
 	}
@@ -143,11 +131,9 @@ protocol RemoteEventsReceiver: AnyObject, Hashable {
 
 extension RemoteEventsCoordinator: RemoteEventsListenerDelegate {
 	func remoteEventsListenerDidConnect(_ remoteEventsListener: RemoteEventsListener) {
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
-		else {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else {
 			return
 		}
-
 		streamReceiverMap[streamIdentifier]?.forEach {
 			$0.remoteEventsCoordinator(streamIdentifierDidConnect: streamIdentifier)
 		}
@@ -204,7 +190,7 @@ private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef {
 		streamIdentifier = stream
 		description = (receiver as? NSObject)?.description ?? String(describing: receiver)
 
-		eventHandler = { [weak receiver] in
+		eventHandler = {[weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifier: $0, didHandleEvent: $1)
 		}
@@ -243,8 +229,7 @@ private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef {
 		didDisconnectHandler(streamIdentifier)
 	}
 
-	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didHandleEvent event: ClientEvent)
-	{
+	func remoteEventsCoordinator(streamIdentifier: StreamIdentifier, didHandleEvent event: ClientEvent) {
 		eventHandler(streamIdentifier, event)
 	}
 
@@ -258,8 +243,7 @@ private class TaggedRemoteEventsListener: RemoteEventsListener {
 
 	let streamIdentifier: StreamIdentifier
 
-	init(baseUrl: URL, accessToken: String, streamIdentifier: StreamIdentifier, delegate: RemoteEventsListenerDelegate)
-	{
+	init(baseUrl: URL, accessToken: String, streamIdentifier: StreamIdentifier, delegate: RemoteEventsListenerDelegate) {
 		self.streamIdentifier = streamIdentifier
 		super.init(baseUrl: baseUrl, accessToken: accessToken, delegate: delegate)
 	}
