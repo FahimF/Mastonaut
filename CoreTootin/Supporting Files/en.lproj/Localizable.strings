@@ -20,9 +20,9 @@
 "Mastonaut — No Account Selected" = "Mastonaut — No Account Selected";
 "Failed authorization from “%@”: Could not login." = "Failed authorization from “%@”: Could not login.";
 "Failed authorization from “%@”: Could not fetch user." = "Failed authorization from “%@”: Could not fetch user.";
-"Boost this toot" = "Boost this toot";
-"This toot can not be boosted because it is private." = "This toot can not be boosted because it is private.";
-"This toot can not be boosted because it is a direct message." = "This toot can not be boosted because it is a direct message.";
+"Boost this post" = "Boost this post";
+"This post can not be boosted because it is private." = "This post can not be boosted because it is private.";
+"This post can not be boosted because it is a direct message." = "This post can not be boosted because it is a direct message.";
 "%@ years ago" = "%@ years ago";
 "Last year" = "Last year";
 "%@ months ago" = "%@ months ago";
@@ -38,9 +38,9 @@
 "%@ seconds ago" = "%@ seconds ago";
 "%@ followed you" = "%@ followed you";
 "%@ boosted" = "%@ boosted";
-"%@ boosted your toot" = "%@ boosted your toot";
+"%@ boosted your post" = "%@ boosted your post";
 "%@ favorited" = "%@ favorited";
-"%@ favorited your toot" = "%@ favorited your toot";
+"%@ favorited your post" = "%@ favorited your post";
 "%@ mentioned" = "%@ mentioned";
 "%@ mentioned you" = "%@ mentioned you";
 "one attachment" = "one attachment";
@@ -61,7 +61,7 @@
 "Post to public timelines." = "Post to public timelines.";
 "Do not post to public timelines." = "Do not post to public timelines.";
 "Post to followers only. Attention: If your account is not locked, anyone can follow you to view your follower-only posts." = "Post to followers only. Attention: If your account is not locked, anyone can follow you to view your follower-only posts.";
-"This toot will only be sent to the mentioned users." = "This toot will only be sent to the mentioned users.";
+"This post will only be sent to the mentioned users." = "This post will only be sent to the mentioned users.";
 "Content Hidden: Click warning button :warning_button: below to toggle display." = "Content Hidden: Click warning button :warning_button: below to toggle display.";
 "Media Hidden: Click visibility button below to toggle display." = "Media Hidden: Click visibility button below to toggle display.";
 "Removing this account will cause its credentials to be deleted. In order to use this account with Mastonaut in the future you will have to login once again. Do you wish to proceed?" = "Removing this account will cause its credentials to be deleted. In order to use this account with Mastonaut in the future you will have to login once again. Do you wish to proceed?";
@@ -104,9 +104,9 @@
 "status.poll.votes" = "%@ votes";
 
 "status.context.boost" = "%@ boosted";
-"status.context.thread" = "continuing from another toot…";
-"status.context.reply" = "replying to another toot…";
-"status.context.pinned" = "pinned toot";
+"status.context.thread" = "continuing from another post…";
+"status.context.reply" = "replying to another post…";
+"status.context.pinned" = "pinned post";
 
 "status.action.reblog" = "Boost Toot";
 "status.action.reblog.undo" = "Unboost Toot";

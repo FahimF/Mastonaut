@@ -73,10 +73,10 @@ class UserNotificationTool {
 			title = 🔠("%@ mentioned you", actorName)
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .reblog:
-			title = 🔠("%@ boosted your toot", actorName)
+			title = 🔠("%@ boosted your post", actorName)
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .favourite:
-			title = 🔠("%@ favorited your toot", actorName)
+			title = 🔠("%@ favorited your post", actorName)
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .follow:
 			title = 🔠("%@ followed you", actorName)

@@ -108,6 +108,9 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			case .favourite:
 				interactionIcon.image = emphasized ? #imageLiteral(resourceName: "favorited") : #imageLiteral(resourceName: "favorited_active")
 
+			case .bookmark:
+				interactionIcon.image = emphasized ? NSImage(systemSymbolName: "bookmark", accessibilityDescription: "Set Bookmark") : NSImage(systemSymbolName: "bookmark.fill", accessibilityDescription: "Remove Bookmark")
+
 			case .poll:
 				interactionIcon.image = #imageLiteral(resourceName: "poll")
 
@@ -135,11 +138,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 		}
 	}
 
-	func set(displayedNotification notification: MastodonNotification,
-	         attachmentPresenter _: AttachmentPresenting,
-	         interactionHandler: NotificationInteractionHandling,
-	         activeInstance: Instance)
-	{
+	func set(displayedNotification notification: MastodonNotification, attachmentPresenter _: AttachmentPresenting, interactionHandler: NotificationInteractionHandling, activeInstance: Instance) {
 		displayedNotificationId = notification.id
 		displayedNotificationType = notification.type
 		displayedStatusId = notification.status?.id
@@ -170,6 +169,12 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			messageAttributes = InteractionCellView.favoriteLabelAttributes
 			set(status: status, activeInstance: activeInstance)
 
+		case .bookmark:
+			interactionIcon.image = NSImage(systemSymbolName: "bookmark.fill", accessibilityDescription: "Bookmark")
+			interactionMessage = 🔠("%@ bookmarked", notification.authorName)
+			messageAttributes = InteractionCellView.favoriteLabelAttributes
+			set(status: status, activeInstance: activeInstance)
+
 		case .poll:
 			interactionIcon.image = #imageLiteral(resourceName: "poll")
 			interactionMessage = 🔠("A poll has ended")
@@ -189,9 +194,7 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			return
 		}
 
-		interactionLabel.set(stringValue: interactionMessage,
-		                     applyingAttributes: messageAttributes,
-		                     applyingEmojis: notification.account.cacheableEmojis)
+		interactionLabel.set(stringValue: interactionMessage, applyingAttributes: messageAttributes, applyingEmojis: notification.account.cacheableEmojis)
 
 		authorAvatarButton.image = #imageLiteral(resourceName: "missing")
 		agentAvatarButton.image = #imageLiteral(resourceName: "missing")

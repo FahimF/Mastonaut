@@ -664,7 +664,7 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		guard statusTextContent.isEmpty else {
 			showAlert(style: .warning,
 			          title: 🔠("Discard current draft?"),
-			          message: 🔠("Composing a reply now will discard your currently drafted toot, including attachments. Do you wish to proceed?"),
+			          message: 🔠("Composing a reply now will discard your currently drafted post, including attachments. Do you wish to proceed?"),
 			          dialogMode: .discardKeepEditing) {
 				response in completion(response == .alertFirstButtonReturn)
 			}
@@ -872,7 +872,7 @@ extension StatusComposerWindowController: NSWindowDelegate {
 	func windowShouldClose(_: NSWindow) -> Bool {
 		guard !isDirty else {
 			showAlert(title: 🔠("Discard current draft?"),
-			          message: 🔠("Closing the composer now will discard your currently drafted toot, including attachments. Do you wish to proceed?"),
+			          message: 🔠("Closing the composer now will discard your currently drafted post, including attachments. Do you wish to proceed?"),
 			          dialogMode: .discardKeepEditing) {
 				response in
 
@@ -1051,7 +1051,7 @@ extension StatusComposerWindowController {
 			informationString = 🔠("Post to followers only. Attention: If your account is not locked, anyone can follow you to view your follower-only posts.")
 
 		case .direct:
-			informationString = 🔠("This toot will only be sent to the mentioned users.")
+			informationString = 🔠("This post will only be sent to the mentioned users.")
 		}
 
 		informationPopoverLabel.stringValue = informationString

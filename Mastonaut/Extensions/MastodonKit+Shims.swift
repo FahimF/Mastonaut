@@ -201,18 +201,18 @@ extension Visibility {
 
 	func reblogToolTip(didReblog: Bool) -> String {
 		guard didReblog == false else {
-			return 🔠("Unboost this toot")
+			return 🔠("Unboost this post")
 		}
 
 		switch self {
 		case .public, .unlisted:
-			return 🔠("Boost this toot")
+			return 🔠("Boost this post")
 
 		case .private:
-			return 🔠("This toot can not be boosted because it is private.")
+			return 🔠("This post can not be boosted because it is private.")
 
 		case .direct:
-			return 🔠("This toot can not be boosted because it is a direct message.")
+			return 🔠("This post can not be boosted because it is a direct message.")
 		}
 	}
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -49,7 +49,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <rect key="contentRect" x="484" y="366" width="534" height="469"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <value key="minSize" type="size" width="530" height="100"/>
             <view key="contentView" wantsLayer="YES" id="zyG-Dy-UO4">
                 <rect key="frame" x="0.0" y="0.0" width="534" height="469"/>
@@ -147,7 +147,7 @@
                                 <color key="value" name="keyboardFocusIndicatorColor" catalog="System" colorSpace="catalog"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
-                        <accessibility description="The toot to which your toot will reply"/>
+                        <accessibility description="The post to which your post will reply"/>
                     </customView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="Zf9-dM-Kea">
                         <rect key="frame" x="0.0" y="32" width="534" height="342"/>
@@ -169,7 +169,7 @@
                                                     <userDefinedRuntimeAttribute type="boolean" keyPath="isContinuousSpellCheckingEnabled" value="YES"/>
                                                     <userDefinedRuntimeAttribute type="boolean" keyPath="isGrammarCheckingEnabled" value="YES"/>
                                                 </userDefinedRuntimeAttributes>
-                                                <accessibility description="Type here to set the content warning of your toot"/>
+                                                <accessibility description="Type here to set the content warning of your post"/>
                                                 <connections>
                                                     <outlet property="delegate" destination="-2" id="QNV-eo-3nm"/>
                                                     <outlet property="nextKeyView" destination="xJy-2A-0H6" id="aKB-7l-1e4"/>
@@ -214,7 +214,7 @@
                                             <userDefinedRuntimeAttributes>
                                                 <userDefinedRuntimeAttribute type="boolean" keyPath="allowInsertingTabs" value="NO"/>
                                             </userDefinedRuntimeAttributes>
-                                            <accessibility description="Type here to compose your toot"/>
+                                            <accessibility description="Type here to compose your post"/>
                                             <connections>
                                                 <outlet property="delegate" destination="-2" id="ZlK-Pj-yA9"/>
                                                 <outlet property="emojiProvider" destination="-2" id="Sdt-Gz-bvH"/>
@@ -463,12 +463,12 @@
                     <toolbarItem implicitItemIdentifier="37A166A2-EDD6-4933-9049-301C4E7677DE" label="Send Toot" paletteLabel="Send Toot" sizingBehavior="auto" id="J1z-pE-aui">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="Y1e-gF-Lwj">
-                            <rect key="frame" x="0.0" y="14" width="93" height="24"/>
+                            <rect key="frame" x="0.0" y="14" width="80" height="26"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="6LV-Z3-Fcc">
                                 <font key="font" metaFont="system"/>
                                 <segments>
-                                    <segment label="Send toot!"/>
+                                    <segment label="Send post!"/>
                                 </segments>
                             </segmentedCell>
                             <connections>
@@ -490,7 +490,7 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
-                            <accessibility description="Pick the visibility option for your toot"/>
+                            <accessibility description="Pick the visibility option for your post"/>
                             <connections>
                                 <action selector="didSelectAudience:" target="-2" id="ZbL-i7-aXs"/>
                             </connections>
@@ -528,7 +528,7 @@
                                     </items>
                                 </menu>
                             </popUpButtonCell>
-                            <accessibility description="Select which account will be used to send the toot"/>
+                            <accessibility description="Select which account will be used to send the post"/>
                         </popUpButton>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="EC515420-64A4-4207-8648-B43F07C9A3A9" label="" paletteLabel="" tag="-1" sizingBehavior="auto" id="nJM-on-i8E">
@@ -708,7 +708,7 @@
         </popover>
     </objects>
     <resources>
-        <image name="NSStopProgressTemplate" width="14" height="13"/>
+        <image name="NSStopProgressTemplate" width="17" height="16"/>
         <image name="camera" width="16" height="14"/>
         <image name="content_warning" width="22" height="14"/>
         <image name="emoji_panel" width="14" height="14"/>

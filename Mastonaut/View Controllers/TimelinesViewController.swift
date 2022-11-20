@@ -262,9 +262,7 @@ protocol ColumnPresentable: BaseColumnViewController {
 }
 
 protocol SidebarModel {
-	func makeViewController(client: ClientType,
-	                        currentAccount: AuthorizedAccount?,
-	                        currentInstance: Instance) -> SidebarViewController
+	func makeViewController(client: ClientType, currentAccount: AuthorizedAccount?, currentInstance: Instance) -> SidebarViewController
 
 	var rawValue: String { get }
 }

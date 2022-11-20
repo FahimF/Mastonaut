@@ -39,8 +39,7 @@ class MenuItemsController: NSObject {
 		return makeCopyItem(title: title, string)
 	}
 
-	fileprivate func makeLazyCopyItem(title: String, _ block: @escaping () -> NSPasteboardWriting) -> NSMenuItem
-	{
+	fileprivate func makeLazyCopyItem(title: String, _ block: @escaping () -> NSPasteboardWriting) -> NSMenuItem {
 		return makeCopyItem(title: title, LazyEvaluationAdapter(block))
 	}
 
@@ -50,7 +49,6 @@ class MenuItemsController: NSObject {
 
 	fileprivate func makeShareItem(url: URL) -> NSMenuItem {
 		let shareMenuItem = NSMenuItem(title: 🔠("Share"), submenu: NSMenu(title: ""))
-
 		DispatchQueue.global(qos: .background).async {
 			let shareMenuItems = ShareMenuFactory.shareMenuItems(for: url)
 
@@ -72,8 +70,7 @@ class StatusMenuItemsController: MenuItemsController {
 		return [makeShowDetailsItem(status: status, interactionHandler: interactionHandler)]
 	}
 
-	func menuItems(for status: Status, interactionHandler handler: StatusInteractionHandling) -> [NSMenuItem]
-	{
+	func menuItems(for status: Status, interactionHandler handler: StatusInteractionHandling) -> [NSMenuItem] {
 		let author = status.reblog?.account ?? status.account
 
 		var items: [NSMenuItem] = [
@@ -129,7 +126,7 @@ class StatusMenuItemsController: MenuItemsController {
 
 		if let url = status.reblog?.url ?? status.url {
 			items.append(.separator())
-			items.append(makeOpenURLInBrowser(title: 🔠("Open toot in Browser"), url: url))
+			items.append(makeOpenURLInBrowser(title: 🔠("Open post in Browser"), url: url))
 
 			items.append(.separator())
 			items.append(makeShareItem(url: url))
@@ -139,17 +136,17 @@ class StatusMenuItemsController: MenuItemsController {
 	}
 
 	private func makeItemCopyStatusTextContents(_ status: Status) -> NSMenuItem {
-		return makeLazyCopyItem(title: 🔠("Copy toot text")) { status.attributedContent.string as NSString }
+		return makeLazyCopyItem(title: 🔠("Copy post text")) { status.attributedContent.string as NSString }
 	}
 
 	private func makeItemCopyLinkToStatus(_ status: Status) -> NSMenuItem {
 		let finalStatus = status.reblog ?? status
-		return makeStringCopyItem(title: 🔠("Copy link to toot"), finalStatus.url?.absoluteString ?? finalStatus.uri)
+		return makeStringCopyItem(title: 🔠("Copy link to post"), finalStatus.url?.absoluteString ?? finalStatus.uri)
 	}
 
 	private func makeShowDetailsItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem
 	{
-		return makeActionItem(title: 🔠("Show toot details")) { interactionHandler.show(status: status) }
+		return makeActionItem(title: 🔠("Show post details")) { interactionHandler.show(status: status) }
 	}
 
 	private func makeDeleteStatusItems(status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem]

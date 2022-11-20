@@ -70,13 +70,7 @@ public enum Statuses {
     ///   - spoilerText: the text to be shown as a warning before the actual content.
     ///   - visibility: The status' visibility.
     /// - Returns: Request for `Status`.
-    public static func create(status: String,
-                              replyToID: String? = nil,
-                              mediaIDs: [String] = [],
-                              sensitive: Bool? = nil,
-                              spoilerText: String? = nil,
-                              poll: PollPayload? = nil,
-                              visibility: Visibility = .public) -> Request<Status> {
+    public static func create(status: String, replyToID: String? = nil, mediaIDs: [String] = [], sensitive: Bool? = nil, spoilerText: String? = nil, poll: PollPayload? = nil, visibility: Visibility = .public) -> Request<Status> {
         let parameters: [String: AnyEncodable?] = [
             "status": AnyEncodable(status),
             "in_reply_to_id": replyToID.map { AnyEncodable($0) },
@@ -86,7 +80,6 @@ public enum Statuses {
             "media_ids": mediaIDs.isEmpty ? nil : AnyEncodable(mediaIDs),
             "poll": poll.map { AnyEncodable($0) }
         ]
-
         let method = HTTPMethod.post(.json(encoding: parameters.compactMapValues { $0 }))
         return Request<Status>(path: "/api/v1/statuses", method: method)
     }

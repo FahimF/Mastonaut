@@ -484,7 +484,7 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="interactionButtonClicked:" target="Hz6-mo-xeY" id="VxT-Qp-pDJ"/>
-                                                <binding destination="Hz6-mo-xeY" name="value" keyPath="cellModel.isReblogged" id="89c-hP-3IH">
+                                                <binding destination="Hz6-mo-xeY" name="value" keyPath="cellModel.isBookmarked" id="I7k-Jg-GYs">
                                                     <dictionary key="options">
                                                         <integer key="NSMultipleValuesPlaceholder" value="0"/>
                                                         <integer key="NSNoSelectionPlaceholder" value="0"/>

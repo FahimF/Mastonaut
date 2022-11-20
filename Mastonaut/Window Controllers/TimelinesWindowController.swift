@@ -40,8 +40,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 	private var newColumnSegmentedControl: NSSegmentedControl = makeNewColumnSegmentedControl()
 	private var userPopUpButtonController: UserPopUpButtonSubcontroller!
 	private var popUpButtonConstraints = [NSLayoutConstraint]()
-	private let columnPopUpButtonMap = NSMapTable<NSViewController, NSPopUpButton>(keyOptions: .weakMemory,
-	                                                                               valueOptions: .weakMemory)
+	private let columnPopUpButtonMap = NSMapTable<NSViewController, NSPopUpButton>(keyOptions: .weakMemory, valueOptions: .weakMemory)
 
 	// MARK: Toolbar Sidebar Controls
 	private var sidebarNavigationSegmentedControl: NSSegmentedControl = makeSidebarNavigationSegmentedControl()
@@ -151,7 +150,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 				return true
 			}
 		}
-
 		return false
 	}
 
@@ -541,15 +539,12 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 			guard let popUpButton = columnPopUpButtonMap.object(forKey: column) else {
 				continue
 			}
-
 			guard let currentModel = column.modelRepresentation as? ColumnMode else {
 				continue
 			}
-
 			let menu = NSMenu(title: "")
 			var items = allSelectableModels.filter { !takenModels.contains($0) }
 				.map { $0.makeMenuItemForChanging(with: self, columnId: index) }
-
 			items.append(currentModel.makeMenuItemForChanging(with: self, columnId: index))
 //			items.sort(by: { $0.columnModel! < $1.columnModel! })
 
@@ -593,12 +588,9 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying, 
 				constant: 8
 			))
 		}
-
 		newColumnMenu.setItems(ColumnMode.allItems.filter { !takenModels.contains($0) }
 			.map { $0.makeMenuItemForAdding(with: self) })
-
 		newColumnSegmentedControl.setEnabled(!newColumnMenu.items.isEmpty, forSegment: 0)
-
 		NSLayoutConstraint.activate(popUpButtonConstraints)
 	}
 
@@ -773,7 +765,6 @@ extension TimelinesWindowController {
 			toolbarView.centerYAnchor.constraint(equalTo: popUpButton.centerYAnchor),
 			popUpButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 40).with(priority: .defaultHigh),
 		])
-
 		if let otherPopUpButton = anyColumnPopUpButton {
 			otherPopUpButton.widthAnchor.constraint(equalTo: popUpButton.widthAnchor).isActive = true
 		}
@@ -782,17 +773,14 @@ extension TimelinesWindowController {
 	func replaceColumn(at columnIndex: Int, with newViewController: ColumnViewController) {
 		let oldViewController = timelinesViewController.replaceColumn(at: columnIndex, with: newViewController)
 		let popUpButton = columnPopUpButtonMap.object(forKey: oldViewController)!
-
 		columnPopUpButtonMap.removeObject(forKey: oldViewController)
 		columnPopUpButtonMap.setObject(popUpButton, forKey: newViewController)
-
 		newViewController.client = client
 	}
 
 	func removeColumn(at columnIndex: Int, contract _: Bool) {
 		let columnViewController = timelinesViewController.removeColumn(at: columnIndex, contract: true)
 		let popUpButton = columnPopUpButtonMap.object(forKey: columnViewController)!
-
 		columnPopUpButtonMap.removeObject(forKey: columnViewController)
 		popUpButton.removeFromSuperview()
 	}
@@ -976,22 +964,14 @@ extension TimelinesWindowController: AccountsMenuProvider {
 	}
 
 	var accountsMenuItems: [NSMenuItem] {
-		let accountItems = accounts.makeMenuItems(currentUser: currentAccount?.uuid,
-		                                          action: #selector(UserPopUpButtonSubcontroller.selectAccount(_:)),
-		                                          target: userPopUpButtonController,
-		                                          emojiContainer: nil,
-		                                          setKeyEquivalents: true).menuItems
+		let accountItems = accounts.makeMenuItems(currentUser: currentAccount?.uuid, action: #selector(UserPopUpButtonSubcontroller.selectAccount(_:)), target: userPopUpButtonController, emojiContainer: nil, setKeyEquivalents: true).menuItems
 
 		let bookmarkedTags = currentAccount?.bookmarkedTagsList ?? []
 		var tagMenuItems: [NSMenuItem] = []
 
 		if bookmarkedTags.isEmpty == false {
 			tagMenuItems.append(.separator())
-
-			let bookmarkedTagItems = MenuItemFactory.makeMenuItems(forTags: bookmarkedTags,
-			                                                       action: #selector(showTag(_:)),
-			                                                       target: self)
-
+			let bookmarkedTagItems = MenuItemFactory.makeMenuItems(forTags: bookmarkedTags, action: #selector(showTag(_:)), target: self)
 			let menu = NSMenu(title: "")
 			menu.setItems(bookmarkedTagItems)
 			tagMenuItems.append(NSMenuItem(title: 🔠("Bookmarked Tags"), submenu: menu))
