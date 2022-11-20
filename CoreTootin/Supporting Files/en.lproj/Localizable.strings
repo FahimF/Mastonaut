@@ -182,3 +182,13 @@
 "authorization.unknown" = "Unknown authorization";
 
 "account.notFound" = "No accounts matching %@ found.";
+
+// MastodonKit
+"error.mastodonkit.malformedURL" = "Malformed URL.";
+"error.mastodonkit.malformedJSON" = "Malformed JSON response.";
+"error.mastodonkit.invalidModel" = "Could not decode response as apecified response type.";
+"error.mastodonkit.genericError" = "Networking error: %@";
+"error.mastodonkit.unauthorized" = "Unauthorized.";
+"error.mastodonkit.badStatus" = "Bad status: %@";
+"error.mastodonkit.mastodonError" = "Mastodon error: %@";
+
