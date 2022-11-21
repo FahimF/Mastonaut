@@ -71,9 +71,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	internal private(set) var filteredEntryKeys: Set<String> = []
 	internal private(set) var revealedFilteredEntryKeys: Set<String> = []
 
-	#if DEBUG
-		private var statusIndicator: NSImageView?
-	#endif
+	private var statusIndicator: NSImageView?
 
 	var client: ClientType? {
 		didSet {
