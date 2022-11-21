@@ -172,13 +172,17 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 			delegate?.remoteEventsListenerDidDisconnect(self, code: code)
 
 		case .text(let text):
-			debugLog("Received text: \(text)")
+			debugLog("*** Received text: \(text)")
+			// Not sure why, but this is received when doing bookmark or favourite connections
+			if text == "{\"error\":\"Unknown stream type\"}" {
+				break
+			}
 			parseMastodonEvent(with: Data(text.utf8))
 			resetReconnectState()
 			resetWatchdog()
 
 		case .binary(let data):
-			debugLog("Received data: \(data.count)")
+			debugLog("*** Received data: \(data.count)")
 			parseMastodonEvent(with: data)
 			resetReconnectState()
 			resetWatchdog()
@@ -286,10 +290,8 @@ struct StreamPayload: Decodable {
 		guard let type = EventType(rawValue: event) else {
 			throw ParseErrors.unknownEventType(event)
 		}
-
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .formatted(DateFormatter.mastodonFormatter)
-
 		switch (type, payload) {
 		case let (.update, .some(payload)):
 			return .update(try decoder.decode(Status.self, from: Data(payload.utf8)))

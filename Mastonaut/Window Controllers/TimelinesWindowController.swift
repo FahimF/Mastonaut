@@ -235,9 +235,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			let decoder = NSKeyedUnarchiver(forReadingWith: stackEncodedData)
 			if let stack = NavigationStack<SidebarMode>(coder: decoder) {
 				timelinesSplitViewController.preserveSplitViewSizeForNextSidebarInstall = true
-				sidebarSubcontroller = SidebarSubcontroller(sidebarContainer: self,
-				                                            navigationControl: sidebarNavigationSegmentedControl,
-				                                            navigationStack: stack)
+				sidebarSubcontroller = SidebarSubcontroller(sidebarContainer: self, navigationControl: sidebarNavigationSegmentedControl, navigationStack: stack)
 			}
 		}
 
@@ -481,14 +479,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			let referenceView = toolbarView.superview ?? toolbarView
 			constraints.append(referenceView.centerYAnchor.constraint(equalTo: $0.centerYAnchor))
 		}
-
-		constraints.append(TrackingLayoutConstraint.constraint(trackingMaxXOf: contentView,
-		                                                       targetView: newColumnSegmentedControl,
-		                                                       containerView: toolbarView,
-		                                                       targetAttribute: .trailing,
-		                                                       containerAttribute: .leading)
-				.with(priority: .defaultLow))
-
+		constraints.append(TrackingLayoutConstraint.constraint(trackingMaxXOf: contentView, targetView: newColumnSegmentedControl, containerView: toolbarView, targetAttribute: .trailing, containerAttribute: .leading).with(priority: .defaultLow))
 		constraints.append(contentsOf: [
 			currentUserPopUpButton.leadingAnchor.constraint(equalTo: toolbarView.leadingAnchor, constant: 6),
 			newColumnSegmentedControl.leadingAnchor.constraint(equalTo: statusComposerSegmentedControl.trailingAnchor,
@@ -550,14 +541,10 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			popUpButtonConstraints.append(TrackingLayoutConstraint
 				.constraint(trackingMidXOf: column.view, targetView: popUpButton, containerView: toolbarView, targetAttribute: .centerX, containerAttribute: .leading)
 				.with(priority: .defaultLow + 248))
-
-			popUpButtonConstraints.append(popUpButton.leadingAnchor.constraint(
-				greaterThanOrEqualTo: previousButton.trailingAnchor,
-				constant: 8
-			))
+			popUpButtonConstraints.append(popUpButton.leadingAnchor.constraint(greaterThanOrEqualTo: previousButton.trailingAnchor, constant: 8))
 			previousButton = popUpButton
 		}
-
+		// Change popup button
 		if previousButton != currentUserPopUpButton {
 			popUpButtonConstraints.append(statusComposerSegmentedControl.leadingAnchor.constraint(
 				greaterThanOrEqualTo: previousButton.trailingAnchor,
@@ -571,7 +558,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	}
 
 	// MARK: - Keyboard Navigation
-
 	override func moveRight(_: Any?) {
 		timelinesViewController.makeNextColumnFirstResponder()
 	}

@@ -766,22 +766,18 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	}
 
 	// MARK: Remote Evenets Receiver
-
 	func remoteEventsCoordinator(streamIdentifierDidConnect _: StreamIdentifier) {
-		#if DEBUG
-			DispatchQueue.main.async { self.showStatusIndicator(state: .green) }
-		#endif
-
+		DispatchQueue.main.async {
+			self.showStatusIndicator(state: .green)
+		}
 		eventsHandlerReconnectDelay = 0.5
 	}
 
 	func remoteEventsCoordinator(streamIdentifierDidDisconnect _: StreamIdentifier) {
-		#if DEBUG
-			DispatchQueue.main.async { self.showStatusIndicator(state: .amber) }
-		#endif
-
+		DispatchQueue.main.async {
+			self.showStatusIndicator(state: .amber)
+		}
 		guard !isSystemSleeping else { return }
-
 		// We can simply dispatch a fetch since we ensure we don't insert duplicate statuses in the timelines.
 		eventsHandlerReconnectDelay = min(10, eventsHandlerReconnectDelay * 2)
 		DispatchQueue.main.asyncAfter(deadline: .now() + eventsHandlerReconnectDelay) {
@@ -789,28 +785,22 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		}
 	}
 
-	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, didHandleEvent event: ClientEvent)
-	{
+	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, didHandleEvent event: ClientEvent) {
 		receivedClientEvent(event)
 	}
 
-	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, parserProducedError error: Error)
-	{
-		#if DEBUG
-			NSLog("Events Handler produced error: \(error)")
-			DispatchQueue.main.async { self.showStatusIndicator(state: .red) }
-		#endif
+	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, parserProducedError error: Error) {
+		NSLog("*** Events Handler produced error: \(error)")
+		DispatchQueue.main.async {
+			self.showStatusIndicator(state: .red("\(error)"))
+		}
 	}
 
 	// MARK: - Keyboard Interaction
-
 	var currentFocusRegion: NSRect? {
-		guard let selectedRow = tableView.selectedRowIndexes.first,
-		      let rowView = tableView.rowView(atRow: selectedRow, makeIfNecessary: false)
-		else {
+		guard let selectedRow = tableView.selectedRowIndexes.first, let rowView = tableView.rowView(atRow: selectedRow, makeIfNecessary: false) else {
 			return nil
 		}
-
 		return tableView.enclosingScrollView?.convert(rowView.frame, from: tableView)
 	}
 
@@ -822,7 +812,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		guard tableView.selectedRowIndexes.isEmpty, entryList.isEmpty == false else {
 			return
 		}
-
 		if selectBestRowIfPossible(for: preferredFocusRegion) == false {
 			tableView.selectFirstVisibleRow()
 		}
@@ -834,7 +823,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 	private func selectBestRowIfPossible(for preferredFocusRegion: NSRect?) -> Bool {
 		guard let region = preferredFocusRegion.flatMap({ tableView.enclosingScrollView?.convert($0, to: tableView) }) else { return false }
-
 		var bestRow: (distanceY: CGFloat, rowIndex: Int) = (.greatestFiniteMagnitude, -1)
 
 		tableView.enumerateAvailableRowViews { rowView, rowIndex in
@@ -927,43 +915,61 @@ protocol ListViewPresentable {
 	var key: String { get }
 }
 
-#if DEBUG
-	extension ListViewController {
-		func showStatusIndicator(state: IndicatorStyle) {
-			let indicator: NSImageView = statusIndicator ?? {
-				let indicator = NSImageView(frame: .zero)
-				indicator.translatesAutoresizingMaskIntoConstraints = false
-				indicator.setAccessibilityElement(false)
-				view.addSubview(indicator)
+extension ListViewController {
+	func showStatusIndicator(state: IndicatorStyle) {
+		let indicator: NSImageView = statusIndicator ?? {
+			let indicator = NSImageView(frame: .zero)
+			indicator.translatesAutoresizingMaskIntoConstraints = false
+			indicator.setAccessibilityElement(false)
+			view.addSubview(indicator)
 
-				NSLayoutConstraint.activate([
-					indicator.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
-					view.rightAnchor.constraint(equalTo: indicator.rightAnchor, constant: 10),
-				])
+			NSLayoutConstraint.activate([
+				indicator.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
+				view.rightAnchor.constraint(equalTo: indicator.rightAnchor, constant: 10),
+			])
+			return indicator
+		}()
+		indicator.image = NSImage(named: state.image)
+		indicator.toolTip = state.hint
+	}
 
-				return indicator
-			}()
+	enum IndicatorStyle {
+		case green, amber, off
+		case red(String)
 
-			indicator.image = NSImage(named: state.rawValue)
+		var image: NSImage.Name {
+			switch self {
+			case .green:
+				return NSImage.statusAvailableName
+				
+			case .amber:
+				return NSImage.statusPartiallyAvailableName
+				
+			case .red:
+				return NSImage.statusUnavailableName
+				
+			case .off:
+				return NSImage.statusNoneName
+			}
 		}
-
-		enum IndicatorStyle: NSImage.Name {
-			case green
-			case amber
-			case red
-			case off
-
-			var rawValue: NSImage.Name {
-				switch self {
-				case .green: return NSImage.statusAvailableName
-				case .amber: return NSImage.statusPartiallyAvailableName
-				case .red: return NSImage.statusUnavailableName
-				case .off: return NSImage.statusNoneName
-				}
+		
+		var hint: String {
+			switch self {
+			case .green:
+				return "Connected to server"
+				
+			case .amber:
+				return "Disconnected from server"
+				
+			case let .red(msg):
+				return "Server error - \(msg)"
+				
+			case .off:
+				return "Not connected"
 			}
 		}
 	}
-#endif
+}
 
 private extension NSTableView.AnimationOptions {
 	static var none: NSTableView.AnimationOptions = []

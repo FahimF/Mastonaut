@@ -75,11 +75,8 @@ class TimelineViewController: StatusListViewController {
 		guard let source = source else {
 			return
 		}
-
 		super.fetchEntries(for: insertion)
-
 		let request: Request<[Status]>
-
 		switch source {
 		case .timeline:
 			request = Timelines.home(range: rangeForEntryFetch(for: insertion))
@@ -110,18 +107,14 @@ class TimelineViewController: StatusListViewController {
 		case let .tag(tagName):
 			request = Timelines.tag(tagName, range: rangeForEntryFetch(for: insertion))
 		}
-
 		run(request: request, for: insertion)
 	}
 
 	override func receivedClientEvent(_ event: ClientEvent) {
 		switch event {
 		case let .update(status):
-			DispatchQueue.main.async {
-				[weak self] in
-
+			DispatchQueue.main.async {[weak self] in
 				guard let self = self else { return }
-
 				if self.entryMap[status.key] != nil {
 					self.handle(updatedEntry: status)
 				} else {
@@ -160,6 +153,8 @@ class TimelineViewController: StatusListViewController {
 			tableView.setAccessibilityLabel("Public Timeline")
 		case .favorites:
 			tableView.setAccessibilityLabel("Favorites Timeline")
+		case .bookmarks:
+			tableView.setAccessibilityLabel("Bookmarks Timeline")
 		case let .tag(name):
 			tableView.setAccessibilityLabel("Timeline for tag \(name)")
 		default:
@@ -173,9 +168,12 @@ class TimelineViewController: StatusListViewController {
 		}
 
 		let currentContext: Filter.Context
-
 		switch source {
-		case .favorites, .bookmarks, .tag, .timeline:
+			// Do not do any filtering for favourites and bookmarks
+		case .favorites, .bookmarks:
+			return []
+			
+		case .tag, .timeline:
 			currentContext = .home
 			
 		case .localTimeline, .publicTimeline:

@@ -43,14 +43,10 @@ class CoverView: BorderView {
 		setUp()
 	}
 
-	private func setUp(backgroundColor: NSColor = #colorLiteral(red: 0.8316226602, green: 0.8316226602, blue: 0.8316226602, alpha: 1),
-	                   textColor: NSColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.8470588235),
-	                   message: String? = nil)
-	{
+	private func setUp(backgroundColor: NSColor = #colorLiteral(red: 0.8316226602, green: 0.8316226602, blue: 0.8316226602, alpha: 1), textColor: NSColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.8470588235), message: String? = nil) {
 		translatesAutoresizingMaskIntoConstraints = false
 		borderRadius = 4.0
 		self.backgroundColor = backgroundColor
-
 		DispatchQueue.main.async { self.delayedSetUp(message: message, textColor: textColor) }
 	}
 

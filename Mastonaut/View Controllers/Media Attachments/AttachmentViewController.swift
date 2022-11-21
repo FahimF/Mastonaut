@@ -36,9 +36,7 @@ class AttachmentViewController: NSViewController {
 
 	private(set) var sensitiveMedia: Bool
 
-	private let coverView = CoverView(backgroundColor: #colorLiteral(red: 0.05655267835, green: 0.05655267835, blue: 0.05655267835, alpha: 1),
-	                                  textColor: #colorLiteral(red: 0.9999966025, green: 1, blue: 1, alpha: 0.8470588235),
-	                                  message: 🔠("Media Hidden: Click visibility button below to toggle display."))
+	private let coverView = CoverView(backgroundColor: #colorLiteral(red: 0.05655267835, green: 0.05655267835, blue: 0.05655267835, alpha: 1), textColor: #colorLiteral(red: 0.9999966025, green: 1, blue: 1, alpha: 0.8470588235), message: 🔠("Media Hidden: Click visibility button below to toggle display."))
 
 	let attachmentGroup: AttachmentGroup
 
@@ -61,13 +59,11 @@ class AttachmentViewController: NSViewController {
 		}
 	}
 
-	init(attachments: [Attachment], attachmentPresenter: AttachmentPresenting, sensitiveMedia: Bool, mediaHidden: Bool?)
-	{
+	init(attachments: [Attachment], attachmentPresenter: AttachmentPresenting, sensitiveMedia: Bool, mediaHidden: Bool?) {
 		attachmentGroup = AttachmentGroup(attachments: attachments)
 		self.attachmentPresenter = attachmentPresenter
 		self.sensitiveMedia = sensitiveMedia
 		super.init(nibName: nil, bundle: nil)
-
 		mediaHidden.map { setMediaHidden($0, animated: false) }
 	}
 
