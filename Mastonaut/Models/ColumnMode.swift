@@ -23,12 +23,7 @@ import Foundation
 enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 	typealias RawValue = String
 
-	case timeline
-	case localTimeline
-	case publicTimeline
-	case notifications
-	case favourites
-	case bookmarks
+	case timeline, localTimeline, publicTimeline, notifications, favourites, bookmarks
 	case tag(name: String)
 
 	var rawValue: RawValue {
@@ -56,6 +51,58 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 		}
 	}
 
+	var title: String {
+		switch self {
+		case .timeline:
+			return "Home"
+			
+		case .localTimeline:
+			return "Local Timeline"
+			
+		case .publicTimeline:
+			return "Public Timeline"
+			
+		case .notifications:
+			return "Notifications"
+			
+		case .favourites:
+			return "Favourites"
+			
+		case .bookmarks:
+			return "Bookmarks"
+			
+		case let .tag(name):
+			return "Tag: \(name)"
+		}
+	}
+	
+	var image: NSImage? {
+		var img: NSImage?
+		switch self {
+		case .timeline:
+			img = NSImage(systemSymbolName: "house", accessibilityDescription: "Home")
+
+		case .localTimeline:
+			img = NSImage(systemSymbolName: "person.3", accessibilityDescription: "Local Timeline")
+
+		case .publicTimeline:
+			img = NSImage.CoreTootin.globe
+
+		case .notifications:
+			img = NSImage(systemSymbolName: "bell", accessibilityDescription: "Notifications")
+
+		case .favourites:
+			img = NSImage(systemSymbolName: "star.fill", accessibilityDescription: "Favourites")
+
+		case .bookmarks:
+			img = NSImage(systemSymbolName: "bookmark.fill", accessibilityDescription: "Bookmarks")
+
+		case let .tag(name):
+			img = NSImage(systemSymbolName: "tag", accessibilityDescription: "Tag: \(name)")
+		}
+		return img
+	}
+	
 	init?(rawValue: RawValue) {
 		switch rawValue {
 		case "timeline":
@@ -81,6 +128,7 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 			self = .tag(name: String(name))
 
 		default:
+			NSLog("*** Could not find matching ColumnMode: \(rawValue)")
 			return nil
 		}
 	}
@@ -138,36 +186,8 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 	private func makeMenuItem() -> NSMenuItem {
 		let menuItem = NSMenuItem()
 		menuItem.representedObject = self
-
-		switch self {
-		case .timeline:
-			menuItem.title = 🔠("Home")
-			menuItem.image = NSImage(systemSymbolName: "house", accessibilityDescription: "Home")
-
-		case .localTimeline:
-			menuItem.title = 🔠("Local Timeline")
-			menuItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: "Local Timeline")
-
-		case .publicTimeline:
-			menuItem.title = "Public Timeline"
-			menuItem.image = NSImage.CoreTootin.globe
-
-		case .notifications:
-			menuItem.title = "Notifications"
-			menuItem.image = NSImage(systemSymbolName: "bell", accessibilityDescription: "Notifications")
-
-		case .favourites:
-			menuItem.title = "Favourites"
-			menuItem.image = NSImage(systemSymbolName: "star.fill", accessibilityDescription: "Favourites")
-
-		case .bookmarks:
-			menuItem.title = "Bookmarks"
-			menuItem.image = NSImage(systemSymbolName: "bookmark.fill", accessibilityDescription: "Bookmarks")
-
-		case let .tag(name):
-			menuItem.title = "Tag: \(name)"
-			menuItem.image = NSImage(systemSymbolName: "tag", accessibilityDescription: "Tag: \(name)")
-		}
+		menuItem.title = self.title
+		menuItem.image = self.image
 		return menuItem
 	}
 

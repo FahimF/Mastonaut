@@ -70,10 +70,8 @@ class ProfileTableCellView: MastonautTableCellView {
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-
 		userBioLabel.linkTextAttributes = ProfileTableCellView.bioLabelLinkAttributes
 		relationshipButtonsContainer.isHidden = true
-
 		relationshipLabel.isHidden = true
 	}
 
@@ -90,20 +88,15 @@ class ProfileTableCellView: MastonautTableCellView {
 
 	func updateAccountControls(with account: Account) {
 		fieldsController.set(account: account)
-
 		let attributedNote = account.attributedNote
 
 		if attributedNote.isEmpty {
 			userBioLabel.isHidden = true
 		} else {
 			userBioLabel.isHidden = false
-			userBioLabel.set(attributedStringValue: attributedNote,
-			                 applyingAttributes: ProfileTableCellView.bioLabelAttributes,
-			                 applyingEmojis: account.cacheableEmojis)
-
+			userBioLabel.set(attributedStringValue: attributedNote, applyingAttributes: ProfileTableCellView.bioLabelAttributes, applyingEmojis: account.cacheableEmojis)
 			userBioLabel.selectableAfterFirstClick = true
 		}
-
 		statusCountLabel.stringValue = "\(account.statusesCount)"
 		followsCountLabel.stringValue = "\(account.followingCount)"
 		followersCountLabel.stringValue = "\(account.followersCount)"

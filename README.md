@@ -14,11 +14,16 @@ The following instructions assume Xcode 14.1 on macOS 12.6.
 
 That should be it.
 
-## Pitfalls
+## Bundle IDs
 
-- Make sure `MastodonKit` is fetched _as a git submodule_. (For example, Xcode's git clone functionality seems to not do this!) This appears to be a
-custom fork called 3.0 that's significantly different from the public MastodonKit. So don't try to change the project to pull the regular MastodonKit using
-CocoaPods.
+The bundle ID _base_ is used because Mastonaut consists of multiple projects, which use an app group to share information. Given a `MASTONAUT_BUNDLE_ID_BASE` of `com.example.mastonaut` and a `DEVELOPMENT_TEAM` of `ABCDEFGH`:
+
+- the main app will be `com.example.mastonaut.mac`
+- the macOS Sharing extension will be `com.example.mastonaut.mac.QuickToot`
+- the Core Data database shared by the two above will be stored in `~/Library/Group Containers/ABCDEFGH.com.example.mastonaut/Mastonaut/Mastonaut.sqlite`
+- Keychain credentials will be prefixed `ABCDEFGH.com.example.mastonaut.keychain`
+
+## Pitfalls
 
 - The `.xcconfig` will auto-append `.mac` and other suffixes to the `MASTONAUT_BUNDLE_ID_BASE`, so you should pick something like
 `com.example.mastonaut` (replacing `com.example` with whatever reverse domain name you have set up for your account).
