@@ -138,9 +138,7 @@ class FilterService: NSObject, RemoteEventsReceiver {
 
 			case let .failure(error):
 				DispatchQueue.main.async {
-					#if DEBUG
-						NSLog("FilterService: Error fetching \(error)")
-					#endif
+					log.info("FilterService: Error fetching \(error)")
 					self.isUpdating = false
 					self.setNeedsUpdate(hadFailure: true)
 				}

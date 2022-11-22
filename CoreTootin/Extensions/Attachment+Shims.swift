@@ -17,8 +17,8 @@
 //  GNU General Public License for more details.
 //
 
-import CoreTootin
 import Foundation
+import CoreTootin
 
 public extension Attachment {
 	var parsedPreviewUrl: URL? {

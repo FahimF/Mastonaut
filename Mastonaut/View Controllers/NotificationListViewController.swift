@@ -287,7 +287,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 			break
 
 		case .unhandled:
-			NSLog("*** Unhandled client event received")
+			log.info("*** Unhandled client event received")
 			
 		case .keywordFiltersChanged:
 			break

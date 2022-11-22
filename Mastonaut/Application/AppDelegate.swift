@@ -98,6 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 	// MARK: App Lifecycle
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
+		log.logAppDetails()
 		if accountsService.authorizedAccounts.isEmpty {
 			authController.removeAllAuthorizationArtifacts()
 		}
@@ -115,7 +116,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		// User notification authorization
 		UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
 			if success {
-				NSLog("*** Authorized for user notifications")
+				log.info("*** Authorized for user notifications")
 				UNUserNotificationCenter.current().delegate = self
 			} else if let error = error {
 				print(error.localizedDescription)
@@ -413,7 +414,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		let context = persistentContainer.viewContext
 
 		if !context.commitEditing() {
-			NSLog("\(NSStringFromClass(type(of: self))) unable to commit editing before saving")
+			log.info("\(NSStringFromClass(type(of: self))) unable to commit editing before saving")
 		}
 		if context.hasChanges {
 			do {
@@ -453,7 +454,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		let context = persistentContainer.viewContext
 
 		if !context.commitEditing() {
-			NSLog("\(NSStringFromClass(type(of: self))) unable to commit editing to terminate")
+			log.info("\(NSStringFromClass(type(of: self))) unable to commit editing to terminate")
 			return .terminateCancel
 		}
 

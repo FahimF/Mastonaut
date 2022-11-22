@@ -140,7 +140,7 @@ class TimelineViewController: StatusListViewController {
 			break
 
 		case .unhandled:
-			NSLog("*** Unhandled client event received")
+			log.info("*** Unhandled client event received")
 			
 		case .keywordFiltersChanged:
 			break

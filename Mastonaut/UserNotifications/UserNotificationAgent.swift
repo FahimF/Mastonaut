@@ -103,7 +103,7 @@ private class ConcreteRemoteEventsReceiver: NSObject, RemoteEventsReceiver {
 	var didDisconnectHandler: (() -> Void)?
 
 	deinit {
-		NSLog("Releasing event receiver: \(self)")
+		log.info("Releasing event receiver: \(self)")
 	}
 
 	internal init(mode: AccountPreferences.NotificationDetailMode) {

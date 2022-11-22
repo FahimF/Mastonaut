@@ -53,7 +53,7 @@ class UserNotificationTool {
 		let request = UNNotificationRequest(identifier: uuid, content: content, trigger: nil)
 		UNUserNotificationCenter.current().add(request) { error in
 			if let error = error {
-				NSLog("*** Error posting local notification: \(error)")
+				log.info("*** Error posting local notification: \(error)")
 				return
 			}
 			self.updateCount()

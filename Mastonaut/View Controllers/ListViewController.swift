@@ -94,18 +94,14 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		let workspaceNC = NSWorkspace.shared.notificationCenter
 
 		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) {[weak self] _ in
-				#if DEBUG
-					NSLog("Disconnecting events socket…")
-				#endif
+				log.info("Disconnecting events socket…")
 				self?.isSystemSleeping = true
 				if let receiver = self?.remoteEventReceiver {
 					RemoteEventsCoordinator.shared.remove(receiver: receiver)
 				}
 			})
 		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) {[weak self] _ in
-				#if DEBUG
-					NSLog("Rescheduling events socket reconnection…")
-				#endif
+				log.info("Rescheduling events socket reconnection…")
 				self?.isSystemSleeping = false
 				// Once the fetch completes, the socket will be reconnected.
 				self?.fetchEntries(for: .detachedAbove)
@@ -283,24 +279,18 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	internal func run(request: Request<[Entry]>, for insertion: InsertionPoint) {
 		let futurePromise = Promise<FutureTask>()
 
-		guard let future = client?.run(request, resumeImmediately: false, completion: {
-			[weak self] result in
-
+		guard let future = client?.run(request, resumeImmediately: false, completion: {[weak self] result in
 			DispatchQueue.main.async {
 				guard let self = self else { return }
-
 				if let task = futurePromise.value {
 					guard self.pendingFetchTasks.contains(task) else {
 						return
 					}
-
 					self.pendingFetchTasks.remove(task)
 				}
-
 				if let receiver = self.remoteEventReceiver {
 					RemoteEventsCoordinator.shared.addExisting(receiver: receiver)
 				}
-
 				switch result {
 				case let .success(entries, pagination):
 					self.prepareNewEntries(entries, for: insertion, pagination: pagination)
@@ -309,32 +299,25 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 					self.failedLoadingEntries(for: request, error: error, insertion: insertion)
 				}
 			}
-		})
-		else {
+		}) else {
 			return
 		}
-
 		futurePromise.value = future
-
 		// If you hit this you have thread safety issues because pendingFetchTasks
 		// is not synchronized and is accessed from the main thread in other places.
 		assert(Thread.isMainThread)
 		pendingFetchTasks.insert(future)
-
 		future.resolutionHandler = { task in task.resume() }
 	}
 
-	internal func failedLoadingEntries(for request: Request<[Entry]>, error: Error?, insertion: InsertionPoint)
-	{
-		NSLog("Failed fetching timeline: \(error?.localizedDescription ?? "nil error")")
+	internal func failedLoadingEntries(for request: Request<[Entry]>, error: Error?, insertion: InsertionPoint) {
+		log.info("Failed fetching timeline: \(error?.localizedDescription ?? "nil error")")
 
 		if case let .atIndex(index) = insertion {
 			expandersPendingLoadCompletion.remove(index)
-			if let expanderCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? ExpanderCellView
-			{
+			if let expanderCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? ExpanderCellView {
 				expanderCell.isLoading = false
 			}
-
 			return
 		}
 
@@ -361,9 +344,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 			guard let entryIndex = entryList.firstIndex(where: { $0.entryKey == entryKey }) else {
 				return
 			}
-
-			if let cell = tableView.view(atColumn: 0, row: entryIndex, makeIfNecessary: false) as? NSTableCellView
-			{
+			if let cell = tableView.view(atColumn: 0, row: entryIndex, makeIfNecessary: false) as? NSTableCellView {
 				populate(cell: cell, for: entry)
 				prepareToDisplay(cellView: cell, at: entryIndex)
 			}
@@ -384,8 +365,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		tableView.removeRowsAnimatingIfVisible(at: IndexSet(integer: entryIndex))
 	}
 
-	private func handleNewEntries(_ entries: [Entry], for insertion: InsertionPoint, pagination: Pagination?)
-	{
+	private func handleNewEntries(_ entries: [Entry], for insertion: InsertionPoint, pagination: Pagination?) {
 		assert(Thread.isMainThread)
 
 		loadingIndicator.removeFromSuperview()
@@ -434,29 +414,23 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 					: nil
 			}
 		}
-
 		for newEntry in entries {
 			entryMap[newEntry.key] = newEntry
 		}
-
 		expandersPendingLoadCompletion.remove(insertionIndex)
-
 		var rowToSelect: Int?
-
 		tableView.beginUpdates()
 
 		if insertionIndex < entryList.count, entryList[insertionIndex].isExpander {
 			if tableView.selectedRowIndexes.contains(insertionIndex) {
 				rowToSelect = insertionIndex
 			}
-
 			entryList.remove(at: insertionIndex)
 			tableView.removeRowsAnimatingIfVisible(at: IndexSet(integer: insertionIndex))
 		}
 
 		func insertExpanderRow(at index: Array<EntryReference>.Index) {
 			guard automaticallyInsertsExpander else { return }
-
 			entryList.insert(.expander, at: index)
 			tableView.insertRowsAnimatingIfVisible(at: IndexSet(integer: index))
 		}
@@ -467,17 +441,13 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		entryList.insert(contentsOf: entries.map { EntryReference.entry(key: $0.key) }, at: insertionIndex)
 		tableView.insertRowsAnimatingIfVisible(at: IndexSet(insertionIndex ..< insertionIndex + entries.count))
-
 		if let index = newExpanderIndex, index >= insertionIndex {
 			insertExpanderRow(at: index)
 		}
-
 		if shouldTruncateList {
 			truncateEntriesIfNeeded()
 		}
-
 		tableView.endUpdates()
-
 		if let row = rowToSelect {
 			tableView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
 		}
@@ -488,22 +458,17 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		let entriesToRemove: [(offset: Int, element: ListViewController<Entry>.EntryReference)] =
 			entryList.enumerated().suffix(entryList.count - maxCount).filter { $0.element.entryKey != nil }
-
 		guard entriesToRemove.isEmpty == false else { return }
-
 		let rowsToRemove = entriesToRemove.map { $0.offset }
-
 		for (row, entry) in entriesToRemove.sorted(by: { $0.offset < $1.offset }).reversed() {
 			assert(entry.isExpander == false)
 			entryList.remove(at: row)
 			entryMap.removeValue(forKey: entry.entryKey!)
 		}
-
 		tableView.removeRowsAnimatingIfVisible(at: IndexSet(rowsToRemove))
 	}
 
-	// MARK: Websocket
-
+	// MARK: - Websocket
 	internal func setClientEventStream(_ stream: RemoteEventStream) {
 		if let receiver = remoteEventReceiver {
 			RemoteEventsCoordinator.shared.remove(receiver: receiver)
@@ -523,17 +488,13 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		guard revealedFilteredEntryKeys.contains(entry.key) == false else {
 			return false
 		}
-
 		if filteredEntryKeys.contains(entry.key) {
 			return true
 		}
-
 		let isMatch = applicableFilters().first(where: { self.checkEntry(entry, matchesFilter: $0) }) != nil
-
 		if isMatch {
 			filteredEntryKeys.insert(entry.key)
 		}
-
 		return isMatch
 	}
 
@@ -765,7 +726,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	}
 
 	func remoteEventsCoordinator(streamIdentifier _: StreamIdentifier, parserProducedError error: Error) {
-		NSLog("*** Events Handler produced error: \(error)")
+		log.info("*** Events Handler produced error: \(error)")
 		DispatchQueue.main.async {
 			self.showStatusIndicator(state: .red("\(error)"))
 		}

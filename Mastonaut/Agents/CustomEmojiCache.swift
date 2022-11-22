@@ -186,27 +186,18 @@ class CustomEmojiCache: NSObject, Cache {
 
 		diskAccessQueue.addOperation {
 			let fileManager = FileManager.default
-
-			let cachesDirectoryURL = try! fileManager.url(for: .cachesDirectory,
-			                                              in: .userDomainMask,
-			                                              appropriateFor: nil,
-			                                              create: true)
+			let cachesDirectoryURL = try! fileManager.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 			let cacheLocation = cachesDirectoryURL.appendingPathComponent("Mastonaut/Emoji", isDirectory: true)
 			try? fileManager.createDirectory(at: cacheLocation, withIntermediateDirectories: true, attributes: [:])
-
 			for previousReferenceFile in self.previousReferenceFileURLs(baseURL: cacheLocation) {
 				if fileManager.fileExists(atPath: previousReferenceFile.path) {
 					try? fileManager.removeItem(at: previousReferenceFile)
 				}
 			}
-
 			let referenceFileURL = self.currentReferenceFileURL(baseURL: cacheLocation)
-			if let shortcodeDatabaseData = try? Data(contentsOf: referenceFileURL),
-			   let database = try? PropertyListDecoder().decode(EmojiReferenceDatabase.self, from: shortcodeDatabaseData)
-			{
+			if let shortcodeDatabaseData = try? Data(contentsOf: referenceFileURL), let database = try? PropertyListDecoder().decode(EmojiReferenceDatabase.self, from: shortcodeDatabaseData) {
 				self.shortcodeDatabase = database
 			}
-
 			self.cacheLocation = cacheLocation
 			self.delegate?.cacheDidFinishLoadingFromDisk(self)
 		}
@@ -222,7 +213,6 @@ class CustomEmojiCache: NSObject, Cache {
 
 	private func scheduleWritingEmojiReferenceDatabase() {
 		let writeSelector = #selector(writeEmojiReferenceDatabase)
-
 		CustomEmojiCache.cancelPreviousPerformRequests(withTarget: self, selector: writeSelector, object: nil)
 		perform(writeSelector, with: nil, afterDelay: 5.0)
 	}
@@ -230,9 +220,7 @@ class CustomEmojiCache: NSObject, Cache {
 	@objc private func writeEmojiReferenceDatabase() {
 		// self is captured strongly here deliberately to prevent the object from going
 		// away while a write is happening.
-		diskAccessQueue.addOperation {
-			[cacheLocation, shortcodeDatabase] in
-
+		diskAccessQueue.addOperation {[cacheLocation, shortcodeDatabase] in
 			guard let cacheLocation = cacheLocation else { return }
 
 			let encoder = PropertyListEncoder()
@@ -240,7 +228,6 @@ class CustomEmojiCache: NSObject, Cache {
 			if let databaseData = try? encoder.encode(shortcodeDatabase) {
 				try? databaseData.write(to: self.currentReferenceFileURL(baseURL: cacheLocation))
 			}
-
 			self.delegate?.cacheDidFinishWritingToDisk(self)
 		}
 	}
@@ -253,21 +240,15 @@ class CustomEmojiCache: NSObject, Cache {
 				assertionFailure()
 				return nil
 			}
-
 			guard case let .success(data) = resourcesFetcher.fetchDataSynchronously(from: url) else {
-				inMemoryCache.setObject(EmojiImageCacheStateClassAdapter(.missing),
-				                        forKey: cacheFileKey as NSString)
+				inMemoryCache.setObject(EmojiImageCacheStateClassAdapter(.missing), forKey: cacheFileKey as NSString)
 				return nil
 			}
-
 			try data.write(to: cacheFileURL)
-
 			return data
 		} catch {
-			inMemoryCache.setObject(EmojiImageCacheStateClassAdapter(.missing),
-			                        forKey: cacheFileKey as NSString)
-			NSLog("Error fetching emoji: \(error)")
-
+			inMemoryCache.setObject(EmojiImageCacheStateClassAdapter(.missing), forKey: cacheFileKey as NSString)
+			log.info("Error fetching emoji: \(error)")
 			return nil
 		}
 	}

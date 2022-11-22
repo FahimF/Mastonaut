@@ -101,7 +101,7 @@ class AuthController {
 
 	func completeAuthorization(from domainName: String, grantCode: String) {
 		guard Thread.isMainThread else {
-			NSLog("Must be called from main thread!")
+			log.info("Must be called from main thread!")
 			abort()
 		}
 
@@ -287,9 +287,7 @@ class AuthController {
 				login = loginResult
 
 			case let .failure(error):
-				#if DEBUG
-					NSLog("Login error: \(error)")
-				#endif
+				log.info("Login error: \(error)")
 				let description = "Failed authorization from “\(baseDomain)”: Could not log in."
 
 				DispatchQueue.main.async { completion?() }
@@ -310,9 +308,7 @@ class AuthController {
 
 				switch result {
 				case let .failure(error):
-					#if DEBUG
-						NSLog("Error fetching account info: \(error)")
-					#endif
+					log.info("Error fetching account info: \(error)")
 					let description = "Failed authorization from “\(baseDomain)”: Could not fetch user."
 
 					DispatchQueue.main.async {

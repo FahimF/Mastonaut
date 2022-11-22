@@ -250,7 +250,5 @@ private class TaggedRemoteEventsListener: RemoteEventsListener {
 }
 
 private func debugLog(_ message: String) {
-	#if DEBUG
-		NSLog(message)
-	#endif
+	log.info(message)
 }

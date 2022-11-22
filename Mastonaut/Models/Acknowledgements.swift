@@ -39,17 +39,13 @@ struct Acknowledgements: Codable {
 
 extension Acknowledgements {
 	static func load(plist: String) -> Acknowledgements? {
-		guard
-			let plistUrl = Bundle.main.url(forResource: plist, withExtension: "plist"),
-			let plistData: Data = try? Data(contentsOf: plistUrl)
-		else {
+		guard let plistUrl = Bundle.main.url(forResource: plist, withExtension: "plist"), let plistData: Data = try? Data(contentsOf: plistUrl) else {
 			return nil
 		}
-
 		do {
 			return try PropertyListDecoder().decode(Acknowledgements.self, from: plistData)
 		} catch {
-			NSLog("Error: \(error)")
+			log.info("Error: \(error)")
 			return nil
 		}
 	}

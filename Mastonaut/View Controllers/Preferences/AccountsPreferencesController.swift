@@ -396,9 +396,7 @@ class AccountsPreferencesController: BaseAccountsPreferencesViewController {
 			let data: Data
 
 			do { data = try upload.data() } catch {
-				#if DEBUG
-					NSLog("Failed parsing image data: \(error)")
-				#endif
+				log.info("Failed parsing image data: \(error)")
 				completion(nil)
 				return
 			}
@@ -452,21 +450,15 @@ class AccountsPreferencesController: BaseAccountsPreferencesViewController {
 		let futuresPromise = Promise<Set<FutureTask>>()
 
 		func setErrorResult(_ error: Error?) {
-			DispatchQueue.main.async {
-				[weak self] in
-
-				NSLog("Could not fetch account info: \(String(describing: error))")
+			DispatchQueue.main.async {[weak self] in
+				log.info("Could not fetch account info: \(String(describing: error))")
 				if let tasks = futuresPromise.value, !tasks.isEmpty {
 					self?.urlTaskFutures.subtract(tasks)
 				}
-
 				self?.avatarImage = nil
 				self?.headerImage = nil
 				self?.canDelete = true
-
-				if case let ClientError.genericError(networkError)? = error,
-				   (networkError as NSError).code == URLError.cancelled.rawValue
-				{
+				if case let ClientError.genericError(networkError)? = error, (networkError as NSError).code == URLError.cancelled.rawValue {
 					return
 				}
 				self?.controlsState = .couldNotLoadAccount

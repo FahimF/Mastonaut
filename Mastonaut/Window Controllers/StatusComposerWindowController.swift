@@ -230,7 +230,7 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 							                  senderWindowController: windowController)
 
 						case let (.failure(error), _):
-							NSLog("Failed resolving status: \(error)")
+							log.info("Failed resolving status: \(error)")
 							fallthrough
 
 						default:

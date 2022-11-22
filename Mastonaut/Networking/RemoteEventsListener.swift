@@ -136,9 +136,7 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 	}
 
 	private func debugLog(_ message: String) {
-		#if DEBUG
-			NSLog("[SOCKET \(addressAsString(self))] \(message)")
-		#endif
+		log.info("[SOCKET \(addressAsString(self))] \(message)")
 	}
 	
 	private func parseMastodonEvent(with data: Data) {

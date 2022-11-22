@@ -582,7 +582,10 @@
 		DD3DA9A7292A2BED00AA0ABA /* RequestRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA95F292A2BED00AA0ABA /* RequestRange.swift */; };
 		DD3DA9A8292A2BED00AA0ABA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA960292A2BED00AA0ABA /* Client.swift */; };
 		DD3DA9AA292A40A500AA0ABA /* Bookmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */; };
-		DD3DA9AD292C8B5300AA0ABA /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9AC292C8B5300AA0ABA /* XCGLogger */; };
+		DD3DA9B0292CAA5F00AA0ABA /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */; };
+		DD3DA9B7292CAABA00AA0ABA /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9B6292CAABA00AA0ABA /* ObjcExceptionBridging */; };
+		DD3DA9B9292CAABA00AA0ABA /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9B8292CAABA00AA0ABA /* XCGLogger */; };
+		DD3DA9BA292CAC3800AA0ABA /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1077,6 +1080,7 @@
 		DD3DA95F292A2BED00AA0ABA /* RequestRange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestRange.swift; sourceTree = "<group>"; };
 		DD3DA960292A2BED00AA0ABA /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmarks.swift; sourceTree = "<group>"; };
+		DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1108,10 +1112,11 @@
 			files = (
 				DD3DA7F92929304B00AA0ABA /* SVGKit in Frameworks */,
 				1596DB46235F65D300B349B7 /* DirectoryService.framework in Frameworks */,
+				DD3DA9B9292CAABA00AA0ABA /* XCGLogger in Frameworks */,
+				DD3DA9B7292CAABA00AA0ABA /* ObjcExceptionBridging in Frameworks */,
 				15765563229692C200783FFE /* AVKit.framework in Frameworks */,
 				154478A6232B0223009C71D4 /* CoreTootin.framework in Frameworks */,
 				DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */,
-				DD3DA9AD292C8B5300AA0ABA /* XCGLogger in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1325,6 +1330,7 @@
 			isa = PBXGroup;
 			children = (
 				DD3DA5AC2928ED7D00AA0ABA /* MastodonKit */,
+				DD3DA9AE292CAA4300AA0ABA /* Shared */,
 			);
 			name = Dependencies;
 			sourceTree = "<group>";
@@ -1979,6 +1985,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		DD3DA9AE292CAA4300AA0ABA /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2075,7 +2089,8 @@
 			packageProductDependencies = (
 				DD3DA7DA29291C0E00AA0ABA /* Starscream */,
 				DD3DA7F82929304B00AA0ABA /* SVGKit */,
-				DD3DA9AC292C8B5300AA0ABA /* XCGLogger */,
+				DD3DA9B6292CAABA00AA0ABA /* ObjcExceptionBridging */,
+				DD3DA9B8292CAABA00AA0ABA /* XCGLogger */,
 			);
 			productName = Sengi;
 			productReference = 15C4DD0C21D41EC0002AF6DA /* Mastonaut.app */;
@@ -2154,7 +2169,7 @@
 			packageReferences = (
 				DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */,
 				DD3DA7F72929304B00AA0ABA /* XCRemoteSwiftPackageReference "SVGKit" */,
-				DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */,
+				DD3DA9B5292CAABA00AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */,
 			);
 			productRefGroup = 15C4DD0D21D41EC0002AF6DA /* Products */;
 			projectDirPath = "";
@@ -2415,6 +2430,7 @@
 				1523C6E521E94C7F006DE234 /* MastodonKit+Shims.swift in Sources */,
 				15431285232EEB960010854A /* UserPopUpButtonController+Helper.swift in Sources */,
 				150CEA4221FCC55100F815A9 /* NotificationDisplaying.swift in Sources */,
+				DD3DA9BA292CAC3800AA0ABA /* Logging.swift in Sources */,
 				15EE539922C9583F001BEA58 /* AccountSearchResultsViewController.swift in Sources */,
 				15E7452A22372001009A1252 /* SVGKImage+Helpers.swift in Sources */,
 				15B25D0B2651CBAC00C90963 /* FilterEditorWindowController.swift in Sources */,
@@ -2763,6 +2779,7 @@
 				15CD5BD621DAC89700E06C2F /* NSWindow+Additions.swift in Sources */,
 				15BCDB13221B41CF007BFFAF /* AttachmentGroup.swift in Sources */,
 				15E7452622371DCB009A1252 /* AccountsPlaceholderController.swift in Sources */,
+				DD3DA9B0292CAA5F00AA0ABA /* Logging.swift in Sources */,
 				152DA64A21E3F9CD0065CC1B /* AttachmentViewController.swift in Sources */,
 				15B981B6234FE549008391F8 /* FavoritesViewController.swift in Sources */,
 				1538FB3622188978006B5F78 /* ViewingPreferencesController.swift in Sources */,
@@ -2944,7 +2961,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D MOCK";
 				PRODUCT_BUNDLE_IDENTIFIER = org.farook.mastonaut.mac;
 				PRODUCT_NAME = Mastonaut;
@@ -2972,7 +2989,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D MOCK";
 				PRODUCT_BUNDLE_IDENTIFIER = org.farook.mastonaut.mac;
 				PRODUCT_NAME = Mastonaut;
@@ -3085,7 +3102,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 134;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = QuickToot/Info.plist;
@@ -3095,7 +3112,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac.QuickToot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -3111,7 +3128,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 134;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = QuickToot/Info.plist;
@@ -3121,7 +3138,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac.QuickToot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -3137,7 +3154,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 134;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = QuickToot/Info.plist;
@@ -3147,7 +3164,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac.QuickToot";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -3291,7 +3308,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3300,7 +3317,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3320,7 +3337,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3329,7 +3346,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3344,6 +3361,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				INFOPLIST_FILE = MastonautTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3365,6 +3383,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				INFOPLIST_FILE = MastonautTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3457,7 +3476,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 135;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEFINES_MODULE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3466,7 +3485,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MASTONAUT_BUNDLE_ID_BASE).mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3492,7 +3511,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.9;
+				MARKETING_VERSION = 1.0.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D MOCK";
 				PRODUCT_BUNDLE_IDENTIFIER = org.farook.mastonaut.mac;
 				PRODUCT_NAME = Mastonaut;
@@ -3508,6 +3527,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				INFOPLIST_FILE = MastonautTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3605,12 +3625,12 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
+		DD3DA9B5292CAABA00AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/DaveWoodCom/XCGLogger.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.0.0;
+				branch = master;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -3631,9 +3651,14 @@
 			package = DD3DA7F72929304B00AA0ABA /* XCRemoteSwiftPackageReference "SVGKit" */;
 			productName = SVGKit;
 		};
-		DD3DA9AC292C8B5300AA0ABA /* XCGLogger */ = {
+		DD3DA9B6292CAABA00AA0ABA /* ObjcExceptionBridging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			package = DD3DA9B5292CAABA00AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			productName = ObjcExceptionBridging;
+		};
+		DD3DA9B8292CAABA00AA0ABA /* XCGLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3DA9B5292CAABA00AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */;
 			productName = XCGLogger;
 		};
 /* End XCSwiftPackageProductDependency section */

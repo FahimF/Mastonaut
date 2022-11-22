@@ -128,7 +128,7 @@ enum ColumnMode: RawRepresentable, ColumnModel, Equatable, Comparable {
 			self = .tag(name: String(name))
 
 		default:
-			NSLog("*** Could not find matching ColumnMode: \(rawValue)")
+			log.info("*** Could not find matching ColumnMode: \(rawValue)")
 			return nil
 		}
 	}
