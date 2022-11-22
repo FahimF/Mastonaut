@@ -175,7 +175,7 @@ struct UserFilter {
 	let wholeWord: Bool
 	let irreversible: Bool
 
-	init(id: String, phrase: String, context: [Filter.Context], expiresAt: Date?, wholeWord: Bool, irreversible: Bool) {
+	init(id: String, phrase: String, context: [Filter.Context], expiresAt: Date?, wholeWord: Bool, irreversible: Bool)  {
 		self.id = id
 		self.phrase = phrase
 		self.context = context
@@ -184,7 +184,7 @@ struct UserFilter {
 		self.irreversible = irreversible
 	}
 
-	fileprivate init(filter: Filter) {
+	init(filter: Filter) {
 		id = filter.id
 		phrase = filter.phrase
 		context = filter.context
@@ -193,12 +193,8 @@ struct UserFilter {
 		irreversible = filter.irreversible
 	}
 
-	fileprivate init?(filter: CachedFilter) {
-		guard
-			let id = filter.id,
-			let phrase = filter.phrase,
-			let context = filter.context?.split(separator: ";").compactMap({ Filter.Context(rawValue: String($0)) })
-		else {
+	init?(filter: CachedFilter) {
+		guard let id = filter.id, let phrase = filter.phrase, let context = filter.context?.split(separator: ";").compactMap({ Filter.Context(rawValue: String($0)) }) else {
 			return nil
 		}
 		self.id = id
@@ -211,25 +207,19 @@ struct UserFilter {
 
 	func checkMatch(status: Status) -> Bool {
 		guard isValid else { return false }
-
 		let spoiler = status.attributedSpoiler.string
-
 		if spoiler.isEmpty == false, checkMatch(string: spoiler) {
 			return true
 		}
-
 		let content = status.attributedContent.string
-
 		if content.isEmpty == false, checkMatch(string: content) {
 			return true
 		}
-
 		return false
 	}
 
 	func checkMatch(notification: MKNotification) -> Bool {
 		guard isValid else { return false }
-
 		if let status = notification.status {
 			if checkMatch(status: status) {
 				return true
@@ -239,7 +229,6 @@ struct UserFilter {
 				return true
 			}
 		}
-
 		return false
 	}
 

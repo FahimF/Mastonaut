@@ -21,7 +21,12 @@ import CoreGraphics
 import QuartzCore
 
 class BPAnimatedImageLayer: CALayer {
-	// MARK: Initializers
+	private let isCopy: Bool
+	private let imageSource: CGImageSource
+	private let scaledAtlasLayer: CALayer = .init()
+	private var atlasGenerator: LayerImageAtlasGenerator?
+	var atlasImage: CGImage?
+	var frameDelays: [TimeInterval] = []
 
 	convenience init?(imageAt url: URL) {
 		guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
@@ -60,7 +65,6 @@ class BPAnimatedImageLayer: CALayer {
 	}
 
 	// MARK: - Overrides
-
 	override var frame: CGRect {
 		didSet {
 			recomputeScaledLayer()
@@ -73,7 +77,6 @@ class BPAnimatedImageLayer: CALayer {
 	}
 
 	// MARK: - Public Stuff
-
 	func startAnimation() {
 		scaledAtlasLayer.speed = 1.0
 	}
@@ -83,33 +86,20 @@ class BPAnimatedImageLayer: CALayer {
 	}
 
 	// MARK: - Private Stuff
-
-	private let isCopy: Bool
-	private let imageSource: CGImageSource
-	private let scaledAtlasLayer: CALayer = .init()
-	private var atlasGenerator: LayerImageAtlasGenerator?
-	fileprivate var atlasImage: CGImage?
-	fileprivate var frameDelays: [TimeInterval] = []
-
 	private func recomputeImageAtlas() {
 		let generator = atlasGenerator ?? .init(layer: self)
 		generator.createAtlas(imageSource: imageSource)
 		atlasGenerator = generator
 	}
 
-	fileprivate func recomputeScaledLayer() {
+	func recomputeScaledLayer() {
 		contentsScale = superlayer?.contentsScale ?? 1.0
-
 		guard let scaledAtlasImage = atlasImage?.resizedImage(newHeight: frame.height, scale: contentsScale) else {
 			return
 		}
-
-		scaledAtlasLayer.frame = CGRect(x: 0, y: 0,
-		                                width: CGFloat(scaledAtlasImage.width) / contentsScale,
-		                                height: CGFloat(scaledAtlasImage.height) / contentsScale)
+		scaledAtlasLayer.frame = CGRect(x: 0, y: 0, width: CGFloat(scaledAtlasImage.width) / contentsScale, height: CGFloat(scaledAtlasImage.height) / contentsScale)
 		scaledAtlasLayer.contentsScale = contentsScale
 		scaledAtlasLayer.contents = scaledAtlasImage
-
 		setUpSpriteAnimation()
 	}
 

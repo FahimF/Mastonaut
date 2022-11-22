@@ -21,11 +21,11 @@ import CoreTootin
 import Foundation
 
 extension AccountReference {
-	fileprivate static func insertBlank() -> AccountReference {
+	private static func insertBlank() -> AccountReference {
 		return AccountReference(context: AppDelegate.shared.managedObjectContext)
 	}
 
-	fileprivate static func insert(id: String) -> AccountReference {
+	private static func insert(id: String) -> AccountReference {
 		let blank = AccountReference(context: AppDelegate.shared.managedObjectContext)
 		blank.identifier = id
 		return blank

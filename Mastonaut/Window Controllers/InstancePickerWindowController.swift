@@ -222,7 +222,7 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate {
 		}
 	}
 
-	fileprivate enum CellViewIdentifier {
+	private enum CellViewIdentifier {
 		static let instance = NSUserInterfaceItemIdentifier("instance")
 	}
 }

@@ -137,7 +137,7 @@ class ResourcesFetcher {
 		case failure(Error)
 		case emptyResponse
 
-		fileprivate func cast<K>(to _: K.Type) -> FetchResult<K> {
+		func cast<K>(to _: K.Type) -> FetchResult<K> {
 			switch self {
 			case let .failure(error):
 				return .failure(error)

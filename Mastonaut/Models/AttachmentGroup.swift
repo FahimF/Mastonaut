@@ -31,7 +31,7 @@ protocol AttachmentGroupType: AnyObject {
 class AttachmentGroup: AttachmentGroupType {
 	let attachments: [Attachment]
 
-	fileprivate var previewMap = [String: NSImage]()
+	private var previewMap = [String: NSImage]()
 
 	var attachmentCount: Int {
 		return attachments.count
@@ -41,7 +41,7 @@ class AttachmentGroup: AttachmentGroupType {
 		self.attachments = attachments
 	}
 
-	fileprivate init(attachments: [Attachment], previews: [String: NSImage]) {
+	private init(attachments: [Attachment], previews: [String: NSImage]) {
 		self.attachments = attachments
 		previewMap = previews
 	}
@@ -68,7 +68,7 @@ class IndexedAttachmentGroup: AttachmentGroupType {
 		return attachmentGroup.attachmentCount
 	}
 
-	fileprivate init(attachmentGroup: AttachmentGroup, initialIndex: Array<Attachment>.Index) {
+	init(attachmentGroup: AttachmentGroup, initialIndex: Array<Attachment>.Index) {
 		self.attachmentGroup = attachmentGroup
 		currentIndex = initialIndex
 	}

@@ -293,7 +293,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 				}
 				switch result {
 				case let .success(entries, pagination):
-					self.prepareNewEntries(entries, for: insertion, pagination: pagination)
+					_ = self.prepareNewEntries(entries, for: insertion, pagination: pagination)
 
 				case let .failure(error):
 					self.failedLoadingEntries(for: request, error: error, insertion: insertion)

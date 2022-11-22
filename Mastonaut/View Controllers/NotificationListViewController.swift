@@ -272,7 +272,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		switch event {
 		case let .notification(notification):
 			DispatchQueue.main.async {[weak self] in
-				self?.prepareNewEntries([notification], for: .above, pagination: nil)
+				_ = self?.prepareNewEntries([notification], for: .above, pagination: nil)
 				self?.postNotificationIfAppropriate(notification)
 			}
 
@@ -337,7 +337,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 	}
 
 	// MARK: - Reuse Identifiers
-	fileprivate enum CellViewIdentifier {
+	private enum CellViewIdentifier {
 		static let status = NSUserInterfaceItemIdentifier("status")
 		static let interaction = NSUserInterfaceItemIdentifier("interaction")
 		static let follow = NSUserInterfaceItemIdentifier("follow")

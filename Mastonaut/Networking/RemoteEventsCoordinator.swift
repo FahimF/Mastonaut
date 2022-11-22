@@ -52,7 +52,7 @@ class RemoteEventsCoordinator: NSObject {
 			var receivers = self.streamReceiverMap[streamIdentifier] ?? []
 			let receiver = AnyRemoteEventsReceiver(receiver, stream: streamIdentifier)
 			receivers.insert(receiver)
-			debugLog("Creating receiver: \(receiver.hashValue) \(receiver.description)")
+			log.info("Creating receiver: \(receiver.hashValue) \(receiver.description)")
 			self.streamReceiverMap[streamIdentifier] = receivers
 			self.createListenerIfNeeded(for: streamIdentifier, notifyingReceiverOtherwise: receiver)
 			return receiver
@@ -65,7 +65,7 @@ class RemoteEventsCoordinator: NSObject {
 			if self.streamReceiverMap[receiver.streamIdentifier]?.contains(receiver) != true {
 				var receivers = self.streamReceiverMap[receiver.streamIdentifier] ?? []
 				receivers.insert(receiver)
-				debugLog("Re-adding receiver: \(receiver.hashValue) \(receiver.description)")
+				log.info("Re-adding receiver: \(receiver.hashValue) \(receiver.description)")
 				self.streamReceiverMap[receiver.streamIdentifier] = receivers
 				self.createListenerIfNeeded(for: receiver.streamIdentifier, notifyingReceiverOtherwise: receiver)
 			}
@@ -81,7 +81,7 @@ class RemoteEventsCoordinator: NSObject {
 		operationQueue.sync {
 			guard var receivers = self.streamReceiverMap[receiver.streamIdentifier] else { return }
 			receivers.remove(receiver)
-			debugLog("Removing receiver: \(receiver.hashValue) \(receiver.description)")
+			log.info("Removing receiver: \(receiver.hashValue) \(receiver.description)")
 			self.streamReceiverMap[receiver.streamIdentifier] = receivers
 			self.removeListenerIfNeeded(for: receiver.streamIdentifier)
 		}
@@ -247,8 +247,4 @@ private class TaggedRemoteEventsListener: RemoteEventsListener {
 		self.streamIdentifier = streamIdentifier
 		super.init(baseUrl: baseUrl, accessToken: accessToken, delegate: delegate)
 	}
-}
-
-private func debugLog(_ message: String) {
-	log.info(message)
 }

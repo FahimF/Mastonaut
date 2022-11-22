@@ -26,11 +26,10 @@ class MastonautPersistentContainer: NSPersistentContainer {
 	override open class func defaultDirectoryURL() -> URL {
 		let storeURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)!
 		let directoryURL = storeURL.appendingPathComponent("Mastonaut", isDirectory: true)
-
+		NSLog("*** Data directory: \(directoryURL.path)")
 		if FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: nil) == false {
 			try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
 		}
-
 		return directoryURL
 	}
 }

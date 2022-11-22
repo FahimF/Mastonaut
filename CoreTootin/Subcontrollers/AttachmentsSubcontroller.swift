@@ -191,7 +191,7 @@ public class AttachmentsSubcontroller: NSObject {
 		attachmentUploader.startUploading(uploads: pendingUploads, for: client)
 	}
 
-	fileprivate enum ReuseIdentifiers {
+	private enum ReuseIdentifiers {
 		static let attachment = NSUserInterfaceItemIdentifier(rawValue: "attachment")
 		static let proposedAttachment = NSUserInterfaceItemIdentifier(rawValue: "proposed")
 	}

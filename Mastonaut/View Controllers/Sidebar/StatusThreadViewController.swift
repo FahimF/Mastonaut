@@ -25,7 +25,7 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 	private var status: Status? {
 		didSet {
 			guard let status = status else { return }
-			prepareNewEntries([status], for: .above, pagination: nil)
+			_ = prepareNewEntries([status], for: .above, pagination: nil)
 			fetchContextStatuses()
 		}
 	}
@@ -93,7 +93,7 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 			guard let self = self else { return }
 
 			if let status = self.status {
-				self.prepareNewEntries([status], for: .above, pagination: nil)
+				_ = self.prepareNewEntries([status], for: .above, pagination: nil)
 				self.fetchContextStatuses()
 			} else if let client = client {
 				self.resolveStatus(using: client, fallbackSearch: false)
@@ -104,13 +104,8 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 	private func resolveStatus(using client: ClientType, fallbackSearch: Bool) {
 		let uri = statusURI
 
-		client.run(Search.search(query: uri, limit: 1, resolve: true)) {
-			[weak self] result in
-
-			if case let .failure(error) = result,
-			   case .badStatus(statusCode: 404) = error,
-			   !fallbackSearch
-			{
+		client.run(Search.search(query: uri, limit: 1, resolve: true)) {[weak self] result in
+			if case let .failure(error) = result, case .badStatus(statusCode: 404) = error, !fallbackSearch {
 				self?.resolveStatus(using: client, fallbackSearch: true)
 			} else if case let .success(searchResults, _) = result, let status = searchResults.statuses.first {
 				DispatchQueue.main.async { self?.status = status }
@@ -122,19 +117,13 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 
 	private func fetchContextStatuses() {
 		guard let status = status, let client = client else { return }
-
-		client.run(Statuses.context(id: status.id)) {
-			[weak self] result in
-
+		client.run(Statuses.context(id: status.id)) {[weak self] result in
 			guard case let .success(context, _) = result else {
 				return
 			}
-
 			DispatchQueue.main.async {
-				self?.prepareNewEntries(context.ancestors.sorted(by: { $0.createdAt < $1.createdAt }),
-				                        for: .above, pagination: nil)
-				self?.prepareNewEntries(context.descendants.sorted(by: { $0.createdAt < $1.createdAt }),
-				                        for: .below, pagination: nil)
+				_ = self?.prepareNewEntries(context.ancestors.sorted(by: { $0.createdAt < $1.createdAt }), for: .above, pagination: nil)
+				_ = self?.prepareNewEntries(context.descendants.sorted(by: { $0.createdAt < $1.createdAt }), for: .below, pagination: nil)
 			}
 		}
 	}
@@ -143,7 +132,6 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 		if statusURI == status.uri {
 			return StatusMenuItemsController.shared.menuItems(for: status, interactionHandler: self)
 		}
-
 		return super.menuItems(for: status)
 	}
 
@@ -155,7 +143,7 @@ class StatusThreadViewController: StatusListViewController, SidebarPresentable {
 		return super.applicableFilters().filter { $0.context.contains(.thread) }
 	}
 
-	fileprivate enum CellViewIdentifier {
+	private enum CellViewIdentifier {
 		static let focused = NSUserInterfaceItemIdentifier("focused")
 	}
 }

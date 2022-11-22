@@ -19,7 +19,7 @@ public struct ClientObserverList {
     }
 
     public var allObservers: [ClientObserver] {
-        return storage.allObjects.flatMap({ $0 as? ClientObserver })
+		return storage.allObjects.compactMap({ $0 as? ClientObserver })
     }
 
     public func addObserver(_ observer: ClientObserver) {

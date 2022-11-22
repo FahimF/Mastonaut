@@ -27,7 +27,9 @@ class UserNotificationTool {
 	private var postedNotificationsCount: Int = 0 {
 		didSet {
 			let count = postedNotificationsCount
-			NSApp.dockTile.badgeLabel = count == 0 ? nil : "\(count)"
+			DispatchQueue.main.async {
+				NSApp.dockTile.badgeLabel = count == 0 ? nil : "\(count)"
+			}
 		}
 	}
 
@@ -36,10 +38,12 @@ class UserNotificationTool {
 	}
 	
 	func updateCount(count: Int = 1) {
-		if NSApp.isActive == false {
-			self.postedNotificationsCount += count
-		} else {
-			self.postedNotificationsCount = 0
+		DispatchQueue.main.async {
+			if NSApp.isActive == false {
+				self.postedNotificationsCount += count
+			} else {
+				self.postedNotificationsCount = 0
+			}
 		}
 	}
 	

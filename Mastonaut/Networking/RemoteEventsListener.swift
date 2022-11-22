@@ -28,12 +28,28 @@ protocol RemoteEventsListenerDelegate: AnyObject {
 	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, parserProducedError: Error)
 }
 
+enum EventType: String {
+	case update, delete, notification
+	case filtersChanged = "filters_changed"
+	// New items
+	case conversation, announcement
+	case reaction = "announcement.reaction"
+	case ann_delete = "announcement.delete"
+	case stat_update = "status.update"
+	case enc_msg = "encrypted_message"
+}
+
+enum ParseErrors: Error {
+	case unknownEventType(String)
+	case missingPayload
+}
+
 enum ClientEvent {
 	case update(Status)
 	case notification(MKNotification)
 	case delete(statusID: String)
 	case keywordFiltersChanged
-	case unhandled
+	case unhandled(EventType)
 }
 
 class RemoteEventsListener: NSObject, WebSocketDelegate {
@@ -94,7 +110,7 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 	func reconnect() {
 		DispatchQueue.main.async {
 			self.performReconnect()
-			self.debugLog("Reconnect")
+			log.info("Reconnect")
 		}
 	}
 
@@ -105,7 +121,7 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 		isReconnecting = true
 		DispatchQueue.main.asyncAfter(deadline: .now() + reconnectDelay) {
 			self.set(resolvedSocketURL: url)
-			self.debugLog("Reconnecting")
+			log.info("Reconnecting")
 		}
 	}
 
@@ -118,7 +134,7 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 		RemoteEventsListener.cancelPreviousPerformRequests(withTarget: self, selector: #selector(watchdogBarked), object: nil)
 		RemoteEventsListener.cancelPreviousPerformRequests(withTarget: self, selector: #selector(releaseWatchdog), object: nil)
 		perform(#selector(releaseWatchdog), with: nil, afterDelay: 60)
-		debugLog("Watchdog was reset")
+		log.info("Watchdog was reset")
 	}
 
 	@objc
@@ -126,19 +142,15 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 		RemoteEventsListener.cancelPreviousPerformRequests(withTarget: self, selector: #selector(watchdogBarked), object: nil)
 		perform(#selector(watchdogBarked), with: nil, afterDelay: 5)
 		socket?.write(ping: Data("ping".utf8))
-		debugLog("Watchdog was released!")
+		log.info("Watchdog was released!")
 	}
 
 	@objc
 	private func watchdogBarked() {
 		socket.disconnect(closeCode: CloseCode.noStatusReceived.rawValue)
-		debugLog("Watchdog barked!!!")
+		log.info("Watchdog barked!!!")
 	}
 
-	private func debugLog(_ message: String) {
-		log.info("[SOCKET \(addressAsString(self))] \(message)")
-	}
-	
 	private func parseMastodonEvent(with data: Data) {
 		guard data.isEmpty == false else {
 			// This is a heartbeat message. Ignoring it…
@@ -157,20 +169,20 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 		switch event {
 		case .connected(let headers):
 			isConnected = true
-			debugLog("WebSocket connected: \(headers)")
+			log.info("WebSocket connected: \(headers)")
 			delegate?.remoteEventsListenerDidConnect(self)
 			resetReconnectState()
 			resetWatchdog()
 
 		case .disconnected(let reason, let code):
 			isConnected = false
-			debugLog("websocket is disconnected: \(reason) with code: \(code)")
+			log.info("websocket is disconnected: \(reason) with code: \(code)")
 			isReconnecting = false
 			reconnectDelay = min(reconnectDelay * 2, 15)
 			delegate?.remoteEventsListenerDidDisconnect(self, code: code)
 
 		case .text(let text):
-			debugLog("*** Received text: \(text)")
+//			log.info("*** Received text: \(text)")
 			// Not sure why, but this is received when doing bookmark or favourite connections
 			if text == "{\"error\":\"Unknown stream type\"}" {
 				break
@@ -180,7 +192,7 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 			resetWatchdog()
 
 		case .binary(let data):
-			debugLog("*** Received data: \(data.count)")
+			log.info("*** Received data: \(data.count)")
 			parseMastodonEvent(with: data)
 			resetReconnectState()
 			resetWatchdog()
@@ -291,7 +303,7 @@ struct StreamPayload: Decodable {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .formatted(DateFormatter.mastodonFormatter)
 		switch (type, payload) {
-		case let (.update, .some(payload)):
+		case let (.update, .some(payload)), let (.stat_update, .some(payload)):
 			return .update(try decoder.decode(Status.self, from: Data(payload.utf8)))
 
 		case let (.notification, .some(payload)):
@@ -303,27 +315,12 @@ struct StreamPayload: Decodable {
 		case (.filtersChanged, _):
 			return .keywordFiltersChanged
 
-		case (.conversation, _), (.announcement, _), (.reaction, _), (.ann_delete, _), (.stat_update, _), (.enc_msg, _):
-			return .unhandled
+		case (.conversation, .some(payload)), (.announcement, .some(payload)), (.reaction, .some(payload)), (.ann_delete, .some(payload)), (.enc_msg, .some(payload)):
+			log.info("*** Unhandled - Type: \(type), Payload: \(payload)")
+			return .unhandled(type)
 			
 		default:
 			throw ParseErrors.missingPayload
 		}
-	}
-
-	enum EventType: String {
-		case update, delete, notification
-		case filtersChanged = "filters_changed"
-		// New items
-		case conversation, announcement
-		case reaction = "announcement.reaction"
-		case ann_delete = "announcement.delete"
-		case stat_update = "status.update"
-		case enc_msg = "encrypted_message"
-	}
-
-	enum ParseErrors: Error {
-		case unknownEventType(String)
-		case missingPayload
 	}
 }

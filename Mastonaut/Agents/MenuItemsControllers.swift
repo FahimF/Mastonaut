@@ -21,44 +21,42 @@ import CoreTootin
 import Foundation
 
 class MenuItemsController: NSObject {
-	fileprivate func makeActionItem(title: String, _ block: @escaping () -> Void) -> NSMenuItem {
+	func makeActionItem(title: String, _ block: @escaping () -> Void) -> NSMenuItem {
 		let item = NSMenuItem(title: title, action: #selector(evaluateRepresentedObject(_:)), keyEquivalent: "")
 		item.target = self
 		item.representedObject = LazyEvaluationAdapter<Void>(block)
 		return item
 	}
 
-	fileprivate func makeCopyItem(title: String, _ object: Any) -> NSMenuItem {
+	private func makeCopyItem(title: String, _ object: Any) -> NSMenuItem {
 		let item = NSMenuItem(title: title, action: #selector(copyRepresentedObject(_:)), keyEquivalent: "")
 		item.target = self
 		item.representedObject = object
 		return item
 	}
 
-	fileprivate func makeStringCopyItem(title: String, _ string: String) -> NSMenuItem {
+	func makeStringCopyItem(title: String, _ string: String) -> NSMenuItem {
 		return makeCopyItem(title: title, string)
 	}
 
-	fileprivate func makeLazyCopyItem(title: String, _ block: @escaping () -> NSPasteboardWriting) -> NSMenuItem {
+	func makeLazyCopyItem(title: String, _ block: @escaping () -> NSPasteboardWriting) -> NSMenuItem {
 		return makeCopyItem(title: title, LazyEvaluationAdapter(block))
 	}
 
-	fileprivate func makeOpenURLInBrowser(title: String, url: URL) -> NSMenuItem {
+	func makeOpenURLInBrowser(title: String, url: URL) -> NSMenuItem {
 		return makeActionItem(title: title) { NSWorkspace.shared.open(url) }
 	}
 
-	fileprivate func makeShareItem(url: URL) -> NSMenuItem {
+	func makeShareItem(url: URL) -> NSMenuItem {
 		let shareMenuItem = NSMenuItem(title: 🔠("Share"), submenu: NSMenu(title: ""))
 		DispatchQueue.global(qos: .background).async {
 			let shareMenuItems = ShareMenuFactory.shareMenuItems(for: url)
-
 			if shareMenuItems.isEmpty {
 				shareMenuItem.isHidden = true
 			} else {
 				shareMenuItem.submenu?.setItems(shareMenuItems)
 			}
 		}
-
 		return shareMenuItem
 	}
 }

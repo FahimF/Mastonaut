@@ -36,10 +36,10 @@ public protocol KeychainStorable: Codable {
 /// using the same Apple ID that have the "iCloud Keychain" service enabled.
 public class KeychainController {
 	/// The unique identifier of this controller service.
-	fileprivate let service: String
+	private let service: String
 
 	/// The user-visible label of this controller service, which is added to the label of keychain items.
-	fileprivate let serviceLabel: String
+	private let serviceLabel: String
 
 	/// Set this property to a keychain group identifier use a shared keychain, or set it to
 	/// `nil` to use the local keychain. The default value is nil.

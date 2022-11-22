@@ -516,7 +516,7 @@ class AccountsPreferencesController: BaseAccountsPreferencesViewController {
 		canDelete = false
 	}
 
-	fileprivate enum ModalAlertResult {
+	private enum ModalAlertResult {
 		case save
 		case discard
 		case cancel
