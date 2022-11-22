@@ -21,8 +21,14 @@ import Cocoa
 import CoreTootin
 
 class TimelineViewController: StatusListViewController {
+	private let notifierTool = UserNotificationTool.shared
+	
 	internal var source: Source? {
-		didSet { if source != oldValue { sourceDidChange(source: source) }}
+		didSet {
+			if source != oldValue {
+				sourceDidChange(source: source)
+			}
+		}
 	}
 
 	init(source: Source?) {
@@ -117,17 +123,25 @@ class TimelineViewController: StatusListViewController {
 				guard let self = self else { return }
 				if self.entryMap[status.key] != nil {
 					self.handle(updatedEntry: status)
+					self.updateCount(count: 1)
 				} else {
-					self.prepareNewEntries([status], for: .above, pagination: nil)
+					let count = self.prepareNewEntries([status], for: .above, pagination: nil)
+					self.updateCount(count: count)
 				}
 			}
 
 		case let .delete(statusID):
-			DispatchQueue.main.async { [weak self] in self?.handle(deletedEntry: statusID) }
+			DispatchQueue.main.async { [weak self] in
+				self?.handle(deletedEntry: statusID)
+			}
+			updateCount(count: -1)
 
 		case .notification:
 			break
 
+		case .unhandled:
+			NSLog("*** Unhandled client event received")
+			
 		case .keywordFiltersChanged:
 			break
 		}
@@ -143,7 +157,6 @@ class TimelineViewController: StatusListViewController {
 			tableView?.setAccessibilityLabel(nil)
 			return
 		}
-
 		switch source {
 		case .timeline:
 			tableView.setAccessibilityLabel("Home Timeline")
@@ -166,7 +179,6 @@ class TimelineViewController: StatusListViewController {
 		guard let source = source else {
 			return super.applicableFilters()
 		}
-
 		let currentContext: Filter.Context
 		switch source {
 			// Do not do any filtering for favourites and bookmarks
@@ -182,10 +194,16 @@ class TimelineViewController: StatusListViewController {
 		case .userMediaStatuses, .userStatuses, .userStatusesAndReplies:
 			currentContext = .account
 		}
-
 		return super.applicableFilters().filter { $0.context.contains(currentContext) }
 	}
 
+	private func updateCount(count: Int) {
+		// Handle updating badge count for Home
+		if source == .timeline {
+			notifierTool.updateCount(count: count)
+		}
+	}
+	
 	enum Source: Equatable {
 		case timeline
 		case localTimeline

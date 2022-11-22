@@ -20,8 +20,7 @@
 import CoreTootin
 import Foundation
 
-class StatusListViewController: ListViewController<Status>, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver
-{
+class StatusListViewController: ListViewController<Status>, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver {
 	private var observations: [NSKeyValueObservation] = []
 	private var filterService: FilterService?
 
@@ -58,8 +57,7 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	override func registerCells() {
 		super.registerCells()
 
-		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main),
-		                   forIdentifier: CellViewIdentifier.status)
+		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main), forIdentifier: CellViewIdentifier.status)
 	}
 
 	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
@@ -77,8 +75,7 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	func handle<T: UserDescriptionError>(interactionError error: T) {
 		DispatchQueue.main.async {
-			[weak self] in self?.view.window?.windowController?.displayError(error,
-			                                                                 title: 🔠("interaction.status"))
+			[weak self] in self?.view.window?.windowController?.displayError(error, title: 🔠("interaction.status"))
 		}
 	}
 
@@ -122,10 +119,7 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		let dialogMode: DialogMode = isRedrafting ? .custom(proceed: "Delete and Redraft", dismiss: "Cancel")
 			: .custom(proceed: "Delete Toot", dismiss: "Cancel")
 
-		view.window?.windowController?.showAlert(style: .informational,
-		                                         title: "Are you sure you want to delete this post?",
-		                                         message: message,
-		                                         dialogMode: dialogMode) {
+		view.window?.windowController?.showAlert(style: .informational, title: "Are you sure you want to delete this post?", message: message, dialogMode: dialogMode) {
 			response in
 			completion(response == .alertFirstButtonReturn)
 		}
@@ -144,7 +138,6 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		guard entryMatchesAnyFilter(status) == false else {
 			return StatusMenuItemsController.shared.menuItems(forFilteredStatus: status, interactionHandler: self)
 		}
-
 		return StatusMenuItemsController.shared.menuItems(for: status, interactionHandler: self)
 	}
 

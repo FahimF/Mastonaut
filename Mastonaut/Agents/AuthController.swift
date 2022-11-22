@@ -290,7 +290,7 @@ class AuthController {
 				#if DEBUG
 					NSLog("Login error: \(error)")
 				#endif
-				let description = 🔠("Failed authorization from “%@”: Could not log in.", baseDomain)
+				let description = "Failed authorization from “\(baseDomain)”: Could not log in."
 
 				DispatchQueue.main.async { completion?() }
 				guard let self = self else { return }
@@ -313,7 +313,7 @@ class AuthController {
 					#if DEBUG
 						NSLog("Error fetching account info: \(error)")
 					#endif
-					let description = 🔠("Failed authorization from “%@”: Could not fetch user.", baseDomain)
+					let description = "Failed authorization from “\(baseDomain)”: Could not fetch user."
 
 					DispatchQueue.main.async {
 						completion?()
@@ -331,13 +331,8 @@ class AuthController {
 					let accountIdentifier = "\(account.username)@\(instance.uri)"
 
 					// The access token goes into the keychain
-					let accountAccessToken = AccountAccessToken(account: accountIdentifier,
-					                                            accessToken: login.accessToken,
-					                                            clientApplication: clientApplication,
-					                                            grantCode: grantCode)
-
+					let accountAccessToken = AccountAccessToken(account: accountIdentifier, accessToken: login.accessToken, clientApplication: clientApplication, grantCode: grantCode)
 					try keychainController.store(accountAccessToken, overwite: true)
-
 					DispatchQueue.main.async {
 						guard let self = self else {
 							completion?()
@@ -358,21 +353,10 @@ class AuthController {
 							authorizedAccount.uri = account.uri(in: instance)
 							authorizedAccount.needsAuthorization = false
 						} else {
-							authorizedAccount = AuthorizedAccount.insert(context: context,
-							                                             account: accountIdentifier,
-							                                             baseDomain: baseDomain,
-							                                             displayName: account.displayName,
-							                                             username: account.username,
-							                                             avatarURL: account.avatarURL,
-							                                             uri: account.uri(in: instance),
-							                                             login: login)
-
+							authorizedAccount = AuthorizedAccount.insert(context: context, account: accountIdentifier, baseDomain: baseDomain, displayName: account.displayName, username: account.username, avatarURL: account.avatarURL, uri: account.uri(in: instance), login: login)
 							accountsService.order.appendAccount(authorizedAccount)
 						}
-
-						self.updateBlocksAndMutes(for: account, authorizedAccount: authorizedAccount, using: client) {
-							[weak self] in
-
+						self.updateBlocksAndMutes(for: account, authorizedAccount: authorizedAccount, using: client) { [weak self] in
 							completion?()
 							guard let self = self else { return }
 							delegate?.authController(self, didAuthorize: account, uuid: authorizedAccount.uuid)
@@ -393,51 +377,31 @@ class AuthController {
 		}
 
 		let alert = NSAlert(style: .warning,
-		                    title: 🔠("Error"),
+		                    title: "Error",
 		                    message: 🔠("authorization.clientRegistration", baseDomain, error.userDescription))
 
-		alert.addButton(withTitle: 🔠("OK"))
+		alert.addButton(withTitle: "OK")
 
 		alert.beginSheetModal(for: sourceWindow) { _ in }
 	}
 
-	private func showOAuthWindow(with baseDomain: String,
-	                             clientApplication: ClientApplication,
-	                             sourceWindow: NSWindow,
-	                             existingAccount: AuthorizedAccount?)
-	{
+	private func showOAuthWindow(with baseDomain: String, clientApplication: ClientApplication, sourceWindow: NSWindow, existingAccount: AuthorizedAccount?) {
 		var authUrlPath = "https://" + baseDomain
 
 		if !authUrlPath.hasSuffix("/") {
 			authUrlPath.append("/")
 		}
-
 		authUrlPath.append(clientApplication.authorizationPath)
-
 		let authWindowController = AuthWindowController()
-
-		guard
-			let authWindow = authWindowController.window,
-			let authUrl = URL(string: authUrlPath)
-		else {
+		guard let authWindow = authWindowController.window, let authUrl = URL(string: authUrlPath) else {
 			delegate?.authController(self, failedAuthorizingWithError: .unknownAuthorization)
 			cleanupAuthorizationState()
 			return
 		}
-
-		authorizationState = .authorizing(sourceWindow: sourceWindow,
-		                                  sheetWindowController: authWindowController,
-		                                  clientApplication: clientApplication,
-		                                  baseDomain: baseDomain,
-		                                  existingAccount: existingAccount)
-
+		authorizationState = .authorizing(sourceWindow: sourceWindow, sheetWindowController: authWindowController, clientApplication: clientApplication, baseDomain: baseDomain, existingAccount: existingAccount)
 		authWindowController.loadUrl(authUrl)
-
-		sourceWindow.beginSheet(authWindow) {
-			[weak self] response in
-
+		sourceWindow.beginSheet(authWindow) {[weak self] response in
 			guard response != .continue, let self = self else { return }
-
 			self.delegate?.authControllerDidCancelAuthorization(self)
 			self.cleanupAuthorizationState()
 		}
@@ -488,10 +452,8 @@ extension AuthController: InstancePickerWindowControllerDelegate {
 			DispatchQueue.main.async {
 				switch result {
 				case let .success(clientApplication):
-					self?.showOAuthWindow(with: baseDomain,
-					                      clientApplication: clientApplication,
-					                      sourceWindow: sourceWindow,
-					                      existingAccount: nil)
+					self?.showOAuthWindow(with: baseDomain, clientApplication: clientApplication, sourceWindow: sourceWindow, existingAccount: nil)
+					
 				case let .failure(error):
 					self?.showError(ValidInstanceCheckErrors.clientError(error), with: baseDomain)
 				}
@@ -506,30 +468,18 @@ private extension ClientApplication {
 	}
 }
 
-extension AuthController // Helpers
-{
-	func checkValidInstanceDomain(_ domain: String,
-	                              completion: @escaping (Swift.Result<ValidInstance, ValidInstanceCheckErrors>) -> Void)
-	{
+// Helpers
+extension AuthController {
+	func checkValidInstanceDomain(_ domain: String, completion: @escaping (Swift.Result<ValidInstance, ValidInstanceCheckErrors>) -> Void) {
 		let trimmedDomain = domain.trimmingCharacters(in: CharacterSet(charactersIn: "@"))
-
-		guard
-			!trimmedDomain.isEmpty,
-			let wellFormedUrl = URL(string: "https://\(trimmedDomain)/api/v1/instance"),
-			let host = wellFormedUrl.host
-		else {
+		guard !trimmedDomain.isEmpty, let wellFormedUrl = URL(string: "https://\(trimmedDomain)/api/v1/instance"), let host = wellFormedUrl.host else {
 			return completion(.failure(.badDomain))
 		}
-
 		guard AuthController.blockedDomains.contains(host) == false else {
 			return completion(.failure(.badDomain))
 		}
-
 		let client = Client(baseURL: "https://\(host)")
-
-		client.run(Instances.current()) {
-			result in
-
+		client.run(Instances.current()) {result in
 			switch result {
 			case let .success(instance, _):
 				let validInstance = ValidInstance(baseURL: wellFormedUrl, instance: instance)

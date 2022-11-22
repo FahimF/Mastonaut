@@ -22,6 +22,8 @@ import Foundation
 import UserNotifications
 
 class UserNotificationTool {
+	static let shared = UserNotificationTool()
+	
 	private var postedNotificationsCount: Int = 0 {
 		didSet {
 			let count = postedNotificationsCount
@@ -29,28 +31,36 @@ class UserNotificationTool {
 		}
 	}
 
-	func postNotification(title: String, subtitle: String?, message: String?, payload: NotificationPayload? = nil)
-	{
-		let notification = NSUserNotification()
-		notification.title = title
-		notification.subtitle = subtitle
-		notification.informativeText = message
-		notification.payload = payload
-
-		NSUserNotificationCenter.default.scheduleNotification(notification)
-
+	private init() {
+		// Private initializer - so that you can't instantiate and should use the shared instance
+	}
+	
+	func updateCount(count: Int = 1) {
 		if NSApp.isActive == false {
-			postedNotificationsCount += 1
+			self.postedNotificationsCount += count
 		} else {
-			postedNotificationsCount = 0
+			self.postedNotificationsCount = 0
+		}
+	}
+	
+	func postNotification(title: String, subtitle: String?, message: String?, payload: NotificationPayload? = nil) {
+		let content = UNMutableNotificationContent()
+		content.title = title
+		content.subtitle = subtitle ?? ""
+		content.body = message ?? ""
+		content.payload = payload
+		let uuid = UUID().uuidString
+		let request = UNNotificationRequest(identifier: uuid, content: content, trigger: nil)
+		UNUserNotificationCenter.current().add(request) { error in
+			if let error = error {
+				NSLog("*** Error posting local notification: \(error)")
+				return
+			}
+			self.updateCount()
 		}
 	}
 
-	func postNotification(mastodonEvent notification: MastodonNotification,
-	                      receiverName: String?,
-	                      userAccount: UUID,
-	                      detailMode: AccountPreferences.NotificationDetailMode)
-	{
+	func postNotification(mastodonEvent notification: MastodonNotification, receiverName: String?, userAccount: UUID, detailMode: AccountPreferences.NotificationDetailMode) {
 		let showDetails: Bool
 
 		switch detailMode {
@@ -59,30 +69,33 @@ class UserNotificationTool {
 		case .whenClean: showDetails = notification.isClean
 		}
 
-		var actorName: String { return showDetails ? notification.authorName : 🔠("A user") }
+		var actorName: String {
+			return showDetails ? notification.authorName : "A user"
+		}
+		
 		var contentOrSpoiler: NSAttributedString? {
 			return showDetails ? notification.status?.attributedContent : notification.status?.attributedSpoiler
 		}
 
 		let title: String
-		let subtitle = receiverName.map { 🔠("For %@", $0) }
+		let subtitle = receiverName.map { "For \($0)" }
 		var message: String?
 
 		switch notification.type {
 		case .mention:
-			title = 🔠("%@ mentioned you", actorName)
+			title = "\(actorName) mentioned you"
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .reblog:
-			title = 🔠("%@ boosted your post", actorName)
+			title = "\(actorName) boosted your post"
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .favourite:
-			title = 🔠("%@ favorited your post", actorName)
+			title = "\(actorName) favorited your post"
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		case .follow:
-			title = 🔠("%@ followed you", actorName)
+			title = "\(actorName) followed you"
 			message = showDetails ? notification.account.attributedNote.string.ellipsedPrefix(maxLength: 80) : nil
 		case .poll:
-			title = 🔠("A poll has ended")
+			title = "A poll has ended"
 			message = contentOrSpoiler?.string.ellipsedPrefix(maxLength: 80)
 		default:
 			return
@@ -91,15 +104,10 @@ class UserNotificationTool {
 		let notificationPayload: NotificationPayload
 
 		if let status = notification.status {
-			notificationPayload = NotificationPayload(accountUUID: userAccount,
-			                                          referenceURI: status.resolvableURI,
-			                                          referenceType: .status)
+			notificationPayload = NotificationPayload(accountUUID: userAccount, referenceURI: status.resolvableURI, referenceType: .status)
 		} else {
-			notificationPayload = NotificationPayload(accountUUID: userAccount,
-			                                          referenceURI: notification.account.acct,
-			                                          referenceType: .account)
+			notificationPayload = NotificationPayload(accountUUID: userAccount, referenceURI: notification.account.acct, referenceType: .account)
 		}
-
 		postNotification(title: title, subtitle: subtitle, message: message, payload: notificationPayload)
 	}
 
@@ -108,11 +116,18 @@ class UserNotificationTool {
 	}
 }
 
-extension NSUserNotification {
+private func infoToPayload(info: [AnyHashable: Any]) -> NotificationPayload? {
+	guard let dict = info["mastonaut_payload"] as? [String: Any?], let accountUUID = (dict["account_UUID"] as? String).flatMap({ UUID(uuidString: $0) }), let referenceURI = dict["reference_URI"] as? String, let referenceType = (dict["reference_type"] as? String).flatMap({ NotificationPayload.Reference(rawValue: $0) }) else {
+		return nil
+	}
+	return NotificationPayload(accountUUID: accountUUID, referenceURI: referenceURI, referenceType: referenceType)
+}
+
+extension UNMutableNotificationContent {
 	var payload: NotificationPayload? {
 		set(payload) {
-			var dict = userInfo ?? [:]
-
+			var dict = userInfo
+			
 			if let payload = payload {
 				dict["mastonaut_payload"] = [
 					"account_UUID": payload.accountUUID.uuidString,
@@ -122,19 +137,19 @@ extension NSUserNotification {
 			} else {
 				dict["mastonaut_payload"] = nil
 			}
-
 			userInfo = dict
 		}
-
+		
 		get {
-			guard
-				let dict = userInfo?["mastonaut_payload"] as? [String: Any?],
-				let accountUUID = (dict["account_UUID"] as? String).flatMap({ UUID(uuidString: $0) }),
-				let referenceURI = dict["reference_URI"] as? String,
-				let referenceType = (dict["reference_type"] as? String).flatMap({ NotificationPayload.Reference(rawValue: $0) })
-			else { return nil }
+			return infoToPayload(info: userInfo)
+		}
+	}
+}
 
-			return NotificationPayload(accountUUID: accountUUID, referenceURI: referenceURI, referenceType: referenceType)
+extension UNNotification {
+	var payload: NotificationPayload? {
+		get {
+			return infoToPayload(info: request.content.userInfo)
 		}
 	}
 }

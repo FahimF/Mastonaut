@@ -20,8 +20,7 @@
 import Cocoa
 import CoreTootin
 
-class NotificationListViewController: ListViewController<MastodonNotification>, NotificationInteractionHandling, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver
-{
+class NotificationListViewController: ListViewController<MastodonNotification>, NotificationInteractionHandling, StatusInteractionHandling, PollVotingCapable, FilterServiceObserver {
 	private var statusIdNotificationIdMap: [String: String] = [:]
 	private var observations: [NSKeyValueObservation] = []
 	private var reduceMotionNotificationObserver: NSObjectProtocol?
@@ -209,14 +208,14 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		run(request: Notifications.all(range: rangeForEntryFetch(for: insertion)), for: insertion)
 	}
 
-	override func prepareNewEntries(_ notifications: [MastodonNotification], for insertion: ListViewController<MastodonNotification>.InsertionPoint, pagination: Pagination?) {
+	override func prepareNewEntries(_ notifications: [MastodonNotification], for insertion: ListViewController<MastodonNotification>.InsertionPoint, pagination: Pagination?) -> Int {
 		let filteredNotifications = notifications.filter { $0.isOfKnownType }
 		for notification in filteredNotifications {
 			if let statusID = notification.status?.id {
 				statusIdNotificationIdMap[statusID] = notification.id
 			}
 		}
-		super.prepareNewEntries(filteredNotifications, for: insertion, pagination: pagination)
+		return super.prepareNewEntries(filteredNotifications, for: insertion, pagination: pagination)
 	}
 
 	override func cellViewIdentifier(for notification: MastodonNotification) -> NSUserInterfaceItemIdentifier {
@@ -272,17 +271,13 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 	override func receivedClientEvent(_ event: ClientEvent) {
 		switch event {
 		case let .notification(notification):
-			DispatchQueue.main.async {
-				[weak self] in
-
+			DispatchQueue.main.async {[weak self] in
 				self?.prepareNewEntries([notification], for: .above, pagination: nil)
 				self?.postNotificationIfAppropriate(notification)
 			}
 
 		case let .delete(statusID):
-			DispatchQueue.main.async {
-				[weak self] in
-
+			DispatchQueue.main.async {[weak self] in
 				if let notificationId = self?.statusIdNotificationIdMap[statusID] {
 					self?.handle(deletedEntry: notificationId)
 				}
@@ -291,6 +286,9 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		case .update:
 			break
 
+		case .unhandled:
+			NSLog("*** Unhandled client event received")
+			
 		case .keywordFiltersChanged:
 			break
 		}

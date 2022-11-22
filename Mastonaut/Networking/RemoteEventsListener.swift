@@ -33,6 +33,7 @@ enum ClientEvent {
 	case notification(MKNotification)
 	case delete(statusID: String)
 	case keywordFiltersChanged
+	case unhandled
 }
 
 class RemoteEventsListener: NSObject, WebSocketDelegate {
@@ -63,7 +64,6 @@ class RemoteEventsListener: NSObject, WebSocketDelegate {
 	deinit {
 		socket?.disconnect()
 		RemoteEventsListener.cancelPreviousPerformRequests(withTarget: self, selector: #selector(watchdogBarked), object: nil)
-
 		RemoteEventsListener.cancelPreviousPerformRequests(withTarget: self, selector: #selector(releaseWatchdog), object: nil)
 	}
 
@@ -305,16 +305,23 @@ struct StreamPayload: Decodable {
 		case (.filtersChanged, _):
 			return .keywordFiltersChanged
 
+		case (.conversation, _), (.announcement, _), (.reaction, _), (.ann_delete, _), (.stat_update, _), (.enc_msg, _):
+			return .unhandled
+			
 		default:
 			throw ParseErrors.missingPayload
 		}
 	}
 
 	enum EventType: String {
-		case update
-		case notification
-		case delete
+		case update, delete, notification
 		case filtersChanged = "filters_changed"
+		// New items
+		case conversation, announcement
+		case reaction = "announcement.reaction"
+		case ann_delete = "announcement.delete"
+		case stat_update = "status.update"
+		case enc_msg = "encrypted_message"
 	}
 
 	enum ParseErrors: Error {

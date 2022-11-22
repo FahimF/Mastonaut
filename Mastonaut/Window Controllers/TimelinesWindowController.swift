@@ -64,9 +64,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 
 	var currentInstance: Instance? {
 		didSet {
-			if let sidebarMode = sidebarSubcontroller.navigationStack?.currentItem,
-			   sidebarViewController == nil
-			{
+			if let sidebarMode = sidebarSubcontroller.navigationStack?.currentItem, sidebarViewController == nil {
 				let oldStack = preservedWindowFrameStack
 				sidebarSubcontroller.installSidebar(mode: sidebarMode)
 				preservedWindowFrameStack = oldStack
@@ -77,15 +75,22 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	private(set) var client: ClientType? {
 		didSet {
 			guard AppDelegate.shared.appIsReady else { return }
-
-			timelinesViewController.columnViewControllers.forEach { $0.client = client }
+			timelinesViewController.columnViewControllers.forEach {
+				$0.client = client
+			}
 			revalidateSidebarAccountReference()
 		}
 	}
 
 	internal var currentUser: UUID? {
-		get { return currentAccount?.uuid }
-		set { currentAccount = newValue.flatMap { accountsService.account(with: $0) } }
+		get {
+			return currentAccount?.uuid
+		}
+		set {
+			currentAccount = newValue.flatMap {
+				accountsService.account(with: $0)
+			}
+		}
 	}
 
 	internal var currentAccount: AuthorizedAccount? {
@@ -95,7 +100,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			if let currentAccount = currentAccount {
 				hasUser = true
 				let client = Client.create(for: currentAccount)
-
 				if let window = window {
 					if let instance = currentAccount.baseDomain {
 						window.title = "@\(currentAccount.username!) — \(instance)"
@@ -103,20 +107,15 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 						window.title = "@\(currentAccount.username!)"
 					}
 				}
-
 				removePlaceholderIfInstalled()
 				updateUserPopUpButton()
-
-				instanceService.instance(for: currentAccount) {
-					[weak self] instance in
+				instanceService.instance(for: currentAccount) {[weak self] instance in
 					DispatchQueue.main.async {
 						self?.client = client
 						self?.currentInstance = instance
 					}
 				}
-
-				accountObservations.observe(currentAccount, \.bookmarkedTags) {
-					_, _ in AppDelegate.shared.updateAccountsMenu()
+				accountObservations.observe(currentAccount, \.bookmarkedTags) {_, _ in AppDelegate.shared.updateAccountsMenu()
 				}
 			} else {
 				hasUser = false
@@ -125,16 +124,13 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 				accountObservations.removeAll()
 				sidebarSubcontroller.uninstallSidebar()
 				installPlaceholder()
-				window?.title = 🔠("Mastonaut — No Account Selected")
+				window?.title = "Mastonaut — No Account Selected"
 			}
-
 			statusComposerSegmentedControl.isHidden = !hasUser
 			newColumnSegmentedControl.isHidden = !hasUser
 			timelinesViewController.columnViewControllers.forEach { columnPopUpButtonMap.object(forKey: $0)?.isHidden = !hasUser }
 			columnPopUpButtonMap.objectEnumerator()?.forEach { ($0 as? NSControl)?.isHidden = !hasUser }
-
 			invalidateRestorableState()
-
 			if window?.isKeyWindow == true {
 				AppDelegate.shared.updateAccountsMenu()
 			}
@@ -174,7 +170,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		} else {
 			currentAccount = nil
 		}
-
 		appendColumnIfFitting(model: ColumnMode.timeline)
 	}
 
@@ -193,40 +188,33 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			let encoder = NSKeyedArchiver(requiringSecureCoding: false)
 			navigationStack.encode(with: encoder)
 			coder.encode(encoder.encodedData, forKey: CodingKeys.sidebarNavigationStack)
-
 //			coder.encode(navigationStack, forKey: CodingKeys.sidebarNavigationStack)
 		}
 	}
 
 	override func restoreState(with coder: NSCoder) {
-		if let uuid: UUID = coder.decodeObject(forKey: CodingKeys.currentUser),
-		   let account = accountsService.account(with: uuid)
-		{
+		if let uuid: UUID = coder.decodeObject(forKey: CodingKeys.currentUser), let account = accountsService.account(with: uuid) {
 			currentAccount = account
 		} else {
 			currentAccount = nil
 		}
-
 		if let encodedColumnModels: String = coder.decodeObject(forKey: CodingKeys.columns) {
-			let columnModels = encodedColumnModels.split(separator: ";")
-				.compactMap { ColumnMode(rawValue: String($0)) }
-
+			let columnModels = encodedColumnModels.split(separator: ";").compactMap {
+				ColumnMode(rawValue: String($0))
+			}
 			for model in columnModels {
 				appendColumnIfFitting(model: model, expand: false)
 			}
 		}
-
 		if let frameStack: [NSValue] = coder.decodeObject(forKey: CodingKeys.preservedWindowFrameStack) {
 			preservedWindowFrameStack = Stack(frameStack.compactMap { $0.rectValue })
 		} else {
 			preservedWindowFrameStack = []
 		}
-
 		if timelinesViewController.columnViewControllers.isEmpty {
 			// Fallback if no columns were installed from decoding
 			appendColumnIfFitting(model: ColumnMode.timeline)
 		}
-
 		// HOTFIX: Swift classes with parameter types do not encode properly in *Release*
 		// Since we know the type in advance, we use a separate archiver for the navigation stack which skips
 		// the class name level and encodes only the internals.
@@ -238,7 +226,6 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 				sidebarSubcontroller = SidebarSubcontroller(sidebarContainer: self, navigationControl: sidebarNavigationSegmentedControl, navigationStack: stack)
 			}
 		}
-
 		updateUserPopUpButton()
 	}
 
@@ -252,24 +239,18 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		// Accounts dropdown
 		userPopUpButtonController = UserPopUpButtonSubcontroller(display: self)
 		// Keep an eye on new columns being spawned
-		observations.observe(on: .main, timelinesViewController, \TimelinesViewController.columnViewControllersCount) {
-			[weak self] timelinesViewController, _ in
+		observations.observe(on: .main, timelinesViewController, \TimelinesViewController.columnViewControllersCount) {[weak self] timelinesViewController, _ in
 			self?.updateColumnsPopUpButtons(for: timelinesViewController.columnViewControllers)
 			self?.newColumnSegmentedControl.setEnabled(timelinesViewController.canAppendStatusList, forSegment: 0)
 			self?.invalidateRestorableState()
 		}
-
-		observations.observe(AppDelegate.shared, \AppDelegate.appIsReady) {
-			[weak self] appDelegate, _ in
-
+		observations.observe(AppDelegate.shared, \AppDelegate.appIsReady) {[weak self] appDelegate, _ in
 			if appDelegate.appIsReady, let client = self?.client {
 				self?.timelinesViewController.columnViewControllers.forEach { $0.client = client }
 				self?.revalidateSidebarAccountReference()
 			}
 		}
-
 		guard let window = window else { return }
-
 		window.backgroundColor = .timelineBackground
 	}
 
@@ -279,8 +260,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		}
 	}
 
-	// MARK: UI Handling
-
+	// MARK: - UI Handling
 	func updateUserPopUpButton() {
 		userPopUpButtonController.updateUserPopUpButton()
 	}
@@ -307,16 +287,13 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		AppDelegate.shared.composeStatus(self)
 		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
 		composerWindowController.showWindow(nil)
-
 		composerWindowController.setupAsMention(handle: userHandle, using: currentAccount, directMessage: directMessage)
 	}
 
 	func installPlaceholder() {
 		guard let contentView = contentViewController?.view, placeholderViewController == nil else { return }
-
 		let accounts = accountsService.authorizedAccounts
 		let viewController: NSViewController
-
 		if accounts.isEmpty {
 			// Show welcome placeholder
 			viewController = WelcomePlaceholderController()
@@ -324,13 +301,10 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			// Show account picker placeholder
 			viewController = AccountsPlaceholderController()
 		}
-
 		contentView.subviews.forEach { $0.isHidden = true }
-
 		contentViewController?.addChild(viewController)
 		contentView.addSubview(viewController.view)
 		placeholderViewController = viewController
-
 		NSLayoutConstraint.activate([
 			contentView.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
 			contentView.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
@@ -343,35 +317,20 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		placeholderViewController?.view.removeFromSuperview()
 		placeholderViewController?.removeFromParent()
 		placeholderViewController = nil
-
 		contentViewController?.view.subviews.forEach { $0.isHidden = false }
 	}
 
 	func presentSearchWindow() {
 		let storyboard = NSStoryboard(name: "Search", bundle: .main)
-
-		guard
-			currentInstance != nil,
-			let account = currentAccount,
-			let client = client,
-			let searchWindowController = storyboard.instantiateInitialController() as? SearchWindowController,
-			let searchWindow = searchWindowController.window,
-			let timelinesWindow = window
-		else {
+		guard currentInstance != nil, let account = currentAccount, let client = client, let searchWindowController = storyboard.instantiateInitialController() as? SearchWindowController, let searchWindow = searchWindowController.window, let timelinesWindow = window else {
 			return
 		}
-
 		searchWindowController.set(client: client)
 		searchWindowController.set(searchDelegate: self)
-
-		AppDelegate.shared.instanceService.instance(for: account) {
-			[weak self] instance in
-
+		AppDelegate.shared.instanceService.instance(for: account) {[weak self] instance in
 			guard let instance = instance else { return }
-
 			searchWindowController.set(instance: instance)
 			self?.searchWindowController = searchWindowController
-
 			timelinesWindow.beginSheet(searchWindow) {
 				_ in self?.searchWindowController = nil
 			}
@@ -379,15 +338,10 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	}
 
 	func adjustWindowFrame(adjustment: WindowSizeAdjustment) {
-		guard
-			let window = window,
-			window.styleMask.contains(.fullScreen) == false,
-			let screen = window.screen
-		else { return }
-
+		guard let window = window, window.styleMask.contains(.fullScreen) == false, let screen = window.screen else { return
+		}
 		let originalWindowFrame = window.frame
 		var frame = originalWindowFrame
-
 		switch adjustment {
 		case .nudgeIfClipped:
 			let excessWidth = window.frame.maxX - screen.frame.maxX
@@ -396,20 +350,16 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 
 		case let .expand(by: extraWidth):
 			preservedWindowFrameStack.push(originalWindowFrame)
-
 			if originalWindowFrame.maxX + extraWidth <= screen.frame.maxX {
 				frame.size.width = originalWindowFrame.width + extraWidth
 			} else {
 				frame.size.width = screen.frame.maxX - window.frame.origin.x
 			}
-
 			if let contentView = window.contentView {
 				let contentFrame = window.contentRect(forFrameRect: frame)
 				contentView.setFrameSize(contentFrame.size)
 				contentView.layoutSubtreeIfNeeded()
-
 				let difference = contentView.frame.width - contentFrame.width
-
 				if difference > 0 {
 					frame.origin.x -= difference
 				}
@@ -427,13 +377,11 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 				frame.origin = preservedFrame.origin
 			}
 		}
-
 		window.animator().setFrame(frame, display: false)
 	}
 
 	override func mouseDragged(with event: NSEvent) {
 		super.mouseDragged(with: event)
-
 		if preservedWindowFrameStack.isEmpty == false {
 			preservedWindowFrameStack = []
 		}
@@ -482,8 +430,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		constraints.append(TrackingLayoutConstraint.constraint(trackingMaxXOf: contentView, targetView: newColumnSegmentedControl, containerView: toolbarView, targetAttribute: .trailing, containerAttribute: .leading).with(priority: .defaultLow))
 		constraints.append(contentsOf: [
 			currentUserPopUpButton.leadingAnchor.constraint(equalTo: toolbarView.leadingAnchor, constant: 6),
-			newColumnSegmentedControl.leadingAnchor.constraint(equalTo: statusComposerSegmentedControl.trailingAnchor,
-			                                                   constant: 8),
+			newColumnSegmentedControl.leadingAnchor.constraint(equalTo: statusComposerSegmentedControl.trailingAnchor, constant: 8),
 			toolbarView.trailingAnchor.constraint(greaterThanOrEqualTo: newColumnSegmentedControl.trailingAnchor, constant: 6),
 		])
 		NSLayoutConstraint.activate(constraints)
@@ -517,14 +464,14 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 			items.append(.separator())
 			// Extra menu items
 			let reloadColumnItem = NSMenuItem()
-			reloadColumnItem.title = 🔠("Reload this Column")
+			reloadColumnItem.title = "Reload this Column"
 			reloadColumnItem.target = self
 			reloadColumnItem.representedObject = index
 			reloadColumnItem.action = #selector(TimelinesWindowController.reloadColumn(_:))
 			items.append(reloadColumnItem)
 			if index > 0 {
 				let removeColumnItem = NSMenuItem()
-				removeColumnItem.title = 🔠("Remove this Column")
+				removeColumnItem.title = "Remove this Column"
 				removeColumnItem.target = self
 				removeColumnItem.representedObject = index
 				removeColumnItem.action = #selector(TimelinesWindowController.removeColumn(_:))
@@ -580,94 +527,51 @@ extension TimelinesWindowController: SidebarContainer {
 		if let currentWindowFrame = window?.frame {
 			preservedWindowFrameStack.push(currentWindowFrame)
 		}
-
 		contentViewController?.addChild(viewController)
 	}
 
 	func didInstallSidebar(viewController _: NSViewController, with _: SidebarMode) {
-		guard
-			let toolbarView = toolbarContainerView,
-			closeSidebarSegmentedControl?.superview == nil,
-			sidebarNavigationSegmentedControl.superview == nil,
-			let titleMode = sidebarViewController?.titleMode
-		else {
+		guard let toolbarView = toolbarContainerView, closeSidebarSegmentedControl?.superview == nil, sidebarNavigationSegmentedControl.superview == nil, let titleMode = sidebarViewController?.titleMode else {
 			invalidateRestorableState()
 			return
 		}
-
 		let navigationControl = sidebarNavigationSegmentedControl
-
 		let closeSidebarButton = makeCloseSidebarButton()
 		toolbarView.addSubview(closeSidebarButton)
 		toolbarView.addSubview(navigationControl)
-
 		let titleView = sidebarTitleViewController.view
 		sidebarTitleViewController.titleMode = titleMode
 		toolbarView.addSubview(titleView)
 
-		let leadingConstraint = TrackingLayoutConstraint.constraint(
-			trackingMaxXOf: timelinesViewController.mainContentView,
-			offset: timelinesSplitViewController.splitView.dividerThickness,
-			targetView: navigationControl,
-			containerView: toolbarView,
-			targetAttribute: .leading,
-			containerAttribute: .leading
+		let leadingConstraint = TrackingLayoutConstraint.constraint(trackingMaxXOf: timelinesViewController.mainContentView, offset: timelinesSplitViewController.splitView.dividerThickness, targetView: navigationControl, containerView: toolbarView, targetAttribute: .leading, containerAttribute: .leading
 		).with(priority: .defaultLow + 1)
 
-		let centerConstraint = TrackingLayoutConstraint.constraint(
-			trackingMidXOf: sidebarViewController!.view.firstParentViewInsideSplitView(),
-			offset: timelinesSplitViewController.splitView.dividerThickness,
-			targetView: titleView,
-			containerView: toolbarView,
-			targetAttribute: .centerX,
-			containerAttribute: .leading
+		let centerConstraint = TrackingLayoutConstraint.constraint(trackingMidXOf: sidebarViewController!.view.firstParentViewInsideSplitView(), offset: timelinesSplitViewController.splitView.dividerThickness, targetView: titleView, containerView: toolbarView, targetAttribute: .centerX, containerAttribute: .leading
 		).with(priority: .defaultLow + 1)
 
 		sidebarTitleViewCenterXConstraint = centerConstraint
 
 		NSLayoutConstraint.activate([
-			toolbarView.trailingAnchor.constraint(equalTo: closeSidebarButton.trailingAnchor, constant: 8),
-			leadingConstraint,
-			navigationControl.leadingAnchor.constraint(greaterThanOrEqualTo: newColumnSegmentedControl.trailingAnchor,
-			                                           constant: 10),
-
+			toolbarView.trailingAnchor.constraint(equalTo: closeSidebarButton.trailingAnchor, constant: 8), leadingConstraint,
+			navigationControl.leadingAnchor.constraint(greaterThanOrEqualTo: newColumnSegmentedControl.trailingAnchor, constant: 10),
 			titleView.leadingAnchor.constraint(greaterThanOrEqualTo: navigationControl.trailingAnchor, constant: 8),
-			closeSidebarButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleView.trailingAnchor, constant: 8),
-			centerConstraint,
-
+			closeSidebarButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleView.trailingAnchor, constant: 8), centerConstraint,
 			toolbarView.centerYAnchor.constraint(equalTo: closeSidebarButton.centerYAnchor),
 			toolbarView.centerYAnchor.constraint(equalTo: navigationControl.centerYAnchor),
 			toolbarView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor),
 		])
-
 		closeSidebarSegmentedControl = closeSidebarButton
-
 		invalidateRestorableState()
 	}
 
 	func didUpdateSidebar(viewController _: NSViewController, previousViewController: NSViewController, with _: SidebarMode) {
-		guard let toolbarView = toolbarContainerView,
-		      let sidebarViewController = sidebarViewController
-		else { return }
-
+		guard let toolbarView = toolbarContainerView, let sidebarViewController = sidebarViewController else { return }
 		sidebarTitleViewController.titleMode = sidebarViewController.titleMode
-
 		sidebarTitleViewCenterXConstraint?.isActive = false
-
-		let centerConstraint = TrackingLayoutConstraint.constraint(
-			trackingMidXOf: sidebarViewController.view.firstParentViewInsideSplitView(),
-			offset: timelinesSplitViewController.splitView.dividerThickness,
-			targetView: sidebarTitleViewController.view,
-			containerView: toolbarView,
-			targetAttribute: .centerX,
-			containerAttribute: .leading
-		).with(priority: .defaultLow + 1)
+		let centerConstraint = TrackingLayoutConstraint.constraint(trackingMidXOf: sidebarViewController.view.firstParentViewInsideSplitView(), offset: timelinesSplitViewController.splitView.dividerThickness, targetView: sidebarTitleViewController.view, containerView: toolbarView, targetAttribute: .centerX, containerAttribute: .leading).with(priority: .defaultLow + 1)
 		centerConstraint.isActive = true
-
 		sidebarTitleViewCenterXConstraint = centerConstraint
-
 		previousViewController.removeFromParent()
-
 		invalidateRestorableState()
 	}
 
@@ -680,9 +584,7 @@ extension TimelinesWindowController: SidebarContainer {
 		sidebarTitleViewController.view.removeFromSuperview()
 		closeSidebarSegmentedControl?.removeFromSuperview()
 		closeSidebarSegmentedControl = nil
-
 		viewController.removeFromParent()
-
 		invalidateRestorableState()
 	}
 
@@ -700,18 +602,13 @@ extension TimelinesWindowController: SidebarContainer {
 
 extension TimelinesWindowController {
 	func appendColumnIfFitting(model: ColumnModel, expand: Bool = true) {
-		guard
-			let columnViewController = timelinesViewController.appendColumnIfFitting(model: model, expand: expand)
-		else {
+		guard let columnViewController = timelinesViewController.appendColumnIfFitting(model: model, expand: expand) else {
 			return
 		}
-
 		columnViewController.client = AppDelegate.shared.appIsReady ? client : nil
-
 		guard let toolbarView = toolbarContainerView else {
 			return
 		}
-
 		let popUpButton = NSPopUpButton(frame: .zero, pullsDown: false)
 		popUpButton.bezelStyle = .texturedRounded
 		popUpButton.translatesAutoresizingMaskIntoConstraints = false
@@ -770,7 +667,6 @@ extension TimelinesWindowController: NSMenuItemValidation {
 		if menuItem.action == #selector(TimelinesWindowController.dismissSidebar(_:)) {
 			return sidebarSubcontroller.sidebarMode != nil
 		}
-
 		return true
 	}
 }
@@ -778,7 +674,6 @@ extension TimelinesWindowController: NSMenuItemValidation {
 extension TimelinesWindowController: SearchViewDelegate {
 	func searchView(_: SearchViewController, userDidSelect selection: SearchResultSelection) {
 		guard let instance = currentInstance else { return }
-
 		switch selection {
 		case let .account(account):
 			presentInSidebar(SidebarMode.profile(uri: account.uri(in: instance), account: account))
@@ -871,23 +766,16 @@ extension TimelinesWindowController {
 	}
 
 	@IBAction private func removeColumn(_ sender: Any?) {
-		guard
-			let menuItem = sender as? NSMenuItem,
-			let columnIndex = menuItem.representedObject as? Int
-		else {
+		guard let menuItem = sender as? NSMenuItem, let columnIndex = menuItem.representedObject as? Int else {
 			return
 		}
 		removeColumn(at: columnIndex, contract: true)
 	}
 
 	@IBAction private func reloadColumn(_ sender: Any?) {
-		guard
-			let menuItem = sender as? NSMenuItem,
-			let columnIndex = menuItem.representedObject as? Int
-		else {
+		guard let menuItem = sender as? NSMenuItem, let columnIndex = menuItem.representedObject as? Int else {
 			return
 		}
-
 		reloadColumn(at: columnIndex)
 	}
 

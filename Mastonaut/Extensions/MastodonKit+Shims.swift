@@ -30,10 +30,7 @@ extension ClientType {
 
 extension Client {
 	static func create(for account: AuthorizedAccount) -> ClientType? {
-		return Client.create(for: account,
-		                     keychainController: AppDelegate.shared.keychainController,
-		                     reauthAgent: AppDelegate.shared.accountsService.reauthorizationAgent(for: account),
-		                     urlSession: AppDelegate.shared.clientsUrlSession)
+		return Client.create(for: account, keychainController: AppDelegate.shared.keychainController, reauthAgent: AppDelegate.shared.accountsService.reauthorizationAgent(for: account), urlSession: AppDelegate.shared.clientsUrlSession)
 	}
 
 	static func registerMockResponses(for client: MockClient) {
@@ -61,8 +58,7 @@ extension Status {
 	}
 
 	var attributedContent: NSAttributedString {
-		return HTMLParsingService.shared.parse(HTML: content, removingTrailingUrl: card?.url,
-		                                       removingInvisibleSpans: true)
+		return HTMLParsingService.shared.parse(HTML: content, removingTrailingUrl: card?.url, removingInvisibleSpans: true)
 	}
 
 	var fullAttributedContent: NSAttributedString {
@@ -86,16 +82,13 @@ extension Status {
 		let range = NSMakeRange(0, attributedContent.length)
 		var links: [URL: String] = [:]
 
-		attributedContent.enumerateAttribute(.link, in: range, options: []) {
-			value, linkRange, _ in
-
+		attributedContent.enumerateAttribute(.link, in: range, options: []) {value, linkRange, _ in
 			if let url = value as? URL {
 				let title = attributedContent.attributedSubstring(from: linkRange).string
 				guard !title.hasPrefix("#"), !title.hasPrefix("@") else { return }
 				links[url] = title
 			}
 		}
-
 		return links
 	}
 }
@@ -108,13 +101,9 @@ extension Instance {
 
 extension ClientType {
 	func makeStreamIdentifier(for stream: RemoteEventStream) -> RemoteEventsCoordinator.StreamIdentifier? {
-		guard
-			let baseUrl = URL(string: baseURL),
-			let accessToken = accessToken
-		else {
+		guard let baseUrl = URL(string: baseURL), let accessToken = accessToken else {
 			return nil
 		}
-
 		return RemoteEventsCoordinator.StreamIdentifier(baseURL: baseUrl, accessToken: accessToken, stream: stream)
 	}
 }
@@ -134,12 +123,9 @@ extension MastodonNotification {
 			if status.spoilerText.isEmpty == false { return false }
 			if status.sensitive == true { return false }
 			if status.tags.contains(where: { $0.name.lowercased() == "nsfw" }) { return false }
-
 			return true
 		}
-
 		if account.attributedNote.string.localizedCaseInsensitiveContains("#nsfw") { return false }
-
 		return true
 	}
 }
@@ -158,7 +144,6 @@ extension Card {
 			completion(nil)
 			return
 		}
-
 		Card.cardResourcesFetcher.fetchImage(with: cardImageUrl) { result in
 			switch result {
 			case let .success(image):
@@ -201,18 +186,18 @@ extension Visibility {
 
 	func reblogToolTip(didReblog: Bool) -> String {
 		guard didReblog == false else {
-			return 🔠("Unboost this post")
+			return "Unboost this post"
 		}
 
 		switch self {
 		case .public, .unlisted:
-			return 🔠("Boost this post")
+			return "Boost this post"
 
 		case .private:
-			return 🔠("This post can not be boosted because it is private.")
+			return "This post can not be boosted because it is private."
 
 		case .direct:
-			return 🔠("This post can not be boosted because it is a direct message.")
+			return "This post can not be boosted because it is a direct message."
 		}
 	}
 }
@@ -243,10 +228,8 @@ extension NSAttributedString {
 				composedString.append(self.attributedSubstring(from: effectiveRange).string)
 				return
 			}
-
 			composedString.append("@\(mention.acct)")
 		}
-
 		return composedString
 	}
 }

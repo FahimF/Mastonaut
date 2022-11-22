@@ -582,6 +582,7 @@
 		DD3DA9A7292A2BED00AA0ABA /* RequestRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA95F292A2BED00AA0ABA /* RequestRange.swift */; };
 		DD3DA9A8292A2BED00AA0ABA /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA960292A2BED00AA0ABA /* Client.swift */; };
 		DD3DA9AA292A40A500AA0ABA /* Bookmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */; };
+		DD3DA9AD292C8B5300AA0ABA /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9AC292C8B5300AA0ABA /* XCGLogger */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1110,6 +1111,7 @@
 				15765563229692C200783FFE /* AVKit.framework in Frameworks */,
 				154478A6232B0223009C71D4 /* CoreTootin.framework in Frameworks */,
 				DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */,
+				DD3DA9AD292C8B5300AA0ABA /* XCGLogger in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2073,6 +2075,7 @@
 			packageProductDependencies = (
 				DD3DA7DA29291C0E00AA0ABA /* Starscream */,
 				DD3DA7F82929304B00AA0ABA /* SVGKit */,
+				DD3DA9AC292C8B5300AA0ABA /* XCGLogger */,
 			);
 			productName = Sengi;
 			productReference = 15C4DD0C21D41EC0002AF6DA /* Mastonaut.app */;
@@ -2151,6 +2154,7 @@
 			packageReferences = (
 				DD3DA7D929291C0E00AA0ABA /* XCRemoteSwiftPackageReference "Starscream" */,
 				DD3DA7F72929304B00AA0ABA /* XCRemoteSwiftPackageReference "SVGKit" */,
+				DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */,
 			);
 			productRefGroup = 15C4DD0D21D41EC0002AF6DA /* Products */;
 			projectDirPath = "";
@@ -3601,6 +3605,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DaveWoodCom/XCGLogger.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -3618,6 +3630,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DD3DA7F72929304B00AA0ABA /* XCRemoteSwiftPackageReference "SVGKit" */;
 			productName = SVGKit;
+		};
+		DD3DA9AC292C8B5300AA0ABA /* XCGLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3DA9AB292C8B5300AA0ABA /* XCRemoteSwiftPackageReference "XCGLogger" */;
+			productName = XCGLogger;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -19,8 +19,9 @@
 
 import Cocoa
 import CoreTootin
+import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
 	@IBOutlet private var windowMenu: NSMenu!
 	@IBOutlet private var accountsMenu: NSMenu!
 
@@ -96,41 +97,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 	// MARK: App Lifecycle
 
-	func applicationDidFinishLaunching(_ notification: Foundation.Notification) {
+	func applicationDidFinishLaunching(_ notification: Notification) {
 		if accountsService.authorizedAccounts.isEmpty {
 			authController.removeAllAuthorizationArtifacts()
 		}
-
-		reauthNotificationObserver = NotificationCenter.default.addObserver(forName: .accountNeedsNewClientToken, object: nil, queue: .main) {
-			[unowned self] notification in
-
+		// Reauth observer
+		reauthNotificationObserver = NotificationCenter.default.addObserver(forName: .accountNeedsNewClientToken, object: nil, queue: .main) {[unowned self] notification in
 			guard let account = (notification.object as? ReauthorizationAgent)?.account else { return }
-
 			if NSAlert.accountNeedsAuthorizationDialog(account: account).runModal() == .alertFirstButtonReturn {
 				self.showAccountsPreferences()
 			}
 		}
-
 		// Make a timeline window if there is none
 		if timelineWindowControllers.isEmpty {
 			makeNewTimelinesWindow(forDecoder: false)
 		}
-
-		if let userInfoDict = notification.userInfo,
-		   let userNotification = userInfoDict[NSApplication.launchUserNotificationUserInfoKey] as? NSUserNotification,
-		   let payload = userNotification.payload
-		{
-			showTimelinesWindow(for: payload)
-			NSUserNotificationCenter.default.removeDeliveredNotification(userNotification)
+		// User notification authorization
+		UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+			if success {
+				NSLog("*** Authorized for user notifications")
+				UNUserNotificationCenter.current().delegate = self
+			} else if let error = error {
+				print(error.localizedDescription)
+			}
 		}
 		// Refresh our local cache of the authorized users info
 		authController.updateAllAccountsLocalInfo()
-		NSUserNotificationCenter.default.delegate = self
 		#if DEBUG
 			windowMenu.addItem(.separator())
 			windowMenu.addItem(withTitle: "Debug Info", action: #selector(showDebugInfoWindow(_:)), keyEquivalent: "")
 		#endif
-
 		if let errorPresenter = migrationErrorPresenter {
 			migrationErrorPresenter = nil
 			errorPresenter()
@@ -156,8 +152,78 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		return true
 	}
 
-	// MARK: Timeline Windows Handling
+	// MARK: - User Notifications Delegate
+	func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+		let action = response.actionIdentifier
+		switch action {
+		case UNNotificationDismissActionIdentifier:
+			// Notification was dismissed by user
+			break
+			
+		case UNNotificationDefaultActionIdentifier:
+			// App was opened from notification
+			if let payload = response.notification.payload {
+				showTimelinesWindow(for: payload)
+//				NSUserNotificationCenter.default.removeDeliveredNotification(un)
+			}
+			
+		default:
+			break
+		}
+		completionHandler()
+	}
+	
+	func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+		guard let payload = notification.payload else {
+			completionHandler([])
+			return
+		}
+		let uuid = payload.accountUUID
+		guard let controller = findBestTimelinesWindowController(forAccount: uuid), controller.hasNotificationsColumn else {
+			completionHandler([.banner])
+			return
+		}
+//		return controller.window?.occlusionState.contains(.visible) != true
+		completionHandler([])
+	}
+	
+	private func showTimelinesWindow(for notificationPayload: NotificationPayload) {
+		let uuid = notificationPayload.accountUUID
+		let mode: SidebarMode
 
+		switch notificationPayload.referenceType {
+		case .account: mode = .profile(uri: notificationPayload.referenceURI)
+		case .status: mode = .status(uri: notificationPayload.referenceURI, status: nil)
+		}
+
+		if let controller = findBestTimelinesWindowController(forAccount: uuid) {
+			showDetailForNotification(mode, in: controller)
+		} else if let account = accountsService.authorizedAccounts.first(where: { $0.uuid == uuid }), let controller = findTimelinesWindowControllerWithNoAccount() ?? makeNewTimelinesWindow(forDecoder: false) {
+			controller.currentAccount = account
+			showDetailForNotification(mode, in: controller)
+		}
+	}
+
+	private func findBestTimelinesWindowController(forAccount uuid: UUID) -> TimelinesWindowController? {
+		return timelineWindowControllers
+			.filter { $0.currentAccount?.uuid == uuid && $0.hasNotificationsColumn }
+			.sorted(by: { ($0.window?.orderedIndex ?? -1) > ($1.window?.orderedIndex ?? -1) })
+			.first
+	}
+
+	private func findTimelinesWindowControllerWithNoAccount() -> TimelinesWindowController? {
+		return timelineWindowControllers
+			.filter { $0.currentAccount?.uuid == nil }
+			.sorted(by: { ($0.window?.orderedIndex ?? -1) > ($1.window?.orderedIndex ?? -1) })
+			.first
+	}
+
+	private func showDetailForNotification(_ mode: SidebarMode, in controller: TimelinesWindowController) {
+		controller.window?.makeKeyAndOrderFront(self)
+		controller.presentInSidebar(mode)
+	}
+	
+	// MARK: - Timeline Windows Handling
 	@discardableResult
 	internal func makeNewTimelinesWindow(forDecoder: Bool) -> TimelinesWindowController? {
 		let timelinesStoryboard = NSStoryboard(name: "Timelines", bundle: .main)
@@ -320,7 +386,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 			alert.addButton(withTitle: 🔠("error.migration.button.accountsettings"))
 			alert.addButton(withTitle: 🔠("error.migration.button.moreinfo"))
-			alert.addButton(withTitle: 🔠("Cancel"))
+			alert.addButton(withTitle: "Cancel")
 
 			if alert.runModal() == .alertFirstButtonReturn {
 				self.showAccountsPreferences()
@@ -329,7 +395,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 				let alert = NSAlert(style: .informational, title: "Error Listing",
 				                    message: message)
 
-				alert.addButton(withTitle: 🔠("Close"))
+				alert.addButton(withTitle: "Close")
 
 				alert.runModal()
 			}
@@ -341,8 +407,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		preferencesWindowController.showAccountPreferences()
 	}
 
-	// MARK: Core Data Saving and Undo support
-
+	// MARK: - Core Data Saving and Undo support
 	func saveContext() {
 		// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
 		let context = persistentContainer.viewContext
@@ -435,7 +500,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 // MARK: - Cache Delegate
-
 extension AppDelegate: CacheDelegate {
 	var allCachesLoaded: Bool {
 		return customEmojiCache.isLoaded
@@ -454,7 +518,6 @@ extension AppDelegate: CacheDelegate {
 }
 
 // MARK: - IBActions
-
 extension AppDelegate {
 	@IBAction func composeStatus(_ sender: Any?) {
 		let newComposerWindow = StatusComposerWindowController()
@@ -506,7 +569,6 @@ extension AppDelegate {
 }
 
 // MARK: - Auth Controller Delegate
-
 extension AppDelegate: AuthControllerDelegate {
 	func authControllerDidCancelAuthorization(_: AuthController) {
 		resetAuthorizationState()
@@ -568,78 +630,8 @@ extension AppDelegate: AuthControllerDelegate {
 	}
 }
 
-// MARK: - User Notification Center Delegate
-
-extension AppDelegate: NSUserNotificationCenterDelegate {
-	func userNotificationCenter(_: NSUserNotificationCenter, didActivate notification: NSUserNotification)
-	{
-		if let payload = notification.payload {
-			showTimelinesWindow(for: payload)
-		}
-
-		NSUserNotificationCenter.default.removeDeliveredNotification(notification)
-	}
-
-	func userNotificationCenter(_: NSUserNotificationCenter,
-	                            shouldPresent notification: NSUserNotification) -> Bool
-	{
-		guard let payload = notification.payload else { return false }
-
-		let uuid = payload.accountUUID
-
-		guard
-			let controller = findBestTimelinesWindowController(forAccount: uuid),
-			controller.hasNotificationsColumn
-		else { return true }
-
-		return controller.window?.occlusionState.contains(.visible) != true
-	}
-
-	private func showTimelinesWindow(for notificationPayload: NotificationPayload) {
-		let uuid = notificationPayload.accountUUID
-		let mode: SidebarMode
-
-		switch notificationPayload.referenceType {
-		case .account: mode = .profile(uri: notificationPayload.referenceURI)
-		case .status: mode = .status(uri: notificationPayload.referenceURI, status: nil)
-		}
-
-		if let controller = findBestTimelinesWindowController(forAccount: uuid) {
-			showDetailForNotification(mode, in: controller)
-		} else if
-			let account = accountsService.authorizedAccounts.first(where: { $0.uuid == uuid }),
-			let controller = findTimelinesWindowControllerWithNoAccount()
-			?? makeNewTimelinesWindow(forDecoder: false)
-		{
-			controller.currentAccount = account
-			showDetailForNotification(mode, in: controller)
-		}
-	}
-
-	private func findBestTimelinesWindowController(forAccount uuid: UUID) -> TimelinesWindowController?
-	{
-		return timelineWindowControllers
-			.filter { $0.currentAccount?.uuid == uuid && $0.hasNotificationsColumn }
-			.sorted(by: { ($0.window?.orderedIndex ?? -1) > ($1.window?.orderedIndex ?? -1) })
-			.first
-	}
-
-	private func findTimelinesWindowControllerWithNoAccount() -> TimelinesWindowController? {
-		return timelineWindowControllers
-			.filter { $0.currentAccount?.uuid == nil }
-			.sorted(by: { ($0.window?.orderedIndex ?? -1) > ($1.window?.orderedIndex ?? -1) })
-			.first
-	}
-
-	private func showDetailForNotification(_ mode: SidebarMode, in controller: TimelinesWindowController)
-	{
-		controller.window?.makeKeyAndOrderFront(self)
-		controller.presentInSidebar(mode)
-	}
-}
 
 // MARK: - Protocols
-
 protocol AccountsMenuProvider {
 	var accountsMenuItems: [NSMenuItem] { get }
 }
@@ -648,7 +640,6 @@ protocol AccountAuthorizationSource {
 	var sourceWindow: NSWindow? { get }
 
 	func successfullyAuthenticatedUser(with userUUID: UUID)
-
 	func prepareForAuthorization()
 	func finalizeAuthorization()
 }

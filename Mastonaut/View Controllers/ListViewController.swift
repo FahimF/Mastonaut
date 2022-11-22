@@ -28,12 +28,7 @@ private enum ListCellViewIdentifier {
 	static let filtered = NSUserInterfaceItemIdentifier("filtered")
 }
 
-class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController,
-	MastonautTableViewDelegate,
-	NSTableViewDataSource,
-	RemoteEventsReceiver,
-	ClientObserver
-{
+class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController, MastonautTableViewDelegate, NSTableViewDataSource, RemoteEventsReceiver, ClientObserver {
 	@IBOutlet internal private(set) unowned var scrollView: NSScrollView!
 	@IBOutlet internal private(set) unowned var tableView: NSTableView!
 	@IBOutlet internal private(set) unowned var topConstraint: NSLayoutConstraint!
@@ -98,49 +93,31 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		let workspaceNC = NSWorkspace.shared.notificationCenter
 
-		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification,
-		                                                     object: nil,
-		                                                     queue: .main) {
-				[weak self] _ in
-
+		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) {[weak self] _ in
 				#if DEBUG
 					NSLog("Disconnecting events socket…")
 				#endif
-
 				self?.isSystemSleeping = true
-
 				if let receiver = self?.remoteEventReceiver {
 					RemoteEventsCoordinator.shared.remove(receiver: receiver)
 				}
 			})
-
-		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification,
-		                                                     object: nil,
-		                                                     queue: .main) {
-				[weak self] _ in
-
+		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) {[weak self] _ in
 				#if DEBUG
 					NSLog("Rescheduling events socket reconnection…")
 				#endif
-
 				self?.isSystemSleeping = false
-
 				// Once the fetch completes, the socket will be reconnected.
 				self?.fetchEntries(for: .detachedAbove)
 			})
-
-		notificationObservers.append(NSAccessibility.observeReduceMotionPreference {
-			[weak self] in
+		notificationObservers.append(NSAccessibility.observeReduceMotionPreference {[weak self] in
 			self?.refreshVisibleCellViews()
 		})
-
 		view.widthAnchor.constraint(greaterThanOrEqualToConstant: ListViewControllerMinimumWidth).isActive = true
 	}
 
 	deinit {
-		#if DEBUG
-			statusIndicator?.removeFromSuperview()
-		#endif
+		statusIndicator?.removeFromSuperview()
 		notificationObservers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
 	}
 
@@ -226,12 +203,10 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 	internal func cleanupSpecialRows(_: inout [EntryReference]) {}
 
-	internal func insert(entryReferences entryReferenceMap: [Array<EntryReference>.Index: EntryReference])
-	{
+	internal func insert(entryReferences entryReferenceMap: [Array<EntryReference>.Index: EntryReference]) {
 		for index in entryReferenceMap.keys.sorted() {
 			entryReferenceMap[index].map { entryList.insert($0, at: index) }
 		}
-
 		tableView.insertRows(at: IndexSet(entryReferenceMap.keys), withAnimation: .effectFade)
 	}
 
@@ -369,10 +344,12 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		}
 	}
 
-	internal func prepareNewEntries(_ entries: [Entry], for insertion: InsertionPoint, pagination: Pagination?)
-	{
-		let newEntries = entries.filter { entryMap[$0.key] == nil }
+	internal func prepareNewEntries(_ entries: [Entry], for insertion: InsertionPoint, pagination: Pagination?) -> Int {
+		let newEntries = entries.filter {
+			entryMap[$0.key] == nil
+		}
 		handleNewEntries(newEntries, for: insertion, pagination: pagination)
+		return newEntries.count
 	}
 
 	internal func handle(updatedEntry entry: Entry) {
@@ -825,19 +802,13 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		tableView.enumerateAvailableRowViews { rowView, rowIndex in
 			guard region.intersects(rowView.frame) else { return }
-
 			let distance = abs(rowView.frame.midY - region.midY)
-
 			guard distance < bestRow.distanceY else { return }
-
 			bestRow = (distance, rowIndex)
 		}
-
 		guard bestRow.rowIndex >= 0 else { return false }
-
 		tableView.selectRowIndexes(IndexSet(integer: bestRow.rowIndex), byExtendingSelection: false)
 		tableView.scrollRowToVisible(bestRow.rowIndex)
-
 		return true
 	}
 
