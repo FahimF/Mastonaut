@@ -19,6 +19,7 @@
 
 import Cocoa
 import CoreTootin
+import UniformTypeIdentifiers
 
 class ShareViewController: NSViewController, UserPopUpButtonDisplaying {
 	private let persistence = Persistence()
@@ -229,23 +230,19 @@ class ShareViewController: NSViewController, UserPopUpButtonDisplaying {
 		let dispatchGroup = DispatchGroup()
 
 		for attachment in attachments {
-			if attachment.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
+			if attachment.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
 				dispatchGroup.enter()
 				loadURL(from: attachment) { dispatchGroup.leave() }
-			} else if attachment.hasItemConformingToTypeIdentifier(kUTTypeImage as String) {
+			} else if attachment.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
 				dispatchGroup.enter()
 				loadImage(from: attachment) { dispatchGroup.leave() }
-			} else if attachment.hasItemConformingToTypeIdentifier(kUTTypePlainText as String) {
+			} else if attachment.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
 				dispatchGroup.enter()
 				loadString(from: attachment) { dispatchGroup.leave() }
 			}
 		}
-
-		dispatchGroup.notify(queue: .main) {
-			[weak self] in
-
+		dispatchGroup.notify(queue: .main) {[weak self] in
 			guard let self = self else { return }
-
 			let joinedTextElements = self.textElementsToInsert.uniqueElements().joined(separator: " ")
 			self.textView.insertAttributedString(NSAttributedString(string: joinedTextElements))
 			self.postingService?.set(status: self.statusTextContent)
@@ -255,15 +252,14 @@ class ShareViewController: NSViewController, UserPopUpButtonDisplaying {
 	private func loadURL(from attachment: NSItemProvider, completion: @escaping () -> Void) {
 		let supportedUTIs = AttachmentUploader.supportedAttachmentTypes
 
-		attachment.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil) { [weak self] object, _ in
+		attachment.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { [weak self] object, _ in
 			if let url = object as? URL, let self = self {
-				if url.isFileURL, let uti = url.fileUTI, supportedUTIs.contains(uti as CFString) {
+				if url.isFileURL, let uti = url.fileUTI, supportedUTIs.contains(uti) {
 					self.attachmentsSubcontroller.addAttachments([url])
 				} else {
 					self.textElementsToInsert.append(url.absoluteString)
 				}
 			}
-
 			completion()
 		}
 	}
@@ -290,23 +286,15 @@ class ShareViewController: NSViewController, UserPopUpButtonDisplaying {
 		let attachments = attachmentsSubcontroller.attachments
 
 		guard !attachmentsSubcontroller.hasAttachmentsPendingUpload else {
-			showAlert(title: 🔠("Attention"),
-			          message: 🔠("One or more attachments are still being uploaded. Please wait for them to complete uploading – or remove them – before submitting."))
+			showAlert(title: "Attention", message: "One or more attachments are still being uploaded. Please wait for them to complete uploading – or remove them – before submitting.")
 			return
 		}
 
-		postingService?.post(visibility: audienceSelection,
-		                     isSensitive: false,
-		                     attachmentIds: attachments.compactMap { $0.attachment?.id },
-		                     replyStatusId: nil,
-		                     poll: nil) {
-			[weak self] result in
-
+		postingService?.post(visibility: audienceSelection, isSensitive: false, attachmentIds: attachments.compactMap { $0.attachment?.id }, replyStatusId: nil, poll: nil) {[weak self] result in
 			guard case .success = result else {
 				// Show error
 				return
 			}
-
 			DispatchQueue.main.async {
 				self?.completeExtension()
 			}
@@ -340,7 +328,6 @@ class ShareViewController: NSViewController, UserPopUpButtonDisplaying {
 		} else if oldCount > 0, newCount == 0 {
 			attachmentsContainerView.isHidden = true
 		}
-
 		updateRemainingCountLabel()
 	}
 }
@@ -353,11 +340,7 @@ extension ShareViewController: NSTextViewDelegate {
 
 extension ShareViewController: StatusComposerController {
 	func showAttachmentError(message: String) {
-		let alert = NSAlert.makeAlert(style: .warning,
-		                              title: 🔠("Error"),
-		                              message: 🔠("compose.attachment.server", message),
-		                              dialogMode: nil)
-
+		let alert = NSAlert.makeAlert(style: .warning, title: "Error", message: 🔠("compose.attachment.server", message), dialogMode: nil)
 		alert.runModal()
 	}
 }

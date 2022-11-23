@@ -301,7 +301,7 @@ private extension AttachmentWindowController {
 		else { return }
 
 		do {
-			try image.dataUsingRepresentation(for: fileType as CFString).write(to: url)
+			try image.dataUsingRepresentation(for: fileType).write(to: url)
 		} catch {
 			presentError(error, modalFor: window!, delegate: nil, didPresent: nil, contextInfo: nil)
 		}
@@ -368,7 +368,7 @@ extension AttachmentWindowController {
 		else { return }
 
 		let savePanel = NSSavePanel()
-		savePanel.allowedFileTypes = [fileType]
+		savePanel.allowedContentTypes = [fileType]
 		savePanel.nameFieldStringValue = attachment.parsedUrl.lastPathComponent
 		savePanel.beginSheetModal(for: window) {
 			[unowned self] response in

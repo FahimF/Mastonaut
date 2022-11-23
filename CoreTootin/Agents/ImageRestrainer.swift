@@ -18,61 +18,43 @@
 //
 
 import AppKit
+import UniformTypeIdentifiers
 
 public class ImageRestrainer {
-	let typeConversionMap: [CFString: CFString]
+	let typeConversionMap: [UTType: UTType]
 	let maximumImageSize: NSSize
 
-	init(typeConversionMap: [CFString: CFString], maximumImageSize: NSSize) {
+	init(typeConversionMap: [UTType: UTType], maximumImageSize: NSSize) {
 		self.typeConversionMap = typeConversionMap
 		self.maximumImageSize = maximumImageSize
 	}
 
-	func restrain(imageAtURL fileURL: URL, fileUTI: CFString) throws -> Data {
+	func restrain(imageAtURL fileURL: URL, fileUTI: UTType) throws -> Data {
 		let restrainedFileUTI = restrain(type: fileUTI)
-
+		
 		func fallbackData() throws -> Data {
 			let image = NSImage(byReferencing: fileURL)
 			return try restrain(staticImage: image).dataUsingRepresentation(for: restrainedFileUTI)
 		}
-
+		
 		// Check if this is an animation. If not, just use the static image restrainer.
-		guard
-			let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil),
-			CGImageSourceGetCount(imageSource) > 1,
-			let originalSize = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)?.size
-		else {
+		guard let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil), CGImageSourceGetCount(imageSource) > 1, let originalSize = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)?.size else {
 			return try fallbackData()
 		}
-
 		let originalData = try Data(contentsOf: fileURL, options: .alwaysMapped)
 		let frameCount = CGImageSourceGetCount(imageSource)
-
 		// Check if animated image needs to be resized or converted
-		guard originalSize.area >= maximumImageSize.area || restrainedFileUTI != fileUTI,
-		      let destinationData = CFDataCreateMutable(kCFAllocatorDefault, originalData.count),
-		      let imageDestination = CGImageDestinationCreateWithData(destinationData,
-		                                                              restrainedFileUTI,
-		                                                              frameCount, nil)
-		else {
+		guard originalSize.area >= maximumImageSize.area || restrainedFileUTI != fileUTI, let destinationData = CFDataCreateMutable(kCFAllocatorDefault, originalData.count), let imageDestination = CGImageDestinationCreateWithData(destinationData, restrainedFileUTI.identifier as CFString, frameCount, nil) else {
 			return originalData
 		}
-
 		let newSize = originalSize.fitting(on: maximumImageSize)
-
 		for frameIndex in 0 ..< frameCount {
-			guard
-				let originalFrame = CGImageSourceCreateImageAtIndex(imageSource, frameIndex, nil),
-				let resizedFrame = originalFrame.resizedImage(newSize: newSize)
-			else {
+			guard let originalFrame = CGImageSourceCreateImageAtIndex(imageSource, frameIndex, nil), let resizedFrame = originalFrame.resizedImage(newSize: newSize) else {
 				continue
 			}
-
 			CGImageDestinationAddImage(imageDestination, resizedFrame, nil)
 		}
-
 		CGImageDestinationFinalize(imageDestination)
-
 		return destinationData as Data
 	}
 
@@ -80,17 +62,13 @@ public class ImageRestrainer {
 		guard staticImage.isValid, let representation = staticImage.representations.first else {
 			return staticImage
 		}
-
 		let originalSize = NSSize(width: representation.pixelsWide, height: representation.pixelsHigh)
-
 		guard originalSize.area >= maximumImageSize.area else { return staticImage }
-
 		let newSize = originalSize.fitting(on: maximumImageSize)
-
 		return staticImage.resizedImage(withSize: newSize)
 	}
 
-	func restrain(type: CFString) -> CFString {
+	func restrain(type: UTType) -> UTType {
 		return typeConversionMap[type] ?? type
 	}
 }

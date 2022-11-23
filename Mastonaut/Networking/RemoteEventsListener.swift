@@ -316,7 +316,7 @@ struct StreamPayload: Decodable {
 			return .keywordFiltersChanged
 
 		case (.conversation, .some(payload)), (.announcement, .some(payload)), (.reaction, .some(payload)), (.ann_delete, .some(payload)), (.enc_msg, .some(payload)):
-			log.info("*** Unhandled - Type: \(type), Payload: \(payload)")
+			log.info("*** Unhandled - Type: \(type), Payload: \(payload ?? "None")")
 			return .unhandled(type)
 			
 		default:

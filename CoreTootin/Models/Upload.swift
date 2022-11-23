@@ -42,15 +42,14 @@ public class Upload {
 	public init?(fileUrl: URL, imageRestrainer: ImageRestrainer) {
 		guard let preferredMimeType = fileUrl.preferredMimeType, let fileUTI = fileUrl.fileUTI else { return nil }
 
-		if UTTypeConformsTo(fileUTI as CFString, kUTTypeImage) {
-			let restrainedType = imageRestrainer.restrain(type: fileUTI as CFString)
+		if fileUTI.conforms(to: .image) {
+			let restrainedType = imageRestrainer.restrain(type: fileUTI)
 			dataLoader = { try imageRestrainer.restrain(imageAtURL: fileUrl, fileUTI: restrainedType) }
-			mimeType = restrainedType as String
+			mimeType = restrainedType.preferredMIMEType ?? "*/*"
 		} else {
 			dataLoader = { try Data(contentsOf: fileUrl, options: .alwaysMapped) }
 			mimeType = preferredMimeType
 		}
-
 		hashProvider = { $0.combine(fileUrl) }
 		fileExtension = fileUrl.pathExtension
 		fileName = fileUrl.lastPathComponent
@@ -63,7 +62,7 @@ public class Upload {
 		fileExtension = "png"
 		fileName = nil
 		mimeType = "image/png"
-		dataLoader = { try image.dataUsingRepresentation(for: kUTTypePNG) }
+		dataLoader = { try image.dataUsingRepresentation(for: .png) }
 		thumbnailProvider = { image }
 
 		let selfPromise = WeakPromise<Upload>()

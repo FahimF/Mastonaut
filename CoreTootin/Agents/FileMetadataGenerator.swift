@@ -29,27 +29,22 @@ public enum FileMetadataGenerator {
 			kQLThumbnailOptionIconModeKey: kCFBooleanFalse!,
 			kQLThumbnailOptionScaleFactorKey: 1.0 as CFNumber,
 		]
-
-		guard let thumbnail = QLThumbnailImageCreate(nil, fileUrl as CFURL, maxSize, options as CFDictionary)
-		else {
+		guard let thumbnail = QLThumbnailImageCreate(nil, fileUrl as CFURL, maxSize, options as CFDictionary) else {
 			return NSWorkspace.shared.icon(forFile: fileUrl.path)
 		}
-
 		let cgImage = thumbnail.takeUnretainedValue()
 		let image = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
-
 		thumbnail.release()
-
 		return image
 	}
 
 	public static func metadata(for fileUrl: URL) -> Metadata {
 		assert(!Thread.isMainThread)
 
-		if fileUrl.fileConforms(toUTI: kUTTypeMovie) {
+		if fileUrl.fileConforms(toUTT: .movie) {
 			let duration = AVURLAsset(url: fileUrl).duration.seconds
 			return .movie(duration: duration)
-		} else if fileUrl.fileConforms(toUTI: kUTTypeImage) {
+		} else if fileUrl.fileConforms(toUTT: .image) {
 			guard
 				let imageSource = CGImageSourceCreateWithURL(fileUrl as CFURL, nil),
 				let propertiesDict = CGImageSourceCopyProperties(imageSource, nil) as? [CFString: Any],
@@ -57,7 +52,6 @@ public enum FileMetadataGenerator {
 			else {
 				return .picture(byteCount: 0)
 			}
-
 			return .picture(byteCount: fileSize)
 		} else {
 			return .unknown

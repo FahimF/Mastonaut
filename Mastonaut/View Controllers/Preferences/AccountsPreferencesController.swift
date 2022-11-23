@@ -55,9 +55,9 @@ class AccountsPreferencesController: BaseAccountsPreferencesViewController {
 	private lazy var openPanel: NSOpenPanel = {
 		let panel = NSOpenPanel()
 		panel.allowsMultipleSelection = false
-		panel.allowedFileTypes = AttachmentUploader.supportedImageTypes.map { $0 as String }
-		panel.message = 🔠("Select an image to upload.")
-		panel.prompt = 🔠("Upload")
+		panel.allowedContentTypes = AttachmentUploader.supportedImageTypes
+		panel.message = "Select an image to upload."
+		panel.prompt = "Upload"
 		return panel
 	}()
 
@@ -72,7 +72,6 @@ class AccountsPreferencesController: BaseAccountsPreferencesViewController {
 	}
 
 	// MARK: - Bindings
-
 	@objc private(set) dynamic var selectedAccount: AccountBindingProxy? {
 		willSet {
 			willChangeValue(for: \AccountsPreferencesController.canEdit)

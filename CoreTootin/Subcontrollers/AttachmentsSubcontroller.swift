@@ -18,6 +18,7 @@
 //
 
 import AppKit
+import UniformTypeIdentifiers
 
 @objc public protocol StatusComposerController: AnyObject {
 	func updateSubmitEnabled()
@@ -376,26 +377,17 @@ extension AttachmentsSubcontroller: AttachmentUploaderDelegate {
 
 public extension AttachmentsSubcontroller {
 	func addAttachments(pasteboard: NSPasteboard) -> Bool {
-		let types = AttachmentUploader.supportedAttachmentTypes as [String]
+		let types = AttachmentUploader.supportedAttachmentTypes
 
-		if let fileUrls = pasteboard.readObjects(forClasses: [NSURL.self],
-		                                         options: [.urlReadingContentsConformToTypes: types,
-		                                                   .urlReadingFileURLsOnly: true]) as? [URL],
-			!fileUrls.isEmpty
-		{
+		if let fileUrls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingContentsConformToTypes: types, .urlReadingFileURLsOnly: true]) as? [URL], !fileUrls.isEmpty {
 			addAttachments(fileUrls)
 			return true
 		}
-
 		// Avoid reading Finder file icons from the pasteboard because that makes no sense
-		if pasteboard.types?.contains(.fileURL) == false,
-		   let images = pasteboard.readObjects(forClasses: [NSImage.self], options: [:]) as? [NSImage],
-		   !images.isEmpty
-		{
+		if pasteboard.types?.contains(.fileURL) == false, let images = pasteboard.readObjects(forClasses: [NSImage.self], options: [:]) as? [NSImage], !images.isEmpty {
 			addAttachments(images)
 			return true
 		}
-
 		return false
 	}
 }

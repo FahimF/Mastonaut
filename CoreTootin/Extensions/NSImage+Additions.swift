@@ -18,36 +18,17 @@
 //
 
 import AppKit
+import AVFoundation
 
 public extension NSImage {
 	func resizedImage(withSize newSize: NSSize) -> NSImage {
 		assert(!Thread.isMainThread)
-
-		let resizedImageRepresentation = NSBitmapImageRep(bitmapDataPlanes: nil,
-		                                                  pixelsWide: Int(newSize.width),
-		                                                  pixelsHigh: Int(newSize.height),
-		                                                  bitsPerSample: 8,
-		                                                  samplesPerPixel: 4,
-		                                                  hasAlpha: true,
-		                                                  isPlanar: false,
-		                                                  colorSpaceName: .calibratedRGB,
-		                                                  bytesPerRow: 0,
-		                                                  bitsPerPixel: 0)!
-
+		let resizedImageRepresentation = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(newSize.width), pixelsHigh: Int(newSize.height), bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .calibratedRGB, bytesPerRow: 0, bitsPerPixel: 0)!
 		resizedImageRepresentation.size = newSize
-
 		NSGraphicsContext.saveGraphicsState()
 		NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: resizedImageRepresentation)
-
-		draw(in: NSRect(origin: .zero, size: newSize),
-		     from: NSRect(origin: .zero, size: size),
-		     operation: .copy,
-		     fraction: 1.0,
-		     respectFlipped: true,
-		     hints: [.interpolation: NSNumber(value: NSImageInterpolation.medium.rawValue)])
-
+		draw(in: NSRect(origin: .zero, size: newSize), from: NSRect(origin: .zero, size: size), operation: .copy, fraction: 1.0, respectFlipped: true, hints: [.interpolation: NSNumber(value: NSImageInterpolation.medium.rawValue)])
 		NSGraphicsContext.restoreGraphicsState()
-
 		let resizedImage = NSImage(size: newSize)
 		resizedImage.addRepresentation(resizedImageRepresentation)
 		return resizedImage
@@ -58,7 +39,6 @@ public extension NSImage {
 			NSLog("pixelSize should not be called on non-bitmap backed images")
 			abort()
 		}
-
 		return NSSize(width: bitmapRep.pixelsWide, height: bitmapRep.pixelsHigh)
 	}
 
@@ -67,28 +47,25 @@ public extension NSImage {
 			.max(by: { ($0.pixelsWide * $0.pixelsHigh) < ($1.pixelsWide * $1.pixelsHigh) })
 	}
 
-	private static let utiTypeMap: [CFString: NSBitmapImageRep.FileType] = [
-		kUTTypePNG: .png,
-		kUTTypeJPEG: .jpeg,
-		kUTTypeJPEG2000: .jpeg2000,
-		kUTTypeGIF: .gif,
-		kUTTypeBMP: .bmp,
-		kUTTypeTIFF: .tiff,
+	private static let utiTypeMap: [UTType: NSBitmapImageRep.FileType] = [
+		.png: .png,
+		.jpeg: .jpeg,
+//		kUTTypeJPEG2000: .jpeg2000,
+		.gif: .gif,
+		.bmp: .bmp,
+		.tiff: .tiff,
 	]
 
-	func dataUsingRepresentation(for UTI: CFString?) throws -> Data {
+	func dataUsingRepresentation(for UTI: UTType?) throws -> Data {
 		guard let rawData = tiffRepresentation, let bitmap = NSBitmapImageRep(data: rawData) else {
 			throw EncodeErrors.noRawData
 		}
-
-		guard let fileType = NSImage.utiTypeMap[UTI ?? kUTTypePNG] else {
+		guard let fileType = NSImage.utiTypeMap[UTI ?? .png] else {
 			throw EncodeErrors.unknownExpectedFormat
 		}
-
 		guard let formattedData = bitmap.representation(using: fileType, properties: [:]) else {
 			throw EncodeErrors.bitmapEncoderReturnedNil
 		}
-
 		return formattedData
 	}
 

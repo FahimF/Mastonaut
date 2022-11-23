@@ -17,31 +17,30 @@
 //  GNU General Public License for more details.
 //
 
-import AVFoundation
 import Foundation
+import AVFoundation
 
 let kUTTypeHEIC = "public.heic" as CFString
 
 public class AttachmentUploader {
 	public typealias ConvertedDataProvider = () throws -> Data
 
-	public static let supportedImageTypes = [kUTTypeJPEG, kUTTypePNG, kUTTypeJPEG2000, kUTTypeHEIC, kUTTypeGIF, kUTTypeTIFF]
-	public static let supportedMovieTypes = [kUTTypeMovie]
+	public static let supportedImageTypes: [UTType] = [.jpeg, .png, .heic, .gif, .tiff]
+	public static let supportedMovieTypes: [UTType] = [.movie]
 	public static let supportedAttachmentTypes = supportedImageTypes + supportedMovieTypes
 	public static let maxAttachmentImageSize = NSSize(width: 4096, height: 4096)
 
-	public static let imageTypeConversionMap: [CFString: CFString] = [
-		kUTTypeJPEG2000: kUTTypeJPEG,
-		kUTTypeHEIC: kUTTypeJPEG,
-		kUTTypeTIFF: kUTTypeJPEG,
+	public static let imageTypeConversionMap: [UTType: UTType] = [
+//		kUTTypeJPEG2000: kUTTypeJPEG,
+		.heic: .jpeg,
+		.tiff: .jpeg,
 	]
 
 	private var activeUploadFutures: [Upload: FutureTask] = [:]
 	private var activeDescriptionUpdateFutures: [Upload: FutureTask] = [:]
 	private var pendingUploadDescriptionUpdates: [Upload: String?] = [:]
 
-	public private(set) lazy var imageRestrainer = ImageRestrainer(typeConversionMap: AttachmentUploader.imageTypeConversionMap,
-	                                                               maximumImageSize: AttachmentUploader.maxAttachmentImageSize)
+	public private(set) lazy var imageRestrainer = ImageRestrainer(typeConversionMap: AttachmentUploader.imageTypeConversionMap, maximumImageSize: AttachmentUploader.maxAttachmentImageSize)
 
 	public weak var delegate: AttachmentUploaderDelegate?
 
