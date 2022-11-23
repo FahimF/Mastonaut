@@ -88,10 +88,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		.underlineStyle: NSNumber(value: 1),
 	]
 
-	private lazy var fileDropFilteringOptions: [NSPasteboard.ReadingOptionKey: Any]? = {
-		[.urlReadingContentsConformToTypes: AttachmentUploader.supportedAttachmentTypes]
-	}()
-
 	private var hasValidTextContents: Bool { return (1 ... statusCharacterLimit).contains(totalCharacterCount) }
 	private var hasAttachments: Bool { return !attachmentsSubcontroller.attachments.isEmpty }
 	private var hasActiveUploadTasks: Bool { return attachmentsSubcontroller.attachmentUploader.hasActiveTasks }
@@ -173,16 +169,12 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 	private var postingService: PostingService? {
 		didSet {
 			postingServiceObservations.removeAll()
-
 			guard let service = postingService else { return }
-
 			service.set(status: statusTextContent)
 			service.set(contentWarning: contentWarningTextContent)
-
 			postingServiceObservations.observe(service, \.characterCount, sendInitial: true) { [weak self] _, _ in
 				self?.updateRemainingCountLabel()
 			}
-
 			postingServiceObservations.observe(service, \.submitTaskFuture) { [weak self] _, _ in
 				self?.updateSubmitEnabled()
 				self?.submitStatusIndicator.setAnimating(self?.hasActiveTasks ?? false)
@@ -193,7 +185,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 	private var currentInstance: Instance? {
 		didSet {
 			guard let instance = currentInstance, let client = client else { return }
-
 			accountSearchService = AccountSearchService(client: client, activeInstance: instance)
 		}
 	}
@@ -215,19 +206,15 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 				}
 			}
 
-			if let client = client, oldValue != nil, client.baseURL != oldValue!.baseURL, let replyStatus = replyStatus
-			{
-				resolverService?.resolveStatus(uri: replyStatus.resolvableURI) {
-					[weak self] result in
+			if let client = client, oldValue != nil, client.baseURL != oldValue!.baseURL, let replyStatus = replyStatus {
+				resolverService?.resolveStatus(uri: replyStatus.resolvableURI) {[weak self] result in
 
 					DispatchQueue.main.async {
 						guard let self = self else { return }
 
 						switch (result, self.replyStatusSenderWindowController) {
 						case let (.success(status), .some(windowController)):
-							self.setupAsReply(to: status,
-							                  using: self.currentAccount,
-							                  senderWindowController: windowController)
+							self.setupAsReply(to: status, using: self.currentAccount, senderWindowController: windowController)
 
 						case let (.failure(error), _):
 							log.info("Failed resolving status: \(error)")
@@ -239,7 +226,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 					}
 				}
 			}
-
 			if let client = client, oldValue?.baseURL != client.baseURL {
 				currentClientEmoji = nil
 				fetchInstanceEmoji(using: client)
@@ -280,7 +266,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 			} else if !isReceivingDrag, bottomDrawerMode.contains(.attachment), !hasAttachments {
 				bottomDrawerMode.subtract(.attachment)
 			}
-
 			attachmentsSubcontroller.showProposedAttachmentItem = isReceivingDrag
 		}
 	}
@@ -899,15 +884,11 @@ extension StatusComposerWindowController: AttributedLabelLinkHandler {
 
 extension StatusComposerWindowController: NSDraggingDestination {
 	func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-		guard
-			sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self, NSImage.self],
-			                                        options: fileDropFilteringOptions)
-		else {
+		guard sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self, NSImage.self]) else {
+			NSLog("*** Dragging entered but can't read object")
 			return NSDragOperation()
 		}
-
 		isReceivingDrag = true
-
 		return .copy
 	}
 
@@ -920,8 +901,7 @@ extension StatusComposerWindowController: NSDraggingDestination {
 	}
 
 	func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
-		return sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self, NSImage.self],
-		                                               options: fileDropFilteringOptions)
+		return sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self, NSImage.self])
 	}
 
 	func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
@@ -932,7 +912,6 @@ extension StatusComposerWindowController: NSDraggingDestination {
 			attachmentsSubcontroller.addAttachments(attachmentImages)
 			return true
 		}
-
 		return false
 	}
 

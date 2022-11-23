@@ -43,13 +43,12 @@ class FileDropImageView: NSImageView {
 	}
 
 	override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+		log.info("*** Dragging entered")
 		guard isEnabled, sender.draggingPasteboard.canReadObject(forClasses: [NSURL.self], options: filteringOptions)
 		else {
 			return NSDragOperation()
 		}
-
 		isReceivingDrag = true
-
 		return .copy
 	}
 

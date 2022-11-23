@@ -295,11 +295,9 @@ private extension AttachmentWindowController {
 	}
 
 	func writeImage(to url: URL) {
-		guard
-			let image = currentAttachment?.image,
-			let fileType = currentAttachment?.attachment.parsedUrl.fileUTI
-		else { return }
-
+		guard let image = currentAttachment?.image, let fileType = currentAttachment?.attachment.parsedUrl.fileUTI else {
+			return
+		}
 		do {
 			try image.dataUsingRepresentation(for: fileType).write(to: url)
 		} catch {
@@ -310,31 +308,21 @@ private extension AttachmentWindowController {
 
 extension AttachmentWindowController {
 	@IBAction private func nextAttachment(_: Any?) {
-		guard
-			let attachmentGroup = attachmentGroup,
-			attachmentGroup.attachments.index(after: attachmentGroup.currentIndex) != attachmentGroup.attachments.endIndex
-		else {
+		guard let attachmentGroup = attachmentGroup, attachmentGroup.attachments.index(after: attachmentGroup.currentIndex) != attachmentGroup.attachments.endIndex else {
 			return
 		}
-
 		let nextIndex = attachmentGroup.attachments.index(after: attachmentGroup.currentIndex)
 		let nextAttachment = attachmentGroup.attachments[nextIndex]
-
 		attachmentGroup.currentIndex = nextIndex
 		setCurrentAttachment(nextAttachment, currentPreview: attachmentGroup.preview(for: nextAttachment))
 	}
 
 	@IBAction private func previousAttachment(_: Any?) {
-		guard
-			let attachmentGroup = attachmentGroup,
-			attachmentGroup.currentIndex != attachmentGroup.attachments.startIndex
-		else {
+		guard let attachmentGroup = attachmentGroup, attachmentGroup.currentIndex != attachmentGroup.attachments.startIndex else {
 			return
 		}
-
 		let previousIndex = attachmentGroup.attachments.index(before: attachmentGroup.currentIndex)
 		let previousAttachment = attachmentGroup.attachments[previousIndex]
-
 		attachmentGroup.currentIndex = previousIndex
 		setCurrentAttachment(previousAttachment, currentPreview: attachmentGroup.preview(for: previousAttachment))
 	}
@@ -349,11 +337,8 @@ extension AttachmentWindowController {
 		else {
 			return
 		}
-
 		do {
-			let url = try FileManager.default.url(for: .downloadsDirectory, in: .userDomainMask,
-			                                      appropriateFor: nil, create: true)
-
+			let url = try FileManager.default.url(for: .downloadsDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 			writeImage(to: url.appendingPathComponent(fileName))
 		} catch {
 			presentError(error, modalFor: window, delegate: nil, didPresent: nil, contextInfo: nil)
@@ -361,18 +346,11 @@ extension AttachmentWindowController {
 	}
 
 	@IBAction private func saveToLocation(_: Any?) {
-		guard
-			let window = window,
-			let attachment = currentAttachment?.attachment,
-			let fileType = attachment.parsedUrl.fileUTI
-		else { return }
-
+		guard let window = window, let attachment = currentAttachment?.attachment, let fileType = attachment.parsedUrl.fileUTI else { return }
 		let savePanel = NSSavePanel()
 		savePanel.allowedContentTypes = [fileType]
 		savePanel.nameFieldStringValue = attachment.parsedUrl.lastPathComponent
-		savePanel.beginSheetModal(for: window) {
-			[unowned self] response in
-
+		savePanel.beginSheetModal(for: window) {[unowned self] response in
 			if response == NSApplication.ModalResponse.OK, let url = savePanel.url {
 				self.writeImage(to: url)
 			}

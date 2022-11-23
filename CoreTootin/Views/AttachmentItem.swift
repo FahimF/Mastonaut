@@ -58,7 +58,6 @@ public class AttachmentItem: NSCollectionViewItem {
 
 	override public func awakeFromNib() {
 		super.awakeFromNib()
-
 		itemImageView.unregisterDraggedTypes()
 		failureIndicatorImageView.unregisterDraggedTypes()
 		itemDetailIcon.unregisterDraggedTypes()
@@ -157,13 +156,11 @@ class ShowOnHoverView: HoverView {
 
 	override func mouseEntered(with event: NSEvent) {
 		super.mouseEntered(with: event)
-
 		animator().alphaValue = 1.0
 	}
 
 	override func mouseExited(with event: NSEvent) {
 		super.mouseExited(with: event)
-
 		animator().alphaValue = 0.001
 	}
 }

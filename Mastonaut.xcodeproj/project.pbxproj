@@ -1199,25 +1199,25 @@
 		1507924121D6E6CB009EE4A3 /* Window Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				15C7836E221CBD4900402C66 /* TimelinesWindowController.swift */,
-				1507924221D6E707009EE4A3 /* InstancePickerWindowController.swift */,
-				1507924321D6E707009EE4A3 /* InstancePickerWindowController.xib */,
-				15CD5BD121DAC76B00E06C2F /* AuthWindowController.swift */,
-				15CD5BD221DAC76B00E06C2F /* AuthWindowController.xib */,
-				15CD5BE721DEEA9300E06C2F /* StatusComposerWindowController.swift */,
-				15CD5BE821DEEA9300E06C2F /* StatusComposerWindowController.xib */,
-				15F1D25021F7D5AC00B01F35 /* AttachmentWindowController.swift */,
-				15F1D25121F7D5AC00B01F35 /* AttachmentWindowController.xib */,
 				150443A32208750000D9018F /* AboutWindowController.swift */,
 				150443A42208750000D9018F /* AboutWindowController.xib */,
 				152B7318220E35A7004121F1 /* AcknowledgementsWindowController.swift */,
 				152B7319220E35A7004121F1 /* AcknowledgementsWindowController.xib */,
-				15B4AF17222B682A007AA447 /* PreferencesWindowController.swift */,
-				15EE538922C956A5001BEA58 /* SearchWindowController.swift */,
+				15F1D25021F7D5AC00B01F35 /* AttachmentWindowController.swift */,
+				15F1D25121F7D5AC00B01F35 /* AttachmentWindowController.xib */,
+				15CD5BD121DAC76B00E06C2F /* AuthWindowController.swift */,
+				15CD5BD221DAC76B00E06C2F /* AuthWindowController.xib */,
 				151E9A29230C830500A76DB0 /* DebugWindowController.swift */,
 				151E9A2A230C830500A76DB0 /* DebugWindowController.xib */,
 				15B25D082651CBAC00C90963 /* FilterEditorWindowController.swift */,
 				15B25D092651CBAC00C90963 /* FilterEditorWindowController.xib */,
+				1507924221D6E707009EE4A3 /* InstancePickerWindowController.swift */,
+				1507924321D6E707009EE4A3 /* InstancePickerWindowController.xib */,
+				15B4AF17222B682A007AA447 /* PreferencesWindowController.swift */,
+				15EE538922C956A5001BEA58 /* SearchWindowController.swift */,
+				15CD5BE721DEEA9300E06C2F /* StatusComposerWindowController.swift */,
+				15CD5BE821DEEA9300E06C2F /* StatusComposerWindowController.xib */,
+				15C7836E221CBD4900402C66 /* TimelinesWindowController.swift */,
 			);
 			path = "Window Controllers";
 			sourceTree = "<group>";
