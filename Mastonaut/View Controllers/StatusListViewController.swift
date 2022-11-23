@@ -40,11 +40,9 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
 		observations.observePreference(\MastonautPreferences.mediaDisplayMode) {
 			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
-
 		observations.observePreference(\MastonautPreferences.spoilerDisplayMode) {
 			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
@@ -56,15 +54,12 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	override func registerCells() {
 		super.registerCells()
-
 		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main), forIdentifier: CellViewIdentifier.status)
 	}
 
 	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
 		super.clientDidChange(client, oldClient: oldClient)
-
 		guard let account = authorizedAccountProvider?.currentAccount else { return }
-
 		filterService = FilterService.service(for: account)
 		filterService?.register(observer: self)
 	}
@@ -114,11 +109,9 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	}
 
 	func confirmDelete(status _: Status, isRedrafting: Bool, completion: @escaping (Bool) -> Void) {
-		let message: String = isRedrafting ? "The contents of this post will be copied over to the composer, and you'll be able to make changes to it before re-submitting it." : "This action can not be undone."
-
+		let message = isRedrafting ? "The contents of this post will be copied over to the composer, and you'll be able to make changes to it before re-submitting it." : "This action can not be undone."
 		let dialogMode: DialogMode = isRedrafting ? .custom(proceed: "Delete and Redraft", dismiss: "Cancel")
 			: .custom(proceed: "Delete Toot", dismiss: "Cancel")
-
 		view.window?.windowController?.showAlert(style: .informational, title: "Are you sure you want to delete this post?", message: message, dialogMode: dialogMode) {
 			response in
 			completion(response == .alertFirstButtonReturn)
@@ -146,23 +139,13 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	}
 
 	override func populate(cell: NSTableCellView, for status: Status) {
-		guard
-			let attachmentPresenter = authorizedAccountProvider?.attachmentPresenter,
-			let instance = authorizedAccountProvider?.currentInstance,
-			let statusCell = cell as? StatusDisplaying
-		else {
+		guard let attachmentPresenter = authorizedAccountProvider?.attachmentPresenter, let instance = authorizedAccountProvider?.currentInstance, let statusCell = cell as? StatusDisplaying else {
 			return
 		}
-
 		if let poll = status.poll {
 			setupRefreshTimer(for: poll, statusID: status.id)
 		}
-
-		statusCell.set(displayedStatus: status,
-		               poll: status.poll.flatMap { updatedPolls[$0.id] },
-		               attachmentPresenter: attachmentPresenter,
-		               interactionHandler: self,
-		               activeInstance: instance)
+		statusCell.set(displayedStatus: status, poll: status.poll.flatMap { updatedPolls[$0.id] }, attachmentPresenter: attachmentPresenter, interactionHandler: self, activeInstance: instance)
 	}
 
 	func set(hasActivePollTask: Bool, for statusID: String) {
@@ -172,7 +155,6 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		else {
 			return
 		}
-
 		statusCell.setHasActivePollTask(hasActivePollTask)
 	}
 
@@ -180,21 +162,15 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		guard let index = entryList.firstIndex(where: { $0.entryKey == statusID }) else {
 			return
 		}
-
 		updatedPolls[poll.id] = poll
-
-		guard
-			let statusCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? StatusTableCellView
-		else {
+		guard let statusCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? StatusTableCellView else {
 			return
 		}
-
 		statusCell.set(updatedPoll: poll)
 	}
 
 	override func prepareToDisplay(cellView: NSTableCellView, at row: Int) {
 		super.prepareToDisplay(cellView: cellView, at: row)
-
 		if let statusCellView = cellView as? StatusTableCellView {
 			statusCellView.updateContentsVisibility()
 		}
@@ -232,12 +208,9 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	// MARK: - Keyboard Navigation
 
 	override func showPreview(for _: Status, atRow row: Int) {
-		guard let cellView = tableView.rowView(atRow: row, makeIfNecessary: false)?.view(atColumn: 0),
-		      let mediaPresenterCell = cellView as? MediaPresenting
-		else {
+		guard let cellView = tableView.rowView(atRow: row, makeIfNecessary: false)?.view(atColumn: 0), let mediaPresenterCell = cellView as? MediaPresenting else {
 			return
 		}
-
 		mediaPresenterCell.makePresentableMediaVisible()
 	}
 }

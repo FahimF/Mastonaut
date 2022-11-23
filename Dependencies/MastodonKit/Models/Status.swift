@@ -61,6 +61,10 @@ public class Status: Codable {
     public let card: Card?
     /// A poll
     public let poll: Poll?
+	
+	// New properties
+	/// How many replies this status has received
+	public let repliesCount: Int
 
     private enum CodingKeys: String, CodingKey {
         case id, uri, url, account, content, emojis, reblogged, favourited, bookmarked, sensitive, visibility
@@ -72,6 +76,7 @@ public class Status: Codable {
         case favouritesCount = "favourites_count"
 		case spoilerText = "spoiler_text"
 		case mediaAttachments = "media_attachments"
+		case repliesCount = "replies_count"
     }
 
     public func markAsPinned() {

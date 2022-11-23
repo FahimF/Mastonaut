@@ -33,8 +33,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	@IBOutlet private unowned var contentWarningLabel: AttributedLabel!
 
 	@IBOutlet unowned var replyButton: NSButton!
+	@IBOutlet unowned var replyCount: NSTextField!
 	@IBOutlet unowned var reblogButton: NSButton!
+	@IBOutlet unowned var reblogCount: NSTextField!
 	@IBOutlet unowned var favoriteButton: NSButton!
+	@IBOutlet unowned var favouriteCount: NSTextField!
 	@IBOutlet unowned var bookmarkButton: NSButton!
 	@IBOutlet unowned var warningButton: NSButton!
 	@IBOutlet unowned var sensitiveContentButton: NSButton!
@@ -159,6 +162,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		authorAccountLabel.stringValue = cellModel.visibleStatus.account.uri(in: activeInstance)
 		timeLabel.objectValue = cellModel.visibleStatus.createdAt
 		timeLabel.toolTip = DateFormatter.longDateFormatter.string(from: cellModel.visibleStatus.createdAt)
+		
+		// Set counts
+		replyCount.stringValue = "\(status.repliesCount)"
+		reblogCount.stringValue = "\(status.reblogsCount)"
+		favouriteCount.stringValue = "\(status.favouritesCount)"
 
 		let attributedStatus = cellModel.visibleStatus.attributedContent
 

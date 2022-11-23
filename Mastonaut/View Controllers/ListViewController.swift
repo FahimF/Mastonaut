@@ -340,7 +340,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		if entryMap[entryKey] != nil {
 			entryMap[entryKey] = entry
-
 			guard let entryIndex = entryList.firstIndex(where: { $0.entryKey == entryKey }) else {
 				return
 			}
@@ -525,17 +524,14 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		tableView.endUpdates()
 	}
 
-	// MARK: Table View Data Source
-
+	// MARK: - Table View Data Source
 	func numberOfRows(in _: NSTableView) -> Int {
 		return entryList.count
 	}
 
-	// MARK: Table View Delegate
-
+	// MARK: - Table View Delegate
 	func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-		let rowView = tableView.makeView(withIdentifier: ListCellViewIdentifier.row,
-		                                 owner: nil) as? BackgroundTableRowView
+		let rowView = tableView.makeView(withIdentifier: ListCellViewIdentifier.row, owner: nil) as? BackgroundTableRowView
 		rowView?.rowIndex = row
 		return rowView
 	}
@@ -546,15 +542,12 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 		if case let .entry(key) = item, let entry = entryMap[key] {
 			let cellViewIdentifier: NSUserInterfaceItemIdentifier
-
 			if entryMatchesAnyFilter(entry) {
 				cellViewIdentifier = ListCellViewIdentifier.filtered
 			} else {
 				cellViewIdentifier = self.cellViewIdentifier(for: entry)
 			}
-
 			view = tableView.makeView(withIdentifier: cellViewIdentifier, owner: nil)
-
 			if let cellView = view as? NSTableCellView {
 				populate(cell: cellView, for: entry)
 			}
