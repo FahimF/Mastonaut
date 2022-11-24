@@ -26,8 +26,9 @@ public extension NSRegularExpression {
 	///
 	/// Notice:
 	/// - The contents of the first capture group must be reinserted into the original string.
+//	(^|\\s)((http|https):)(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
 	static let uriRegex = try! NSRegularExpression(pattern: """
-	(^|\\s)((http|https):)(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
+	((?:http|https)://)?(?:[\\w\\d\\-_]+\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?
 	""", options: [.caseInsensitive])
 
 	/// Adapted from the Mastodon mention Regex, with changes to make it compatible with the POSIX parser

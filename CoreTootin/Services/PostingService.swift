@@ -89,6 +89,9 @@ private extension String {
 	static let linkPlaceholder = String(repeating: "x", count: 23)
 
 	var mastodonCount: Int {
+		if self.isEmpty {
+			return 0
+		}
 		let mutableCopy = (self as NSString).mutableCopy() as! NSMutableString
 		var replacementRanges: [NSRange: String] = [:]
 
