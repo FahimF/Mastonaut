@@ -63,39 +63,16 @@ class ComposerTextView: BaseComposerTextView, NSTextStorageDelegate {
 		window?.selectPreviousKeyView(sender)
 	}
 
-	override func updateDragTypeRegistration() {
-		unregisterDraggedTypes()
-		registerForDraggedTypes([.string])
-	}
-
-	override var readablePasteboardTypes: [NSPasteboard.PasteboardType] {
-		guard let pasteDelegate = self.pasteDelegate else {
-			return super.readablePasteboardTypes
-		}
-
-		return pasteDelegate.readablePasteboardTypes(for: self, proposedTypes: super.readablePasteboardTypes)
-	}
-
-	override func paste(_ sender: Any?) {
-		if pasteDelegate?.readFromPasteboard(for: self) != true {
-			super.paste(sender)
-		}
-	}
-
-	override func writeSelection(to pboard: NSPasteboard, types _: [NSPasteboard.PasteboardType]) -> Bool
-	{
+	override func writeSelection(to pboard: NSPasteboard, types _: [NSPasteboard.PasteboardType]) -> Bool {
 		guard let textStorage = textStorage else { return false }
 
 		let aggregateString = NSMutableAttributedString()
-
 		for range in selectedRanges.map({ $0.rangeValue }) {
 			if !aggregateString.isEmpty {
 				aggregateString.append(NSAttributedString(string: "\n"))
 			}
-
 			aggregateString.append(textStorage.attributedSubstring(from: range))
 		}
-
 		let strippedString = aggregateString.strippingEmojiAttachments(insertJoinersBetweenEmojis: Preferences.insertJoinersBetweenEmojis)
 		pboard.clearContents()
 		pboard.writeObjects([strippedString as NSString])

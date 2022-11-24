@@ -27,9 +27,6 @@ open class BaseComposerTextView: SuggestionTextView {
 	@IBOutlet
 	public var submitControl: NSControl? = nil
 
-	@IBOutlet
-	public weak var pasteDelegate: BaseComposerTextViewPasteDelegate? = nil
-
 	override public func insertNewline(_ sender: Any?) {
 		guard suggestionWindowController.isWindowVisible == false else {
 			insertCurrentlySelectedSuggestion()
@@ -66,17 +63,4 @@ open class BaseComposerTextView: SuggestionTextView {
 		formattedString.addAttributes(typingAttributes, range: NSMakeRange(0, string.length))
 		return formattedString
 	}
-}
-
-@objc public protocol BaseComposerTextViewPasteDelegate: AnyObject {
-	/// Returns which pasteboard types the delegate is capable of reading from the pasteboard into the control.
-	func readablePasteboardTypes(for controlTextView: BaseComposerTextView,
-	                             proposedTypes: [NSPasteboard.PasteboardType]) -> [NSPasteboard.PasteboardType]
-
-	/// Read the contents from the pasteboard into the control.
-	///
-	/// Asks the delegate to read from the pasteboard and modify the control's contents as appropriate. If the delegate
-	/// reads any content from the pasteboard, it should return true. Returning false will result in the default paste
-	/// behavior being applied.
-	func readFromPasteboard(for controlTextView: BaseComposerTextView) -> Bool
 }

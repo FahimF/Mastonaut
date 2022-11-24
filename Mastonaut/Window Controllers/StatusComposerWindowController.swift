@@ -934,18 +934,6 @@ extension StatusComposerWindowController: NSTextViewDelegate {
 	}
 }
 
-extension StatusComposerWindowController: BaseComposerTextViewPasteDelegate {
-	func readablePasteboardTypes(for _: BaseComposerTextView,
-	                             proposedTypes: [NSPasteboard.PasteboardType]) -> [NSPasteboard.PasteboardType]
-	{
-		return proposedTypes + [.fileURL, .png, .tiff]
-	}
-
-	func readFromPasteboard(for _: BaseComposerTextView) -> Bool {
-		return attachmentsSubcontroller?.addAttachments(pasteboard: NSPasteboard.general) ?? false
-	}
-}
-
 extension StatusComposerWindowController: AccountsMenuProvider {
 	private var accounts: [AuthorizedAccount] {
 		return accountsService.authorizedAccounts
