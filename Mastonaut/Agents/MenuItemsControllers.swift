@@ -48,7 +48,7 @@ class MenuItemsController: NSObject {
 	}
 
 	func makeShareItem(url: URL) -> NSMenuItem {
-		let shareMenuItem = NSMenuItem(title: 🔠("Share"), submenu: NSMenu(title: ""))
+		let shareMenuItem = NSMenuItem(title: "Share", submenu: NSMenu(title: ""))
 		DispatchQueue.global(qos: .background).async {
 			let shareMenuItems = ShareMenuFactory.shareMenuItems(for: url)
 			if shareMenuItems.isEmpty {
@@ -79,9 +79,9 @@ class StatusMenuItemsController: MenuItemsController {
 			makeItemCopyStatusTextContents(status),
 			makeItemCopyLinkToStatus(status),
 			.separator(),
-			makeActionItem(title: 🔠("Mention @\(author.username)…"))
+			makeActionItem(title: "Mention @\(author.username)…")
 				{ handler.mention(userHandle: "@\(author.acct)", directMessage: false) },
-			makeActionItem(title: 🔠("Direct message @\(author.username)…"))
+			makeActionItem(title: "Direct message @\(author.username)…")
 				{ handler.mention(userHandle: "@\(author.acct)", directMessage: true) },
 		].compacted()
 
@@ -124,7 +124,7 @@ class StatusMenuItemsController: MenuItemsController {
 
 		if let url = status.reblog?.url ?? status.url {
 			items.append(.separator())
-			items.append(makeOpenURLInBrowser(title: 🔠("Open post in Browser"), url: url))
+			items.append(makeOpenURLInBrowser(title: "Open post in Browser", url: url))
 
 			items.append(.separator())
 			items.append(makeShareItem(url: url))
@@ -134,56 +134,48 @@ class StatusMenuItemsController: MenuItemsController {
 	}
 
 	private func makeItemCopyStatusTextContents(_ status: Status) -> NSMenuItem {
-		return makeLazyCopyItem(title: 🔠("Copy post text")) { status.attributedContent.string as NSString }
+		return makeLazyCopyItem(title: "Copy post text") { status.attributedContent.string as NSString }
 	}
 
 	private func makeItemCopyLinkToStatus(_ status: Status) -> NSMenuItem {
 		let finalStatus = status.reblog ?? status
-		return makeStringCopyItem(title: 🔠("Copy link to post"), finalStatus.url?.absoluteString ?? finalStatus.uri)
+		return makeStringCopyItem(title: "Copy link to post", finalStatus.url?.absoluteString ?? finalStatus.uri)
 	}
 
-	private func makeShowDetailsItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
-		return makeActionItem(title: 🔠("Show post details")) { interactionHandler.show(status: status) }
+	private func makeShowDetailsItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
+		return makeActionItem(title: "Show post details") { interactionHandler.show(status: status) }
 	}
 
-	private func makeDeleteStatusItems(status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem]
-	{
+	private func makeDeleteStatusItems(status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem] {
 		return [
-			makeActionItem(title: 🔠("Delete")) { interactionHandler.delete(status: status, redraft: false) },
-			makeActionItem(title: 🔠("Delete & Re-draft")) { interactionHandler.delete(status: status, redraft: true) },
+			makeActionItem(title: "Delete") { interactionHandler.delete(status: status, redraft: false) },
+			makeActionItem(title: "Delete & Re-draft") { interactionHandler.delete(status: status, redraft: true) },
 		]
 	}
 
-	private func makePinOrUnpinStatusItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
+	private func makePinOrUnpinStatusItem(status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
 		if status.pinned != true {
-			return makeActionItem(title: 🔠("Pin to Profile")) { interactionHandler.pin(status: status) }
+			return makeActionItem(title: "Pin to Profile") { interactionHandler.pin(status: status) }
 		} else {
-			return makeActionItem(title: 🔠("Unpin from Profile")) { interactionHandler.unpin(status: status) }
+			return makeActionItem(title: "Unpin from Profile") { interactionHandler.unpin(status: status) }
 		}
 	}
 
-	private func makeShowAccountItem(account: Account, interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
+	private func makeShowAccountItem(account: Account, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
 		return makeActionItem(title: "@\(account.acct)") { interactionHandler.show(account: account) }
 	}
 
-	private func makeShowMentionItem(mention: Mention, interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
+	private func makeShowMentionItem(mention: Mention, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
 		return makeActionItem(title: "@\(mention.acct)") { interactionHandler.handle(linkURL: mention.url,
 		                                                                             knownTags: nil) }
 	}
 
-	private func makeShowTagItem(tag: Tag, interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
+	private func makeShowTagItem(tag: Tag, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
 		return makeActionItem(title: "#\(tag.name)") { interactionHandler.show(tag: tag) }
 	}
 
-	private func makeReloadPollItem(poll: Poll, status: Status,
-	                                interactionHandler: StatusInteractionHandling) -> NSMenuItem
-	{
-		return makeActionItem(title: 🔠("Reload poll results")) {
+	private func makeReloadPollItem(poll: Poll, status: Status, interactionHandler: StatusInteractionHandling) -> NSMenuItem {
+		return makeActionItem(title: "Reload poll results") {
 			interactionHandler.refreshPoll(statusID: status.id, pollID: poll.id)
 		}
 	}
@@ -192,16 +184,13 @@ class StatusMenuItemsController: MenuItemsController {
 class NotificationMenuItemsController: MenuItemsController {
 	static let shared = NotificationMenuItemsController()
 
-	func menuItems(for notification: MastodonNotification,
-	               interactionHandler: NotificationInteractionHandling) -> [NSMenuItem]
-	{
+	func menuItems(for notification: MastodonNotification, interactionHandler: NotificationInteractionHandling) -> [NSMenuItem] {
 		return [
 			makeShowAccountItem(account: notification.account, interactionHandler: interactionHandler),
 		]
 	}
 
-	private func makeShowAccountItem(account: Account, interactionHandler: NotificationInteractionHandling) -> NSMenuItem
-	{
+	private func makeShowAccountItem(account: Account, interactionHandler: NotificationInteractionHandling) -> NSMenuItem {
 		return makeActionItem(title: "@\(account.acct)") { interactionHandler.show(account: account) }
 	}
 }
@@ -209,19 +198,18 @@ class NotificationMenuItemsController: MenuItemsController {
 class AccountMenuItemsController: MenuItemsController {
 	static let shared = AccountMenuItemsController()
 
-	func menuItems(for account: Account, interactionHandler handler: StatusInteractionHandling) -> [NSMenuItem]
-	{
+	func menuItems(for account: Account, interactionHandler handler: StatusInteractionHandling) -> [NSMenuItem] {
 		return [
-			makeActionItem(title: 🔠("Mention @\(account.username)…")) {
+			makeActionItem(title: "Mention @\(account.username)…") {
 				handler.mention(userHandle: "@\(account.acct)", directMessage: false)
 			},
-			makeActionItem(title: 🔠("Direct message @\(account.username)…")) {
+			makeActionItem(title: "Direct message @\(account.username)…") {
 				handler.mention(userHandle: "@\(account.acct)", directMessage: true)
 			},
 			.separator(),
-			makeOpenURLInBrowser(title: 🔠("Open profile in Browser"), url: account.url),
-			makeStringCopyItem(title: 🔠("Copy link to profile"), account.url.absoluteString),
-			makeStringCopyItem(title: 🔠("Copy profile handle"), account.acct),
+			makeOpenURLInBrowser(title: "Open profile in Browser", url: account.url),
+			makeStringCopyItem(title: "Copy link to profile", account.url.absoluteString),
+			makeStringCopyItem(title: "Copy profile handle", account.acct),
 			.separator(),
 			makeShareItem(url: account.url),
 		]
@@ -233,8 +221,7 @@ private extension MenuItemsController {
 		if let pasteboardWritable = sender.representedObject as? NSPasteboardWriting {
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([pasteboardWritable])
-		} else if let lazyPasteboardWritable = sender.representedObject as? LazyEvaluationAdapter<NSPasteboardWriting>
-		{
+		} else if let lazyPasteboardWritable = sender.representedObject as? LazyEvaluationAdapter<NSPasteboardWriting> {
 			NSPasteboard.general.clearContents()
 			NSPasteboard.general.writeObjects([lazyPasteboardWritable.evaluate()])
 		}

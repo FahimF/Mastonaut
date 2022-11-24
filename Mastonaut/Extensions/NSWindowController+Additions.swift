@@ -25,32 +25,19 @@ extension NSWindowController {
 		_ = window
 	}
 
-	func displayError<T: UserDescriptionError>(_ error: T,
-	                                           title: String = 🔠("Error"),
-	                                           dialogMode: DialogMode? = nil,
-	                                           completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
-	{
+	func displayError<T: UserDescriptionError>(_ error: T, title: String = "Error", dialogMode: DialogMode? = nil, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
 		guard let window = window else {
 			presentError(error)
 			return
 		}
-
-		let alert = NSAlert.makeAlert(style: .warning, title: title,
-		                              message: error.userDescription,
-		                              dialogMode: dialogMode)
-
+		let alert = NSAlert.makeAlert(style: .warning, title: title, message: error.userDescription, dialogMode: dialogMode)
 		alert.beginSheetModal(for: window, completionHandler: handler)
 	}
 
-	func showAlert(style: NSAlert.Style = .informational,
-	               title: String, message: String,
-	               dialogMode: DialogMode? = nil,
-	               completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil)
-	{
+	func showAlert(style: NSAlert.Style = .informational, title: String, message: String, dialogMode: DialogMode? = nil, completionHandler handler: ((NSApplication.ModalResponse) -> Void)? = nil) {
 		guard let window = window else {
 			return
 		}
-
 		let alert = NSAlert.makeAlert(style: style, title: title, message: message, dialogMode: dialogMode)
 		alert.beginSheetModal(for: window, completionHandler: handler)
 	}
