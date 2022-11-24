@@ -1,0 +1,5 @@
+DEVELOPMENT_TEAM = PADL68BMN2
+
+MASTONAUT_BUNDLE_ID_BASE = org.farook.mastonaut
+
+CODE_SIGN_IDENTITY = Apple Development

@@ -1,5 +1,0 @@
-DEVELOPMENT_TEAM = xxxxxxxxxx
-
-MASTONAUT_BUNDLE_ID_BASE = app.mastonaut
-
-CODE_SIGN_IDENTITY = Apple Development

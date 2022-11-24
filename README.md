@@ -4,13 +4,13 @@ The following instructions assume Xcode 14.1 on macOS 12.6.
 
 ## Setup
 
-- Open the file `userspecific.xcconfig`.
+- Make a copy of the file `userspecific.xcconfig.template` as `userspecific.xcconfig`.
 
-- Set `MASTONAUT_BUNDLE_ID_BASE` to a bundle ID for the app that works with your Apple ID.
+- In the new `userspecific.xcconfig` file, set `MASTONAUT_BUNDLE_ID_BASE` to a bundle ID for the app that works with your Apple ID.
 
 - Enter your Team ID instead of the `xxxxxxxxxx` next to `DEVELOPMENT_TEAM` (It looks something like `74J34U3R6X`).
 
-- **Do not check in your changes to `userspecific.xcconfig`!**
+- **Do not add `userspecific.xcconfig` to your Git commits!**
 
 That should be it.
 
