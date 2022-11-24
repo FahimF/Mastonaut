@@ -36,7 +36,7 @@ public class Client: ClientType {
     @discardableResult
     public func run<Model: Codable>(_ request: Request<Model>,
                                     resumeImmediately: Bool,
-                                    completion: @escaping (Result<Model>) -> Void) -> FutureTask? {
+                                    completion: @escaping (MKResult<Model>) -> Void) -> FutureTask? {
         run(request, existingFuture: nil, resumeImmediately: resumeImmediately, completion: completion)
     }
 
@@ -44,7 +44,7 @@ public class Client: ClientType {
     private func run<Model: Codable>(_ request: Request<Model>,
                                      existingFuture: FutureTask?,
                                      resumeImmediately: Bool,
-                                     completion: @escaping (Result<Model>) -> Void) -> FutureTask? {
+                                     completion: @escaping (MKResult<Model>) -> Void) -> FutureTask? {
 
         guard delegate?.isRequestingNewAccessToken != true else {
             let future = FutureTask()
@@ -114,7 +114,7 @@ public class Client: ClientType {
     }
 
     public func runAndAggregateAllPages<Model: Codable>(requestProvider: @escaping (Pagination) -> Request<[Model]>,
-                                                        completion: @escaping (Result<[Model]>) -> Void) {
+                                                        completion: @escaping (MKResult<[Model]>) -> Void) {
 
         let aggregationQueue = DispatchQueue(label: "Aggregation", qos: .utility)
         var aggregateResults: [Model] = []
@@ -157,7 +157,7 @@ public class Client: ClientType {
 
     private func scheduleRequestForRetry<Model>(_ request: Request<Model>,
                                                 future: FutureTask,
-                                                completion: @escaping (Result<Model>) -> Void) {
+                                                completion: @escaping (MKResult<Model>) -> Void) {
 
         let queue = retryQueue ?? {
             let queue = OperationQueue()

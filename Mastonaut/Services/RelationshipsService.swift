@@ -64,27 +64,27 @@ struct RelationshipsService {
 		}
 	}
 
-	func loadBlockedAccounts(completion: @escaping (Swift.Result<[Account], Errors>) -> Void) {
+	func loadBlockedAccounts(completion: @escaping (Result<[Account], Errors>) -> Void) {
 		loadAccounts({ Blocks.all(range: $0.next ?? .default) }, completion)
 	}
 
-	func loadMutedAccounts(completion: @escaping (Swift.Result<[Account], Errors>) -> Void) {
+	func loadMutedAccounts(completion: @escaping (Result<[Account], Errors>) -> Void) {
 		loadAccounts({ Mutes.all(range: $0.next ?? .default) }, completion)
 	}
 
-	func loadFollowerAccounts(account: Account, completion: @escaping (Swift.Result<[Account], Errors>) -> Void)
+	func loadFollowerAccounts(account: Account, completion: @escaping (Result<[Account], Errors>) -> Void)
 	{
 		let id = account.id
 		loadAccounts({ Accounts.followers(id: id, range: $0.next ?? .default) }, completion)
 	}
 
-	func loadFollowingAccounts(account: Account, completion: @escaping (Swift.Result<[Account], Errors>) -> Void)
+	func loadFollowingAccounts(account: Account, completion: @escaping (Result<[Account], Errors>) -> Void)
 	{
 		let id = account.id
 		loadAccounts({ Accounts.following(id: id, range: $0.next ?? .default) }, completion)
 	}
 
-	func follow(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func follow(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.follow(id: account.id),
@@ -92,7 +92,7 @@ struct RelationshipsService {
 		                completion: completion)
 	}
 
-	func unfollow(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func unfollow(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.unfollow(id: account.id),
@@ -100,7 +100,7 @@ struct RelationshipsService {
 		                completion: completion)
 	}
 
-	func block(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func block(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.block(id: account.id),
@@ -108,7 +108,7 @@ struct RelationshipsService {
 		                completion: completion)
 	}
 
-	func unblock(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func unblock(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.unblock(id: account.id),
@@ -116,7 +116,7 @@ struct RelationshipsService {
 		                completion: completion)
 	}
 
-	func mute(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func mute(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.mute(id: account.id),
@@ -124,7 +124,7 @@ struct RelationshipsService {
 		                completion: completion)
 	}
 
-	func unmute(account: Account, completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	func unmute(account: Account, completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		setRelationship(with: account,
 		                request: Accounts.unmute(id: account.id),
@@ -135,7 +135,7 @@ struct RelationshipsService {
 	func setRelationship(with account: Account,
 	                     request: Request<Relationship>,
 	                     persistenceSetter: @escaping (AccountReference, Relationship) -> Void,
-	                     completion: @escaping (Swift.Result<AccountReference, Errors>) -> Void)
+	                     completion: @escaping (Result<AccountReference, Errors>) -> Void)
 	{
 		client.run(request) { result in
 
@@ -161,7 +161,7 @@ struct RelationshipsService {
 	}
 
 	private func loadAccounts(_ requestProvider: @escaping (Pagination) -> Request<[Account]>,
-	                          _ completion: @escaping (Swift.Result<[Account], Errors>) -> Void)
+	                          _ completion: @escaping (Result<[Account], Errors>) -> Void)
 	{
 		client.runAndAggregateAllPages(requestProvider: requestProvider) {
 			result in

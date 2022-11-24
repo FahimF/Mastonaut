@@ -23,7 +23,7 @@ import Foundation
 struct PollService {
 	let client: ClientType
 
-	func voteOn(poll: Poll, options: IndexSet, completion: @escaping (Swift.Result<Poll, Errors>) -> Void)
+	func voteOn(poll: Poll, options: IndexSet, completion: @escaping (Result<Poll, Errors>) -> Void)
 	{
 		guard !options.isEmpty, poll.multiple || options.count == 1 else {
 			completion(.failure(.invalidOptionsCount))
@@ -46,7 +46,7 @@ struct PollService {
 		}
 	}
 
-	func poll(pollID: String, completion: @escaping (Swift.Result<Poll, Errors>) -> Void) {
+	func poll(pollID: String, completion: @escaping (Result<Poll, Errors>) -> Void) {
 		client.run(Polls.poll(id: pollID)) {
 			result in
 

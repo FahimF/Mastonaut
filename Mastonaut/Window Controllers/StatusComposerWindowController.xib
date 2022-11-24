@@ -45,7 +45,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="New Toot" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" titleVisibility="hidden" id="0jZ-D2-fmk">
+        <window title="New Post" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" titleVisibility="hidden" id="0jZ-D2-fmk">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenAuxiliary="YES"/>
             <rect key="contentRect" x="484" y="366" width="534" height="469"/>
@@ -463,7 +463,7 @@
                     <toolbarItem implicitItemIdentifier="37A166A2-EDD6-4933-9049-301C4E7677DE" label="Send Toot" paletteLabel="Send Toot" sizingBehavior="auto" id="J1z-pE-aui">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="Y1e-gF-Lwj">
-                            <rect key="frame" x="0.0" y="14" width="80" height="26"/>
+                            <rect key="frame" x="0.0" y="14" width="78" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="6LV-Z3-Fcc">
                                 <font key="font" metaFont="system"/>
@@ -479,7 +479,7 @@
                     <toolbarItem implicitItemIdentifier="2670EA07-9FA5-47B6-9999-C658C5893191" label="Toot Visibility" paletteLabel="Toot Visibility" title="Public" sizingBehavior="auto" id="4FZ-eB-IQb">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Tdb-iG-POu">
-                            <rect key="frame" x="0.0" y="14" width="100" height="24"/>
+                            <rect key="frame" x="3" y="14" width="73" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="Public" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vDZ-pj-ZWA" id="Tg7-Bh-quE">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -499,7 +499,7 @@
                     <toolbarItem implicitItemIdentifier="DED6F7FB-3FD1-40AC-8C7B-39467D857A57" label="Info" paletteLabel="Info" sizingBehavior="auto" id="6at-pb-t4e">
                         <nil key="toolTip"/>
                         <button key="view" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="gcx-Vd-DhQ">
-                            <rect key="frame" x="0.0" y="14" width="29" height="29"/>
+                            <rect key="frame" x="1" y="14" width="25" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HHG-5t-xdH">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -514,7 +514,7 @@
                     <toolbarItem implicitItemIdentifier="05802D9C-CA56-4653-9DDF-A5C4631DE4B3" label="Current Account" paletteLabel="Current Account" title="No Accounts" sizingBehavior="auto" id="Cyu-QN-sc8">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="oR2-CQ-cC4">
-                            <rect key="frame" x="0.0" y="14" width="140" height="24"/>
+                            <rect key="frame" x="0.0" y="14" width="113" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" title="No Accounts" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="1" imageScaling="proportionallyDown" inset="2" selectedItem="83Y-qT-94C" id="gYM-ZC-2bf">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

@@ -62,12 +62,12 @@ public extension Client {
 
 public extension ClientType {
 	@discardableResult
-	func fetchAccountAndInstance(completion: @escaping (Swift.Result<(Account, Instance), ClientError>) -> Void) -> Set<FutureTask>
+	func fetchAccountAndInstance(completion: @escaping (Result<(Account, Instance), ClientError>) -> Void) -> Set<FutureTask>
 	{
 		let dispatchGroup = DispatchGroup()
 		var futures = Set<FutureTask>()
-		var accountResult: Result<Account>?
-		var instanceResult: Result<Instance>?
+		var accountResult: MKResult<Account>?
+		var instanceResult: MKResult<Instance>?
 
 		dispatchGroup.enter()
 		(run(Accounts.currentUser(), resumeImmediately: true) {

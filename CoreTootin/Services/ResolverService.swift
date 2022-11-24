@@ -30,13 +30,13 @@ public class ResolverService: NSObject {
 		self.client = client
 	}
 
-	public func resolveStatus(uri: String, completion: @escaping (Swift.Result<Status, ResolverError>) -> Void)
+	public func resolveStatus(uri: String, completion: @escaping (Result<Status, ResolverError>) -> Void)
 	{
 		resolveStatus(uri: uri, fallbackSearch: false, completion: completion)
 	}
 
 	public func resolve(account: Account, activeInstance: Instance,
-	                    completion: @escaping (Swift.Result<Account, AccountRevalidationErrors>) -> Void)
+	                    completion: @escaping (Result<Account, AccountRevalidationErrors>) -> Void)
 	{
 		let accountURI = account.uri(in: activeInstance)
 		client.run(Accounts.search(query: accountURI, limit: 1)) {
@@ -56,7 +56,7 @@ public class ResolverService: NSObject {
 		}
 	}
 
-	private func resolveStatus(uri: String, fallbackSearch: Bool, completion: @escaping (Swift.Result<Status, ResolverError>) -> Void) {
+	private func resolveStatus(uri: String, fallbackSearch: Bool, completion: @escaping (Result<Status, ResolverError>) -> Void) {
 		if resolverFuture?.task?.state != .completed {
 			resolverFuture?.task?.cancel()			
 		}

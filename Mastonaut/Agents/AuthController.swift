@@ -466,7 +466,7 @@ private extension ClientApplication {
 
 // Helpers
 extension AuthController {
-	func checkValidInstanceDomain(_ domain: String, completion: @escaping (Swift.Result<ValidInstance, ValidInstanceCheckErrors>) -> Void) {
+	func checkValidInstanceDomain(_ domain: String, completion: @escaping (Result<ValidInstance, ValidInstanceCheckErrors>) -> Void) {
 		let trimmedDomain = domain.trimmingCharacters(in: CharacterSet(charactersIn: "@"))
 		guard !trimmedDomain.isEmpty, let wellFormedUrl = URL(string: "https://\(trimmedDomain)/api/v1/instance"), let host = wellFormedUrl.host else {
 			return completion(.failure(.badDomain))

@@ -355,7 +355,7 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 	private func process(relationshipInteraction: ProfileTableCellView.RelationshipInteraction, relationshipService service: RelationshipsService) {
 		guard let account = account else { return }
 
-		let completion: (Swift.Result<AccountReference, RelationshipsService.Errors>) -> Void = {[weak self, account] result in
+		let completion: (Result<AccountReference, RelationshipsService.Errors>) -> Void = {[weak self, account] result in
 			guard let profileCellView = self?.profileCellView() else { return }
 			guard case let .success(reference) = result else {
 				service.relationship(with: account) { profileCellView.setRelationship($0) }

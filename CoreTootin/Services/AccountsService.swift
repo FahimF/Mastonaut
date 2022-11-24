@@ -68,7 +68,7 @@ public class AccountsService: NSObject {
 		accountDetailsMap.removeValue(forKey: account.uuid)
 	}
 
-	public func details(for account: AuthorizedAccount, completion: @escaping (Swift.Result<AccountDetails, Error>) -> Void)
+	public func details(for account: AuthorizedAccount, completion: @escaping (Result<AccountDetails, Error>) -> Void)
 	{
 		let accountUUID = account.uuid
 

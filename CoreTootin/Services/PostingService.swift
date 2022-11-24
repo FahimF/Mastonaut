@@ -52,34 +52,16 @@ public class PostingService: NSObject {
 		updateCharacterCount()
 	}
 
-	public func post(visibility: Visibility,
-	                 isSensitive: Bool,
-	                 attachmentIds: [String],
-	                 replyStatusId: String?,
-	                 poll: PollPayload?,
-	                 completion: @escaping (Swift.Result<Status, Error>) -> Void)
-	{
+	public func post(visibility: Visibility, isSensitive: Bool, attachmentIds: [String], replyStatusId: String?, poll: PollPayload?, completion: @escaping (Result<Status, Error>) -> Void) {
 		let isSensitive = attachmentIds.count > 0 && isSensitive
-
-		let createStatusRequest = Statuses.create(status: status,
-		                                          replyToID: replyStatusId,
-		                                          mediaIDs: attachmentIds,
-		                                          sensitive: isSensitive,
-		                                          spoilerText: contentWarning,
-		                                          poll: poll,
-		                                          visibility: visibility)
-
+		let createStatusRequest = Statuses.create(status: status, replyToID: replyStatusId, mediaIDs: attachmentIds, sensitive: isSensitive, spoilerText: contentWarning, poll: poll, visibility: visibility)
 		let taskPromise = Promise<URLSessionTask>()
-		guard let future = client.run(createStatusRequest, resumeImmediately: false, completion: {
-			[weak self] result in
-
+		guard let future = client.run(createStatusRequest, resumeImmediately: false, completion: {[weak self] result in
 			DispatchQueue.main.async {
 				guard let self = self else { return }
-
 				if self.submitTaskFuture === taskPromise.value {
 					self.submitTaskFuture = nil
 				}
-
 				switch result {
 				case let .success(status, _):
 					completion(.success(status))
@@ -88,13 +70,10 @@ public class PostingService: NSObject {
 					completion(.failure(error))
 				}
 			}
-		})
-		else {
+		}) else {
 			return
 		}
-
 		submitTaskFuture = future
-
 		future.resolutionHandler = { task in
 			taskPromise.value = task
 			task.resume()
@@ -113,49 +92,30 @@ private extension String {
 		let mutableCopy = (self as NSString).mutableCopy() as! NSMutableString
 		var replacementRanges: [NSRange: String] = [:]
 
-		// Mastodon counts any sequence joined by a ZWJ as a single character, regardless of whether the characters are
-		// joinable. This regex replaces all groups with a single char to reproduce this behavior.
-		NSRegularExpression.zwjGroupRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-			{
-				result, _, _ in
-
+		// Mastodon counts any sequence joined by a ZWJ as a single character, regardless of whether the characters are joinable. This regex replaces all groups with a single char to reproduce this behavior.
+		NSRegularExpression.zwjGroupRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
 				guard let result = result else { return }
-
 				replacementRanges[result.range] = "x"
 			}
-
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
-
 		// Mastodon always counts every link URL as having 23 characters, regardless of the actual length of the URL.
-		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-			{
-				result, _, _ in
-
+		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
 				guard let result = result, result.numberOfRanges > 1 else {
 					return
 				}
-
 				let prefix = mutableCopy.substring(with: result.range(at: 1))
 				replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)"
 			}
-
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
-
-		// Mastodon only counts the username part of a mention towards the character limit, so we drop the instance URI
-		// in case it is present.
-		NSRegularExpression.mentionRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range)
-			{
-				result, _, _ in
-
+		// Mastodon only counts the username part of a mention towards the character limit, so we drop the instance URI in case it is present.
+		NSRegularExpression.mentionRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
 				guard let result = result, result.numberOfRanges > 1 else {
 					return
 				}
-
 				replacementRanges[result.range] = "@\(mutableCopy.substring(with: result.range(at: 3)))"
 			}
-
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		return (mutableCopy as String).count
 	}

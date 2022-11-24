@@ -81,7 +81,7 @@ protocol StatusInteractionHandling: AnyObject {
 	func handle(linkURL: URL, knownTags: [Tag]?)
 
 	/// Tells the handler the user has voted on one or more options on a poll.
-	func voteOn(poll: Poll, statusID: String, options: IndexSet, completion: @escaping (Swift.Result<Poll, Error>) -> Void)
+	func voteOn(poll: Poll, statusID: String, options: IndexSet, completion: @escaping (Result<Poll, Error>) -> Void)
 
 	/// Tells the handler the user has requested the poll data to be reloaded.
 	func refreshPoll(statusID: String, pollID: String)

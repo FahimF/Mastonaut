@@ -37,7 +37,7 @@ public protocol ClientType {
     @discardableResult
     func run<Model>(_ request: Request<Model>,
                     resumeImmediately: Bool,
-                    completion: @escaping (_ result: Result<Model>) -> Void) -> FutureTask?
+                    completion: @escaping (_ result: MKResult<Model>) -> Void) -> FutureTask?
 
     /// Performs several network requests and aggregates their results.
     ///
@@ -46,7 +46,7 @@ public protocol ClientType {
     ///   - completion: The completion block to be called when the request is complete.
     ///   - result: The request result.
     func runAndAggregateAllPages<Model: Codable>(requestProvider: @escaping (Pagination) -> Request<[Model]>,
-                                                 completion: @escaping (Result<[Model]>) -> Void)
+                                                 completion: @escaping (MKResult<[Model]>) -> Void)
 
     /// Adds a new observer to the receiver. The receiver keeps a weak reference to the observer, and thus calling
     /// `removeObserver(_:)` is not required if the observer is going to be released.
@@ -69,7 +69,7 @@ public extension ClientType {
     ///   - request: The request to be performed.
     ///   - completion: The completion block to be called when the request is complete.
     ///   - result: The request result.
-    func run<Model>(_ request: Request<Model>, completion: @escaping (_ result: Result<Model>) -> Void) {
+    func run<Model>(_ request: Request<Model>, completion: @escaping (_ result: MKResult<Model>) -> Void) {
         run(request, resumeImmediately: true, completion: completion)
     }
 }

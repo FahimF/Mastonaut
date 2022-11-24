@@ -48,7 +48,7 @@ extension PollVotingCapable {
 	}
 
 	func voteOn(poll: Poll, statusID: String, options: IndexSet,
-	            completion: @escaping (Swift.Result<Poll, Error>) -> Void)
+	            completion: @escaping (Result<Poll, Error>) -> Void)
 	{
 		guard let client = client else { return }
 

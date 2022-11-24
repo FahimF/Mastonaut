@@ -27,7 +27,7 @@ public class AppRegistrationAgent {
 	}
 
 	public func clientAppRegistration(for baseDomain: String,
-	                                  completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
+	                                  completion: @escaping (Result<ClientApplication, Errors>) -> Void)
 	{
 		if let clientApplication = keychainController.clientAppRegistration(for: baseDomain) {
 			completion(.success(clientApplication))
@@ -56,7 +56,7 @@ public class AppRegistrationAgent {
 	}
 
 	private func registerApplication(onInstance baseDomain: String,
-	                                 completion: @escaping (Swift.Result<ClientApplication, Errors>) -> Void)
+	                                 completion: @escaping (Result<ClientApplication, Errors>) -> Void)
 	{
 		let client = Client(baseURL: "https://" + baseDomain)
 

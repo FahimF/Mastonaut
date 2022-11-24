@@ -392,6 +392,84 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		pollViewController.nextKeyView = contentWarningTextField
 	}
 
+	// MARK: - Actions
+	@IBAction func composeStatus(_ sender: Any?) {
+		AppDelegate.shared.composeStatus(sender)
+		guard let newComposerWindow = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		newComposerWindow.currentAccount = currentAccount
+	}
+
+	@IBAction func sendStatus(_: Any?) {
+		validateAndSendStatus()
+	}
+
+	@IBAction func didSelectMediaVisibility(_: Any?) {
+		mediaIsVisible = !visibilitySegmentedControl.isSelected(forSegment: 0)
+	}
+
+	@IBAction func didSelectContentWarning(_: Any?) {
+		contentWarningEnabled = contentWarningSegmentedControl.isSelected(forSegment: 0)
+	}
+
+	@IBAction func didSelectPoll(_: Any?) {
+		if pollSegmentedControl.isSelected(forSegment: 0) {
+			bottomDrawerMode.insert(.poll)
+		} else {
+			bottomDrawerMode.subtract(.poll)
+		}
+
+		updateSubmitEnabled()
+	}
+
+	@IBAction func didSelectAudience(_: Any?) {
+		if let audience = audiencePopupButton.selectedItem?.representedObject as? Visibility {
+			audienceSelection = audience
+		}
+	}
+
+	@IBAction func showEmojiPickerPopover(_: Any?) {
+		let control = emojiSegmentedControl!
+		emojiPickerPopover.show(relativeTo: control.bounds, of: control, preferredEdge: .maxX)
+	}
+
+	@IBAction func showAttachmentPickerSheet(_: Any?) {
+		guard let window = window else {
+			return
+		}
+
+		openPanel.beginSheetModal(for: window) {[weak self] response in
+			guard response == .OK, let urls = self?.openPanel.urls else {
+				return
+			}
+			DispatchQueue.main.async { self?.attachmentsSubcontroller.addAttachments(urls) }
+		}
+	}
+
+	@IBAction func showAudienceInfo(_: Any?) {
+		let informationString: String
+
+		switch audienceSelection {
+		case .public:
+			informationString = "Post to public timelines."
+
+		case .unlisted:
+			informationString = "Do not post to public timelines."
+
+		case .private:
+			informationString = "Post to followers only. Attention: If your account is not locked, anyone can follow you to view your follower-only posts."
+
+		case .direct:
+			informationString = "This post will only be sent to the mentioned users."
+		}
+		informationPopoverLabel.stringValue = informationString
+		informationPopover.show(relativeTo: informationButton.bounds, of: informationButton, preferredEdge: .minY)
+	}
+
+	@IBAction func clickedDismissReplyButton(_: Any?) {
+		dismissReplyStatus()
+	}
+
+	// MARK: - Internal Methods
 	func shouldChangeCurrentUser(to userUUID: UUID) -> Bool {
 		guard !hasAttachments else {
 			NSAlert.confirmReuploadAttachmentsDialog().beginSheetModal(for: window!) {response in
@@ -407,34 +485,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 
 	func windowDidResignMain(_: Foundation.Notification) {
 		textView.dismissSuggestionsWindow()
-	}
-
-	private func handleAttachmentCountsChanged(oldCount: Int) {
-		let newCount = attachmentsSubcontroller.attachmentCount
-		if oldCount == 0, newCount > 0 {
-			bottomDrawerMode.insert(.attachment)
-			visibilitySegmentedControl.setEnabled(true, forSegment: 0)
-			bottomControlsStackView.setArrangedSubview(visibilitySegmentedControl, hidden: false, animated: true)
-		} else if oldCount > 0, newCount == 0 {
-			bottomDrawerMode.subtract(.attachment)
-			visibilitySegmentedControl.setEnabled(false, forSegment: 0)
-			bottomControlsStackView.setArrangedSubview(visibilitySegmentedControl, hidden: true, animated: true)
-		}
-		updateRemainingCountLabel()
-	}
-
-	private func collapseAllDrawers() {
-		guard let window = window else { return }
-		let constraintsToCollapse = [
-			contentWarningConstraint,
-			bottomDrawerConstraint,
-			replyStatusConstraint,
-		]
-		let totalCollapsedHeight = constraintsToCollapse.reduce(0) { $0 + $1!.constant }
-		constraintsToCollapse.forEach { $0!.constant = 0 }
-		// This is done separatelly because collapsing this constraint doesn't affect the window height
-		attachmentsConstraint.constant = 0
-		window.setFrame(window.frame.insetBy(dx: 0, dy: totalCollapsedHeight / 2), display: true)
 	}
 
 	func setupAsReply(to status: Status, using account: AuthorizedAccount?, senderWindowController: TimelinesWindowController) {
@@ -548,6 +598,40 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		}
 	}
 
+	func updateSubmitEnabled() {
+		submitSegmentedControl.isEnabled = canSubmitStatus
+		setDocumentEdited(isDirty)
+	}
+
+	// MARK: - Private Methods
+	private func handleAttachmentCountsChanged(oldCount: Int) {
+		let newCount = attachmentsSubcontroller.attachmentCount
+		if oldCount == 0, newCount > 0 {
+			bottomDrawerMode.insert(.attachment)
+			visibilitySegmentedControl.setEnabled(true, forSegment: 0)
+			bottomControlsStackView.setArrangedSubview(visibilitySegmentedControl, hidden: false, animated: true)
+		} else if oldCount > 0, newCount == 0 {
+			bottomDrawerMode.subtract(.attachment)
+			visibilitySegmentedControl.setEnabled(false, forSegment: 0)
+			bottomControlsStackView.setArrangedSubview(visibilitySegmentedControl, hidden: true, animated: true)
+		}
+		updateRemainingCountLabel()
+	}
+
+	private func collapseAllDrawers() {
+		guard let window = window else { return }
+		let constraintsToCollapse = [
+			contentWarningConstraint,
+			bottomDrawerConstraint,
+			replyStatusConstraint,
+		]
+		let totalCollapsedHeight = constraintsToCollapse.reduce(0) { $0 + $1!.constant }
+		constraintsToCollapse.forEach { $0!.constant = 0 }
+		// This is done separatelly because collapsing this constraint doesn't affect the window height
+		attachmentsConstraint.constant = 0
+		window.setFrame(window.frame.insetBy(dx: 0, dy: totalCollapsedHeight / 2), display: true)
+	}
+
 	private func confirmDiscardChangesIfNeeded(completion: @escaping (Bool) -> Void) -> Bool {
 		guard statusTextContent.isEmpty else {
 			showAlert(style: .warning, title: "Discard current draft?", message: "Composing a reply now will discard your currently drafted post, including attachments. Do you wish to proceed?", dialogMode: .discardKeepEditing) {
@@ -598,11 +682,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		remainingCountLabel.integerValue = remainingCount
 		remainingCountLabel.textColor = .labelColor(for: remainingCount)
 		updateSubmitEnabled()
-	}
-
-	func updateSubmitEnabled() {
-		submitSegmentedControl.isEnabled = canSubmitStatus
-		setDocumentEdited(isDirty)
 	}
 
 	private func validateAndSendStatus() {
@@ -792,84 +871,6 @@ extension StatusComposerWindowController: AccountsMenuProvider {
 
 	var accountsMenuItems: [NSMenuItem] {
 		return accounts.makeMenuItems(currentUser: currentAccount?.uuid, action: #selector(UserPopUpButtonSubcontroller.selectAccount(_:)), target: userPopUpButtonController, emojiContainer: nil, setKeyEquivalents: true).menuItems
-	}
-}
-
-extension StatusComposerWindowController {
-	@IBAction func composeStatus(_ sender: Any?) {
-		AppDelegate.shared.composeStatus(sender)
-		guard let newComposerWindow = AppDelegate.shared.statusComposerWindowControllers.last else { return }
-		newComposerWindow.currentAccount = currentAccount
-	}
-
-	@IBAction func sendStatus(_: Any?) {
-		validateAndSendStatus()
-	}
-
-	@IBAction func didSelectMediaVisibility(_: Any?) {
-		mediaIsVisible = !visibilitySegmentedControl.isSelected(forSegment: 0)
-	}
-
-	@IBAction func didSelectContentWarning(_: Any?) {
-		contentWarningEnabled = contentWarningSegmentedControl.isSelected(forSegment: 0)
-	}
-
-	@IBAction func didSelectPoll(_: Any?) {
-		if pollSegmentedControl.isSelected(forSegment: 0) {
-			bottomDrawerMode.insert(.poll)
-		} else {
-			bottomDrawerMode.subtract(.poll)
-		}
-
-		updateSubmitEnabled()
-	}
-
-	@IBAction func didSelectAudience(_: Any?) {
-		if let audience = audiencePopupButton.selectedItem?.representedObject as? Visibility {
-			audienceSelection = audience
-		}
-	}
-
-	@IBAction func showEmojiPickerPopover(_: Any?) {
-		let control = emojiSegmentedControl!
-		emojiPickerPopover.show(relativeTo: control.bounds, of: control, preferredEdge: .maxX)
-	}
-
-	@IBAction func showAttachmentPickerSheet(_: Any?) {
-		guard let window = window else {
-			return
-		}
-
-		openPanel.beginSheetModal(for: window) {[weak self] response in
-			guard response == .OK, let urls = self?.openPanel.urls else {
-				return
-			}
-			DispatchQueue.main.async { self?.attachmentsSubcontroller.addAttachments(urls) }
-		}
-	}
-
-	@IBAction func showAudienceInfo(_: Any?) {
-		let informationString: String
-
-		switch audienceSelection {
-		case .public:
-			informationString = "Post to public timelines."
-
-		case .unlisted:
-			informationString = "Do not post to public timelines."
-
-		case .private:
-			informationString = "Post to followers only. Attention: If your account is not locked, anyone can follow you to view your follower-only posts."
-
-		case .direct:
-			informationString = "This post will only be sent to the mentioned users."
-		}
-		informationPopoverLabel.stringValue = informationString
-		informationPopover.show(relativeTo: informationButton.bounds, of: informationButton, preferredEdge: .minY)
-	}
-
-	@IBAction func clickedDismissReplyButton(_: Any?) {
-		dismissReplyStatus()
 	}
 }
 

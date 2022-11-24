@@ -87,17 +87,17 @@ class FilterService: NSObject, RemoteEventsReceiver {
 		setNeedsUpdate(hadFailure: false)
 	}
 
-	func delete(filter: UserFilter, completion: @escaping (Result<Empty>) -> Void) {
+	func delete(filter: UserFilter, completion: @escaping (MKResult<Empty>) -> Void) {
 		client.run(FilterRequests.delete(id: filter.id), completion: completion)
 	}
 
-	func create(filter: UserFilter, completion: @escaping (Result<Filter>) -> Void) {
+	func create(filter: UserFilter, completion: @escaping (MKResult<Filter>) -> Void) {
 		client.run(FilterRequests.create(phrase: filter.phrase, context: filter.context,
 		                                 irreversible: filter.irreversible, wholeWord: filter.wholeWord,
 		                                 expiresIn: filter.expiresAt), completion: completion)
 	}
 
-	func updateFilter(id: String, updatedFilter filter: UserFilter, completion: @escaping (Result<Filter>) -> Void) {
+	func updateFilter(id: String, updatedFilter filter: UserFilter, completion: @escaping (MKResult<Filter>) -> Void) {
 		client.run(FilterRequests.update(id: id, phrase: filter.phrase, context: filter.context,
 		                                 irreversible: filter.irreversible, wholeWord: filter.wholeWord,
 		                                 expiresIn: filter.expiresAt), completion: completion)

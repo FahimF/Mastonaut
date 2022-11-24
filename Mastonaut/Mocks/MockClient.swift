@@ -69,7 +69,7 @@ class MockClient: ClientType {
 	@discardableResult
 	func run<Model: Codable>(_ request: Request<Model>,
 	                         resumeImmediately: Bool,
-	                         completion: @escaping (Result<Model>) -> Void) -> FutureTask?
+	                         completion: @escaping (MKResult<Model>) -> Void) -> FutureTask?
 	{
 		if mockCalls, let hash = try? JSONEncoder().encode(request).hashValue, let response = responseMap[hash]
 		{
@@ -91,7 +91,7 @@ class MockClient: ClientType {
 	}
 
 	func runAndAggregateAllPages<Model: Codable>(requestProvider: @escaping (Pagination) -> Request<[Model]>,
-	                                             completion: @escaping (Result<[Model]>) -> Void)
+	                                             completion: @escaping (MKResult<[Model]>) -> Void)
 	{
 		realClient.runAndAggregateAllPages(requestProvider: requestProvider, completion: completion)
 	}
