@@ -26,6 +26,20 @@ public class Attachment: Codable {
     /// Metadata about the attachment. Not always available.
     public let meta: MetaCollection?
 
+	// Additions
+	public var parsedPreviewUrl: URL? {
+		return previewURL.flatMap(URL.init(string:))
+	}
+
+	public var parsedUrl: URL {
+		return URL(string: url)!
+	}
+
+	public var bestUrl: URL {
+		return URL(string: remoteURL ?? url)!
+	}
+	// End Additions
+	
     private enum CodingKeys: String, CodingKey {
         case id
         case type

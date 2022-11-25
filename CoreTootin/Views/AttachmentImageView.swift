@@ -49,10 +49,8 @@ public class AttachmentImageView: NSControl {
 	public var image: NSImage? {
 		didSet {
 			needsDisplay = true
-
-			if overrideContentSize == nil, superview != nil {
-				// There's no need to invalidate the intrinsic content size if we are overriding it, or if we're not
-				// attached yet.
+			if defaultContentSize == nil, superview != nil {
+				// There's no need to invalidate the intrinsic content size if we are overriding it, or if we're not attached yet.
 				invalidateIntrinsicContentSize()
 			}
 		}
@@ -61,7 +59,7 @@ public class AttachmentImageView: NSControl {
 	/// Use this value as the intrinsicContentSize.
 	///
 	/// Useful if the size of the image is known before it is fetched from a remote location, for example.
-	public var overrideContentSize: NSSize? {
+	public var defaultContentSize: NSSize? = nil {
 		didSet {
 			invalidateIntrinsicContentSize()
 		}
@@ -72,7 +70,7 @@ public class AttachmentImageView: NSControl {
 	}
 
 	override public var intrinsicContentSize: NSSize {
-		return overrideContentSize ?? image?.size ?? .zero
+		return defaultContentSize ?? image?.size ?? .zero
 	}
 
 	override public init(frame frameRect: NSRect) {

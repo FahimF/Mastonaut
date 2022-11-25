@@ -22,43 +22,32 @@
 
 @implementation NSBundle (KeychainAccess)
 
-- (id)mastonautAppRef
-{
+- (id)mastonautAppRef {
 	return [self referenceForApplicationAtURL:[self bundleURL]];
 }
 
-- (id)quickTootAppRef
-{
-	return [self referenceForApplicationAtURL:[[self builtInPlugInsURL] URLByAppendingPathComponent:@"QuickToot.appex"
-																						isDirectory:NO]];
+- (id)quickTootAppRef {
+	return [self referenceForApplicationAtURL:[[self builtInPlugInsURL] URLByAppendingPathComponent:@"QuickToot.appex" isDirectory:NO]];
 }
 
-- (id)referenceForApplicationAtURL:(NSURL *)url
-{
+- (id)referenceForApplicationAtURL:(NSURL *)url {
 	SecTrustedApplicationRef appRef = nil;
-
 	OSStatus status = SecTrustedApplicationCreateFromPath([url fileSystemRepresentation], &appRef);
-
 	if (status != errSecSuccess) {
 		NSLog(@"Could not create TrustedApplicationRef for application at URL (%@): %d", url, (int)status);
 		return nil;
 	}
-
 	return (__bridge_transfer id)appRef;
 }
 
-- (nullable id)mastonautSecurityAccess
-{
+- (nullable id)mastonautSecurityAccess {
 	NSArray *applications = @[[self mastonautAppRef], [self quickTootAppRef]];
-
 	SecAccessRef mastonautSecAccess = nil;
 	OSStatus status = SecAccessCreate(CFSTR("Mastonaut"), (__bridge CFArrayRef)applications, &mastonautSecAccess);
-
 	if (status != errSecSuccess) {
 		NSLog(@"Could not create SecurityAccess: %d", (int)status);
 		return nil;
 	}
-
 	return (__bridge_transfer id)mastonautSecAccess;
 }
 

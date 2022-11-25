@@ -472,7 +472,6 @@
 		15EE2B11232EA3EF00155E16 /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA65721E545F80065CC1B /* BackgroundView.swift */; };
 		15EE2B12232EA3EF00155E16 /* HoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15BCDB18221B797F007BFFAF /* HoverView.swift */; };
 		15EE2B13232EA4B800155E16 /* NSColor+Mastonaut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DA70FB21E55208000F9802 /* NSColor+Mastonaut.swift */; };
-		15EE2B15232EA68500155E16 /* Attachment+Shims.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EE2B14232EA68500155E16 /* Attachment+Shims.swift */; };
 		15EE538B22C956A5001BEA58 /* SearchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EE538922C956A5001BEA58 /* SearchWindowController.swift */; };
 		15EE538C22C956A5001BEA58 /* SearchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EE538922C956A5001BEA58 /* SearchWindowController.swift */; };
 		15EE539022C956C8001BEA58 /* Search.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 15EE538F22C956C8001BEA58 /* Search.storyboard */; };
@@ -504,7 +503,6 @@
 		15FD4C34223870B000D699EF /* TransientWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FD4C32223870B000D699EF /* TransientWindow.swift */; };
 		5512395A291847DB0026C1D5 /* AuthorizedAccount+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55123959291847DB0026C1D5 /* AuthorizedAccount+Image.swift */; };
 		C98AE162223D7FB700A8DD22 /* AvatarImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98AE161223D7FB700A8DD22 /* AvatarImageCache.swift */; };
-		DD3DA79F2928FF0600AA0ABA /* Attachment+Shims.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15EE2B14232EA68500155E16 /* Attachment+Shims.swift */; };
 		DD3DA7D829290D0E00AA0ABA /* Mastonaut-acknowledgements.plist in Resources */ = {isa = PBXBuildFile; fileRef = DD3DA7D729290D0E00AA0ABA /* Mastonaut-acknowledgements.plist */; };
 		DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DA29291C0E00AA0ABA /* Starscream */; };
 		DD3DA7DD29291C9700AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DC29291C9700AA0ABA /* Starscream */; };
@@ -977,7 +975,6 @@
 		15E9E7EC22B91ACD00C1C701 /* PollViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PollViewController.xib; sourceTree = "<group>"; };
 		15ECEECD22E8EEAB00A37CC0 /* LazyEvaluationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyEvaluationAdapter.swift; sourceTree = "<group>"; };
 		15EE2B07232EA28600155E16 /* NSImage+ErrorImages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+ErrorImages.swift"; sourceTree = "<group>"; };
-		15EE2B14232EA68500155E16 /* Attachment+Shims.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Attachment+Shims.swift"; sourceTree = "<group>"; };
 		15EE538922C956A5001BEA58 /* SearchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchWindowController.swift; sourceTree = "<group>"; };
 		15EE538F22C956C8001BEA58 /* Search.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Search.storyboard; sourceTree = "<group>"; };
 		15EE539222C956E2001BEA58 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
@@ -1513,7 +1510,6 @@
 				1543127E232EE39D0010854A /* Account+Shims.swift */,
 				15FA6FD92291AB3D0044B154 /* AccountOrder+Additions.swift */,
 				1531C1122331813900725A0C /* Array+Helpers.swift */,
-				15EE2B14232EA68500155E16 /* Attachment+Shims.swift */,
 				15431288232EEE840010854A /* AuthorizedAccount+Helpers.swift */,
 				1543128A232EEFD00010854A /* Client+Helpers.swift */,
 				15D648EB227610CE00E083F7 /* CGImage+Additions.swift */,
@@ -2650,7 +2646,6 @@
 				DD3DA9AA292A40A500AA0ABA /* Bookmarks.swift in Sources */,
 				DD3DA971292A2BED00AA0ABA /* PaginationItem.swift in Sources */,
 				DD3DA99C292A2BED00AA0ABA /* Filter.swift in Sources */,
-				15EE2B15232EA68500155E16 /* Attachment+Shims.swift in Sources */,
 				DD3DA966292A2BED00AA0ABA /* Decodable.swift in Sources */,
 				159C2171232C5B1300139BD5 /* AccountsService.swift in Sources */,
 				154B6BC5234A165E0025A9DB /* NSCoder+RawRepresentableKeys.swift in Sources */,
@@ -2704,7 +2699,6 @@
 				150B1EE0227E33C30048EA22 /* NSView+EmojiSubviews.m in Sources */,
 				151199CB22BFCF05007F2AEB /* ComposerPollViewController.swift in Sources */,
 				1572C55C22A2038100FAA77F /* StringCapableTextAttachment.swift in Sources */,
-				DD3DA79F2928FF0600AA0ABA /* Attachment+Shims.swift in Sources */,
 				15B44D5A225D0D9B00EDFDC1 /* AnnotatedURL.m in Sources */,
 				1538FB3922188CCA006B5F78 /* PropertyObserver.swift in Sources */,
 				15A1CA0C221F72C400CF51F1 /* AccountsPreferencesController.swift in Sources */,

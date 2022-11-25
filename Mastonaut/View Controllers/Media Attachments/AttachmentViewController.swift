@@ -74,26 +74,20 @@ class AttachmentViewController: NSViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
 		let imageViews = [firstImageView, secondImageView, thirdImageView, fourthImageView].compacted()
-
 		setupCoverView()
-
-		zip(attachmentGroup.attachments, imageViews).forEach {
-			attachment, imageView in
-
-			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI.
-			// This will avoid unecessary layout passes when the image is loaded and set to the image view.
-			imageView.overrideContentSize = attachment.meta?.original?.size?.limit(width: 790, height: 460)
-				?? NSSize(width: 395, height: 230)
-
-			fetchImage(with: attachment.parsedPreviewUrl ?? attachment.parsedUrl,
-			           fallbackUrl: attachment.parsedUrl,
-			           from: attachment,
-			           placingInto: imageView)
-
+		zip(attachmentGroup.attachments, imageViews).forEach {(attachment, imageView) in
+			let att = attachment
+			let iv = imageView
+			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI. This will avoid unecessary layout passes when the image is loaded and set to the image view
+			var sz = NSSize(width: 395, height: 230)
+			if let meta = attachment.meta, let orig = meta.original, let size = orig.size {
+				sz = size.limit(width: 790, height: 460)
+			}
+			imageView.defaultContentSize = sz
+			fetchImage(with: attachment.parsedPreviewUrl ?? attachment.parsedUrl, fallbackUrl: attachment.parsedUrl, from: attachment, placingInto: imageView)
 			if [.video, .gifv].contains(attachment.type) {
-				let playGlyphView = NSButton(image: #imageLiteral(resourceName: "play_big"), target: self, action: #selector(presentAttachment(_:)))
+				let playGlyphView = NSButton(image: #imageLiteral(resourceName: "play_big"), target: self, action: #selector(self.presentAttachment(_:)))
 				playGlyphView.bezelStyle = .regularSquare
 				playGlyphView.isBordered = false
 				playGlyphView.translatesAutoresizingMaskIntoConstraints = false
