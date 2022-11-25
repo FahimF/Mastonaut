@@ -6,7 +6,9 @@ Since this codebase has made some heavy changes to the code and project structur
 
 That said, I believe this codebase is easier to build and run than the original one, though YMMV. If you want to build and run on your own, you can look at the **Build** section further down for all the details.
 
-**Note:** If you'd prefer to download a binary (and trust something I built 😛) please let me know and I'll start putting up a binary build for download as well.
+**Binary Builds**
+
+Someone asked for a binary build and so I've created a binary. It should be accessible from [here](https://github.com/FahimF/Mastonaut/releases). Do note that I might not be releasing binaries on a regular schedule, but I'll add new binaries as and when I have the time and when enough features have accumulated to warrante a new build 🙂 (There are a lot of features/fixes I want to add, but the trouble is finding the time to work on this ...)
 
 ## What's new
 
