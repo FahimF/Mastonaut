@@ -6,6 +6,8 @@ Since this codebase has made some heavy changes to the code and project structur
 
 That said, I believe this codebase is easier to build and run than the original one, though YMMV. If you want to build and run on your own, you can look at the **Build** section further down for all the details.
 
+**Note:** If you'd prefer to download a binary (and trust something I built 😛) please let me know and I'll start putting up a binary build for download as well.
+
 ## What's new
 
 Here are some changes from the original Mastonaut. There might be other changes and minor fixes, but these are the things that I do remember at the moment. (I might update this section as I add more features, or I might forget to 😛)
