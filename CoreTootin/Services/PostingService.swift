@@ -102,6 +102,15 @@ private extension String {
 			}
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
+		// Mastodon only counts the username part of a mention towards the character limit, so we drop the instance URI in case it is present. Do this first so that the URL detection doesn't detect instance URI is not detected as a URL
+		NSRegularExpression.mentionRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
+				guard let result = result, result.numberOfRanges > 1 else {
+					return
+				}
+				replacementRanges[result.range] = "@\(mutableCopy.substring(with: result.range(at: 3)))"
+			}
+		mutableCopy.replaceCharacters(in: replacementRanges)
+		replacementRanges.removeAll()
 		// Mastodon always counts every link URL as having 23 characters, regardless of the actual length of the URL.
 		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
 				guard let result = result, result.numberOfRanges > 1 else {
@@ -109,15 +118,6 @@ private extension String {
 				}
 				let prefix = mutableCopy.substring(with: result.range(at: 1))
 				replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)"
-			}
-		mutableCopy.replaceCharacters(in: replacementRanges)
-		replacementRanges.removeAll()
-		// Mastodon only counts the username part of a mention towards the character limit, so we drop the instance URI in case it is present.
-		NSRegularExpression.mentionRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
-				guard let result = result, result.numberOfRanges > 1 else {
-					return
-				}
-				replacementRanges[result.range] = "@\(mutableCopy.substring(with: result.range(at: 3)))"
 			}
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		return (mutableCopy as String).count
