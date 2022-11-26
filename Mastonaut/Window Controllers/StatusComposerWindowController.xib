@@ -460,7 +460,7 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="SoY-t9-UrB"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="sO3-Tc-Uyc"/>
-                    <toolbarItem implicitItemIdentifier="37A166A2-EDD6-4933-9049-301C4E7677DE" label="Send Toot" paletteLabel="Send Toot" sizingBehavior="auto" id="J1z-pE-aui">
+                    <toolbarItem implicitItemIdentifier="37A166A2-EDD6-4933-9049-301C4E7677DE" label="Send Post" paletteLabel="Send Post" sizingBehavior="auto" id="J1z-pE-aui">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="Y1e-gF-Lwj">
                             <rect key="frame" x="0.0" y="14" width="78" height="23"/>
@@ -476,7 +476,7 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="2670EA07-9FA5-47B6-9999-C658C5893191" label="Toot Visibility" paletteLabel="Toot Visibility" title="Public" sizingBehavior="auto" id="4FZ-eB-IQb">
+                    <toolbarItem implicitItemIdentifier="2670EA07-9FA5-47B6-9999-C658C5893191" label="Post Visibility" paletteLabel="Post Visibility" title="Public" sizingBehavior="auto" id="4FZ-eB-IQb">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Tdb-iG-POu">
                             <rect key="frame" x="3" y="14" width="73" height="25"/>

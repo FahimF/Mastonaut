@@ -571,13 +571,13 @@ DQ
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="37" horizontalPageScroll="10" verticalLineScroll="37" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="106-1f-PDF">
-                                <rect key="frame" x="12" y="12" width="455" height="274"/>
+                                <rect key="frame" x="12" y="12" width="455" height="272"/>
                                 <clipView key="contentView" id="tzn-vY-QtU">
-                                    <rect key="frame" x="1" y="1" width="453" height="272"/>
+                                    <rect key="frame" x="1" y="1" width="453" height="270"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="35" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="20P-0l-D8w">
-                                            <rect key="frame" x="0.0" y="0.0" width="453" height="272"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="453" height="270"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>

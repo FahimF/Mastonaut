@@ -605,7 +605,7 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 			tableView.deselectRow(selectedRow)
 			fetchEntries(forExpanderAt: selectedRow, cellView: nil)
 
-			// Disabled revealing filtered toots for now, as we need to find a good UX to re-hide them
+			// Disabled revealing filtered posts for now, as we need to find a good UX to re-hide them
 //		case .entry(let key) where filteredEntryKeys.contains(key) && revealedFilteredEntryKeys.contains(key) == false:
 //			revealedFilteredEntryKeys.insert(key)
 //			tableView.beginUpdates()

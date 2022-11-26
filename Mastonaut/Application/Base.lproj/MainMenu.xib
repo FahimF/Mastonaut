@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -306,11 +306,11 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Toot" id="dMs-cI-mzQ">
+                <menuItem title="Post" id="dMs-cI-mzQ">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Toot" id="bib-Uj-vzu">
+                    <menu key="submenu" title="Post" id="bib-Uj-vzu">
                         <items>
-                            <menuItem title="Compose Toot" keyEquivalent="n" id="Was-JA-tGl">
+                            <menuItem title="Compose Post" keyEquivalent="n" id="Was-JA-tGl">
                                 <connections>
                                     <action selector="composeStatus:" target="-1" id="JOk-aK-AXo"/>
                                 </connections>
@@ -352,7 +352,7 @@
                                     <action selector="togglePresentableMediaVisible:" target="-1" id="00L-WG-RHo"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Toot Details" id="ua5-FM-bZn">
+                            <menuItem title="Show Post Details" id="ua5-FM-bZn">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 DQ
 </string>
@@ -459,7 +459,7 @@ DQ
         </menu>
         <menu id="YxX-DO-anf">
             <items>
-                <menuItem title="Compose Toot" id="JMA-Gy-96u">
+                <menuItem title="Compose Post" id="JMA-Gy-96u">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="composeStatus:" target="-1" id="5xe-KJ-IH5"/>

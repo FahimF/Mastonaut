@@ -233,7 +233,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			components.append(model.status.authorAccount)
 		}
 
-		setAccessibilityLabel("Toot")
+		setAccessibilityLabel("Post")
 		setAccessibilityElement(true)
 		setAccessibilityTitle(components.joined(separator: ", "))
 	}

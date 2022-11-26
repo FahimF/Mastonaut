@@ -111,7 +111,7 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	func confirmDelete(status _: Status, isRedrafting: Bool, completion: @escaping (Bool) -> Void) {
 		let message = isRedrafting ? "The contents of this post will be copied over to the composer, and you'll be able to make changes to it before re-submitting it." : "This action can not be undone."
 		let dialogMode: DialogMode = isRedrafting ? .custom(proceed: "Delete and Redraft", dismiss: "Cancel")
-			: .custom(proceed: "Delete Toot", dismiss: "Cancel")
+			: .custom(proceed: "Delete Post", dismiss: "Cancel")
 		view.window?.windowController?.showAlert(style: .informational, title: "Are you sure you want to delete this post?", message: message, dialogMode: dialogMode) {
 			response in
 			completion(response == .alertFirstButtonReturn)

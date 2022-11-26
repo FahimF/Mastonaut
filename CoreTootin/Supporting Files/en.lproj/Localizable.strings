@@ -108,10 +108,10 @@
 "status.context.reply" = "replying to another post…";
 "status.context.pinned" = "pinned post";
 
-"status.action.reblog" = "Boost Toot";
-"status.action.reblog.undo" = "Unboost Toot";
-"status.action.favorite" = "Favorite Toot";
-"status.action.favorite.undo" = "Unfavorite Toot";
+"status.action.reblog" = "Boost Post";
+"status.action.reblog.undo" = "Unboost Post";
+"status.action.favorite" = "Favorite Post";
+"status.action.favorite.undo" = "Unfavorite Post";
 "status.action.media" = "Reveal Attachments";
 "status.action.media.undo" = "Hide Attachments";
 "status.action.content" = "Reveal CW Content";
