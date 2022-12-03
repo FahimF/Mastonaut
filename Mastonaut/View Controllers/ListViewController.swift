@@ -488,6 +488,13 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		return isMatch
 	}
 
+	func getFilter(_ entry: Entry) -> String? {
+		if let filter = applicableFilters().first(where: { self.checkEntry(entry, matchesFilter: $0) }) {
+			return filter.phrase
+		}
+		return nil
+	}
+	
 	func checkEntry(_: Entry, matchesFilter _: UserFilter) -> Bool {
 		return false
 	}

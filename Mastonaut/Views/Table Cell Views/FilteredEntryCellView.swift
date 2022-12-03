@@ -20,5 +20,5 @@
 import AppKit
 
 class FilteredEntryCellView: MastonautTableCellView {
-	@IBOutlet private var label: NSTextField!
+	@IBOutlet var label: NSTextField!
 }

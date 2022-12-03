@@ -139,13 +139,20 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	}
 
 	override func populate(cell: NSTableCellView, for status: Status) {
-		guard let attachmentPresenter = authorizedAccountProvider?.attachmentPresenter, let instance = authorizedAccountProvider?.currentInstance, let statusCell = cell as? StatusDisplaying else {
+		guard let attachmentPresenter = authorizedAccountProvider?.attachmentPresenter, let instance = authorizedAccountProvider?.currentInstance else {
 			return
 		}
-		if let poll = status.poll {
-			setupRefreshTimer(for: poll, statusID: status.id)
+		if let statusCell = cell as? StatusDisplaying {
+			if let poll = status.poll {
+				setupRefreshTimer(for: poll, statusID: status.id)
+			}
+			statusCell.set(displayedStatus: status, poll: status.poll.flatMap { updatedPolls[$0.id] }, attachmentPresenter: attachmentPresenter, interactionHandler: self, activeInstance: instance)
+		} else if let cell = cell as? FilteredEntryCellView {
+			// Do we have a filter phrase?
+			if let txt = getFilter(status) {
+				cell.label.stringValue = "Filtered: \(txt)"
+			}
 		}
-		statusCell.set(displayedStatus: status, poll: status.poll.flatMap { updatedPolls[$0.id] }, attachmentPresenter: attachmentPresenter, interactionHandler: self, activeInstance: instance)
 	}
 
 	func set(hasActivePollTask: Bool, for statusID: String) {
