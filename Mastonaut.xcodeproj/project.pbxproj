@@ -584,6 +584,9 @@
 		DD3DA9B7292CAABA00AA0ABA /* ObjcExceptionBridging in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9B6292CAABA00AA0ABA /* ObjcExceptionBridging */; };
 		DD3DA9B9292CAABA00AA0ABA /* XCGLogger in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA9B8292CAABA00AA0ABA /* XCGLogger */; };
 		DD3DA9BA292CAC3800AA0ABA /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */; };
+		DD3DA9BD2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
+		DD3DA9BE2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
+		DD3DA9BF2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1078,6 +1081,7 @@
 		DD3DA960292A2BED00AA0ABA /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmarks.swift; sourceTree = "<group>"; };
 		DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		DD3DA9BC2932F27100AA0ABA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1985,6 +1989,7 @@
 			isa = PBXGroup;
 			children = (
 				DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */,
+				DD3DA9BC2932F27100AA0ABA /* Constants.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -2407,6 +2412,7 @@
 				155B938A237A23E5006EBF3C /* AnyObject+Helpers.swift in Sources */,
 				15728A6E22B1B92100EE2BE9 /* PollViewController.swift in Sources */,
 				15BF72CC2342B3460020CE70 /* SidebarTitleViewController.swift in Sources */,
+				DD3DA9BE2932F27100AA0ABA /* Constants.swift in Sources */,
 				15DB809A21FFE4B700BEA2F9 /* NSMenu+Additions.swift in Sources */,
 				1523C6E221E94C7F006DE234 /* RelativeDateFormatter.swift in Sources */,
 				15E973C9225A9E14009CE4DF /* NSViewController+AuthorizedAccountProviding.swift in Sources */,
@@ -2545,6 +2551,7 @@
 				15EE2B0F232EA3B000155E16 /* AttachmentImageView.swift in Sources */,
 				15EE2B02232EA0CB00155E16 /* ImageRestrainer.swift in Sources */,
 				DD3DA970292A2BED00AA0ABA /* ClientError.swift in Sources */,
+				DD3DA9BF2932F27100AA0ABA /* Constants.swift in Sources */,
 				DD3DA982292A2BED00AA0ABA /* DomainBlocks.swift in Sources */,
 				15EE2B10232EA3EF00155E16 /* BorderView.swift in Sources */,
 				DD3DA980292A2BED00AA0ABA /* Reports.swift in Sources */,
@@ -2741,6 +2748,7 @@
 				1530429022AEF5A100489F31 /* InfoWindow.swift in Sources */,
 				150CEA3B21FCC17600F815A9 /* InteractionCellView.swift in Sources */,
 				1531B8BE230216FA006D9DDB /* UserNotificationTool.swift in Sources */,
+				DD3DA9BD2932F27100AA0ABA /* Constants.swift in Sources */,
 				1574CF63224435B4000FE3ED /* NSURL+Sanitization.m in Sources */,
 				C98AE162223D7FB700A8DD22 /* AvatarImageCache.swift in Sources */,
 				15B25D05265166F100C90963 /* AccountFiltersController.swift in Sources */,

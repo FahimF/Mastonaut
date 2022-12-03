@@ -24,15 +24,10 @@ public let Preferences = MastonautPreferences.instance
 public class MastonautPreferences: PreferencesController {
 	private static var sharedInstance: MastonautPreferences!
 
-	override var suiteName: String? {
-		return Bundle.main.object(forInfoDictionaryKey: "MTNAppGroupIdentifier") as? String
-	}
-
 	/// Initializer declared as private to avoid accidental creation of new instances.
 	override private init() {
 		super.init()
-
-		defaults.removeObject(forKey: #keyPath(currentUser))
+		prefs.removeObject(forKey: #keyPath(currentUser))
 	}
 
 	/// The shared instance of the Preferences class.
@@ -40,86 +35,83 @@ public class MastonautPreferences: PreferencesController {
 		if sharedInstance == nil {
 			sharedInstance = MastonautPreferences()
 		}
-
 		return sharedInstance
 	}
 
 	@objc private dynamic var currentUser: UUID? {
 		get { return uuid(forKey: #keyPath(currentUser)) }
-		set { defaults.setValue(newValue?.uuidString, forKey: #keyPath(currentUser)) }
+		set { prefs.setValue(newValue?.uuidString, forKey: #keyPath(currentUser)) }
 	}
 
 	// General preferences
 
 	@objc public dynamic var timelinesResizeMode: TimelinesResizeMode {
 		get { return integerRepresentable(for: #keyPath(timelinesResizeMode), default: .expandWindowFirst) }
-		set { defaults.setValue(newValue.rawValue, forKey: #keyPath(timelinesResizeMode)) }
+		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(timelinesResizeMode)) }
 	}
 
 	@objc public dynamic var newWindowAccountMode: NewWindowAccountMode {
 		get { return integerRepresentable(for: #keyPath(newWindowAccountMode), default: .ask) }
-		set { defaults.setValue(newValue.rawValue, forKey: #keyPath(newWindowAccountMode)) }
+		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(newWindowAccountMode)) }
 	}
 
 	@objc public dynamic var didMigrateToSharedLocalKeychain: Bool {
 		get { return bool(forKey: #keyPath(didMigrateToSharedLocalKeychain)) ?? false }
-		set { defaults.setValue(newValue, forKey: #keyPath(didMigrateToSharedLocalKeychain)) }
+		set { prefs.setValue(newValue, forKey: #keyPath(didMigrateToSharedLocalKeychain)) }
 	}
 
 	// Viewing preferences
 
 	@objc public dynamic var mediaDisplayMode: MediaDisplayMode {
 		get { return integerRepresentable(for: #keyPath(mediaDisplayMode), default: .hideSensitiveMedia) }
-		set { defaults.setValue(newValue.rawValue, forKey: #keyPath(mediaDisplayMode)) }
+		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(mediaDisplayMode)) }
 	}
 
 	@objc public dynamic var spoilerDisplayMode: SpoilerDisplayMode {
 		get { return integerRepresentable(for: #keyPath(spoilerDisplayMode), default: .alwaysHide) }
-		set { defaults.setValue(newValue.rawValue, forKey: #keyPath(spoilerDisplayMode)) }
+		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(spoilerDisplayMode)) }
 	}
 
 	@objc public dynamic var autoplayVideos: Bool {
 		get { return bool(forKey: #keyPath(autoplayVideos)) ?? true }
-		set { defaults.setValue(newValue, forKey: #keyPath(autoplayVideos)) }
+		set { prefs.setValue(newValue, forKey: #keyPath(autoplayVideos)) }
 	}
 
 	// Composing preferences
 
 	@objc public dynamic var defaultStatusAudience: StatusAudience {
 		get { return integerRepresentable(for: #keyPath(defaultStatusAudience), default: .public) }
-		set { defaults.setValue(newValue.rawValue, forKey: #keyPath(defaultStatusAudience)) }
+		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(defaultStatusAudience)) }
 	}
 
 	@objc public dynamic var markMediaAsSensitive: Bool {
 		get { return bool(forKey: #keyPath(markMediaAsSensitive)) ?? false }
-		set { defaults.setValue(newValue, forKey: #keyPath(markMediaAsSensitive)) }
+		set { prefs.setValue(newValue, forKey: #keyPath(markMediaAsSensitive)) }
 	}
 
 	@objc public dynamic var insertDoubleNewLines: Bool {
 		get { return bool(forKey: #keyPath(insertDoubleNewLines)) ?? true }
-		set { defaults.setValue(newValue, forKey: #keyPath(insertDoubleNewLines)) }
+		set { prefs.setValue(newValue, forKey: #keyPath(insertDoubleNewLines)) }
 	}
 
 	@objc public dynamic var insertJoinersBetweenEmojis: Bool {
 		get { return bool(forKey: #keyPath(insertJoinersBetweenEmojis)) ?? true }
-		set { defaults.setValue(newValue, forKey: #keyPath(insertJoinersBetweenEmojis)) }
+		set { prefs.setValue(newValue, forKey: #keyPath(insertJoinersBetweenEmojis)) }
 	}
 
 	// Storages
-
 	public func storedFrame(forTimelineWindowIndex index: Int) -> NSRect? {
 		guard let frames: [String: String] = object(forKey: "MastonautPreferences.preservedWindowFrames")
 		else {
 			return nil
 		}
-
 		return frames["\(index)"].map { NSRectFromString($0) }
 	}
 
 	public func set(frame: NSRect, forTimelineWindowIndex index: Int) {
 		var frames: [String: String] = object(forKey: "MastonautPreferences.preservedWindowFrames") ?? [:]
 		frames["\(index)"] = NSStringFromRect(frame)
-		defaults.setValue(frames, forKey: "MastonautPreferences.preservedWindowFrames")
+		prefs.setValue(frames, forKey: "MastonautPreferences.preservedWindowFrames")
 	}
 }
 

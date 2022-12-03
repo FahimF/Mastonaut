@@ -76,23 +76,21 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+		// Table view
 		tableView.target = self
 		tableView.doubleAction = #selector(ListViewController.didDoubleClickTableView(_:))
-
+		// Scroll view
 		scrollView.drawsBackground = false
 		scrollView.contentView.drawsBackground = false
-
+		// Background
 		if let backgroundView = view as? BackgroundView {
 			backgroundView.backgroundColor = NSColor(named: "TimelinesBackground")!
 		}
-
 		updateBackgroundView()
-
+		// Register cells
 		registerCells()
-
+		// Notifications
 		let workspaceNC = NSWorkspace.shared.notificationCenter
-
 		notificationObservers.append(workspaceNC.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) {[weak self] _ in
 				log.info("Disconnecting events socket…")
 				self?.isSystemSleeping = true
@@ -207,11 +205,8 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	}
 
 	internal func refreshVisibleCellViews() {
-		tableView.enumerateAvailableRowViews {
-			_, row in
-
-			if let cellView = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? NSTableCellView
-			{
+		tableView.enumerateAvailableRowViews {_, row in
+			if let cellView = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? NSTableCellView {
 				prepareToDisplay(cellView: cellView, at: row)
 			}
 		}
@@ -237,13 +232,10 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 				// FIXME: This is sort of a fallback for a bad index. It can cause duplicate entries in the list tho.
 				return (entryList.last?.entryKey).map { .max(id: $0, limit: 20) } ?? .default
 			}
-
-			if let lastEntryIdBeforeIndex = entryList[..<index].reversed().first(where: { !$0.isExpander })?.entryKey
-			{
+			if let lastEntryIdBeforeIndex = entryList[..<index].reversed().first(where: { !$0.isExpander })?.entryKey {
 				return .max(id: lastEntryIdBeforeIndex, limit: 20)
 			}
 		}
-
 		return .default
 	}
 
@@ -265,7 +257,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		let indicator = loadingIndicator
 		view.addSubview(indicator)
 		indicator.startAnimation(nil)
-
 		NSLayoutConstraint.activate([
 			view.centerXAnchor.constraint(equalTo: indicator.centerXAnchor),
 			view.centerYAnchor.constraint(equalTo: indicator.centerYAnchor),
@@ -636,28 +627,23 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		let entryReference = entryList[row]
 
 		if entryReference.isExpander, !entryMap.isEmpty, row == entryList.count - 1 {
-			DispatchQueue.main.async {
-				[weak self] in self?.fetchEntries(forExpanderAt: row, cellView: cellView)
+			DispatchQueue.main.async {[weak self] in
+				self?.fetchEntries(forExpanderAt: row, cellView: cellView)
 			}
 		} else if let richTextTableCellView = cellView as? RichTextCapable, let window = view.window {
 			let shouldAnimate = !NSAccessibility.shouldReduceMotion && window.occlusionState.contains(.visible)
 			richTextTableCellView.set(shouldDisplayAnimatedContents: shouldAnimate)
 		}
-
 		if var selectableCellView = cellView as? Selectable {
 			selectableCellView.isSelected = tableView.selectedRowIndexes.contains(row)
 		}
-
 		if var lazyMenuCell = cellView as? LazyMenuProviding {
 			lazyMenuCell.menuItemsProvider = { [weak self] in self?.menuItems(for: entryReference) }
 		}
 	}
 
 	private func fetchEntries(forExpanderAt row: Int, cellView: NSTableCellView?) {
-		if !expandersPendingLoadCompletion.contains(row),
-		   let cellView = cellView ?? tableView.view(atColumn: 0, row: row, makeIfNecessary: false),
-		   let expanderView = cellView as? ExpanderCellView
-		{
+		if !expandersPendingLoadCompletion.contains(row), let cellView = cellView ?? tableView.view(atColumn: 0, row: row, makeIfNecessary: false), let expanderView = cellView as? ExpanderCellView {
 			expandersPendingLoadCompletion.insert(row)
 			fetchEntries(for: .atIndex(row))
 			expanderView.isLoading = true
@@ -665,7 +651,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	}
 
 	// MARK: Abstract Methods
-
 	internal func receivedClientEvent(_: ClientEvent) {
 		fatalError("receivedClientEvent(_:) must be overwritten by subclasses!")
 	}
@@ -815,21 +800,16 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 	}
 
 	internal enum InsertionPoint {
-		/// Entries are the latest available at the moment, and should be placed on the top of the entry list view,
-		/// with an expander item in between the last new entries and the first old entries.
+		/// Entries are the latest available at the moment, and should be placed on the top of the entry list view, with an expander item in between the last new entries and the first old entries.
 		case detachedAbove
 
-		/// Entries are the chronological successors of the current-latest stauses. Should be placed directly above
-		/// the current entries without an expander item.
+		/// Entries are the chronological successors of the current-latest stauses. Should be placed directly above the current entries without an expander item.
 		case above
 
-		/// Entries are the chronological predecessors of the current-latest stauses. Should be placed directly
-		/// below the current entries without an expander item.
+		/// Entries are the chronological predecessors of the current-latest stauses. Should be placed directly below the current entries without an expander item.
 		case below
 
-		/// Entries are intermediaries of the the current status collection, and fecthing them will fill (at least part)
-		/// of a gap in the status list. Should be placed at the parameter index, potentially replacing an expander
-		/// cell at that index, and also possibliy inserting a new expander cell.
+		/// Entries are intermediaries of the the current status collection, and fecthing them will fill (at least part) of a gap in the status list. Should be placed at the parameter index, potentially replacing an expander cell at that index, and also possibliy inserting a new expander cell.
 		case atIndex(Array<EntryReference>.Index)
 	}
 }

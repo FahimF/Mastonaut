@@ -20,21 +20,13 @@
 import Foundation
 
 public class PreferencesController: NSObject {
-	internal lazy var defaults = UserDefaults(suiteName: suiteName) ?? .standard
-
-	/// The suite name. Should be the same as the App's App Group identifier.
-	internal var suiteName: String? {
-		return nil
-	}
-
-	// Default helpers
-
+	//MARK: - Default helpers
 	public func number(forKey key: String) -> NSNumber? {
-		return defaults.object(forKey: key) as? NSNumber
+		return prefs.object(forKey: key) as? NSNumber
 	}
 
 	public func string(forKey key: String) -> String? {
-		return defaults.string(forKey: key)
+		return prefs.string(forKey: key)
 	}
 
 	public func bool(forKey key: String) -> Bool? {
@@ -46,15 +38,13 @@ public class PreferencesController: NSObject {
 	}
 
 	public func object<T>(forKey key: String) -> T? {
-		return defaults.object(forKey: key) as? T
+		return prefs.object(forKey: key) as? T
 	}
 
-	public func integerRepresentable<T: RawRepresentable>(for key: String, default: T) -> T where T.RawValue == Int
-	{
+	public func integerRepresentable<T: RawRepresentable>(for key: String, default: T) -> T where T.RawValue == Int {
 		guard let number = number(forKey: key) else {
 			return `default`
 		}
-
 		return T(rawValue: number.intValue) ?? `default`
 	}
 

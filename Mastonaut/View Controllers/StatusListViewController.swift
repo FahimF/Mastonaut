@@ -40,11 +40,11 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		observations.observePreference(\MastonautPreferences.mediaDisplayMode) {
-			[unowned self] _, _ in self.refreshVisibleCellViews()
+		observations.observePreference(\MastonautPreferences.mediaDisplayMode) {[unowned self] _, _ in
+			self.refreshVisibleCellViews()
 		}
-		observations.observePreference(\MastonautPreferences.spoilerDisplayMode) {
-			[unowned self] _, _ in self.refreshVisibleCellViews()
+		observations.observePreference(\MastonautPreferences.spoilerDisplayMode) {[unowned self] _, _ in
+			self.refreshVisibleCellViews()
 		}
 	}
 

@@ -10,14 +10,13 @@ import Foundation
 
 /// `Timelines` requests.
 public enum Timelines {
-    /// Retrieves the home timeline.
+    /// Retrieves the home timeline
     ///
     /// - Parameter range: The bounds used when requesting data from Mastodon.
     /// - Returns: Request for `[Status]`.
     public static func home(range: RequestRange = .default) -> Request<[Status]> {
         let parameters = range.parameters(limit: between(1, and: 40, default: 20))
         let method = HTTPMethod.get(.parameters(parameters))
-
         return Request<[Status]>(path: "/api/v1/timelines/home", method: method)
     }
 
@@ -31,7 +30,6 @@ public enum Timelines {
         let rangeParameters = range.parameters(limit: between(1, and: 40, default: 20)) ?? []
         let localParameter = [Parameter(name: "local", value: local.flatMap(trueOrNil))]
         let method = HTTPMethod.get(.parameters(localParameter + rangeParameters))
-
         return Request<[Status]>(path: "/api/v1/timelines/public", method: method)
     }
 
@@ -46,7 +44,6 @@ public enum Timelines {
         let rangeParameters = range.parameters(limit: between(1, and: 40, default: 20)) ?? []
         let localParameter = [Parameter(name: "local", value: local.flatMap(trueOrNil))]
         let method = HTTPMethod.get(.parameters(localParameter + rangeParameters))
-
         return Request<[Status]>(path: "/api/v1/timelines/tag/\(hashtag)", method: method)
     }
 }
