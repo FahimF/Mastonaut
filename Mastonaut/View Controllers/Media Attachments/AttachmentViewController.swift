@@ -31,8 +31,7 @@ class AttachmentViewController: NSViewController {
 
 	private weak var attachmentPresenter: AttachmentPresenting?
 
-	private var imageViewAttachmentMap = NSMapTable<NSControl, Attachment>(keyOptions: .weakMemory,
-	                                                                       valueOptions: .structPersonality)
+	private var imageViewAttachmentMap = NSMapTable<NSControl, Attachment>(keyOptions: .weakMemory, valueOptions: .structPersonality)
 
 	private(set) var sensitiveMedia: Bool
 
@@ -114,7 +113,6 @@ class AttachmentViewController: NSViewController {
 
 	func setMediaHidden(_ hideMedia: Bool, animated: Bool = true) {
 		let imageViews = [firstImageView, secondImageView, thirdImageView, fourthImageView].compacted()
-
 		coverView.setHidden(!hideMedia, animated: animated)
 		(imageViews + previewAttachments).forEach { $0.setHidden(hideMedia, animated: animated) }
 	}
@@ -133,43 +131,31 @@ class AttachmentViewController: NSViewController {
 		])
 	}
 
-	private func fetchImage(with url: URL, fallbackUrl: URL?, from attachment: Attachment, placingInto imageView: AttachmentImageView?)
-	{
-		resourcesFetcher.fetchImage(with: url) {
-			[weak imageView, weak self] result in
-
+	private func fetchImage(with url: URL, fallbackUrl: URL?, from attachment: Attachment, placingInto imageView: AttachmentImageView?) {
+		resourcesFetcher.fetchImage(with: url) { [weak imageView, weak self] result in
 			guard case let .success(image) = result else {
 				DispatchQueue.main.async {
 					imageView?.image = NSImage.previewErrorImage
-
 					if let fallbackUrl = fallbackUrl {
-						self?.fetchImage(with: fallbackUrl, fallbackUrl: nil,
-						                 from: attachment, placingInto: imageView)
+						self?.fetchImage(with: fallbackUrl, fallbackUrl: nil, from: attachment, placingInto: imageView)
 					}
 				}
-
 				return
 			}
-
 			let finalImage: NSImage
-
 			if image.pixelSize.area > NSSize(width: 1024, height: 1024).area {
 				finalImage = image.resizedImage(withSize: NSSize(width: 1024, height: 1024))
 			} else {
 				finalImage = image
 			}
-
 			DispatchQueue.main.async {
 				guard let self = self else {
 					return
 				}
-
 				self.attachmentGroup.set(preview: finalImage, for: attachment)
-
 				imageView?.image = finalImage
 				imageView?.toolTip = attachment.description
 				imageView?.setAccessibilityLabel(attachment.description)
-
 				imageView?.target = self
 				imageView?.action = #selector(AttachmentViewController.presentAttachment(_:))
 			}

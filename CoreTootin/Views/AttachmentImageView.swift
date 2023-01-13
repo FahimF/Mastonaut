@@ -92,12 +92,10 @@ public class AttachmentImageView: NSControl {
 			assertionFailure()
 			return
 		}
-
 		guard let image = image else {
 			layer.contents = nil
 			return
 		}
-
 		layer.contentsGravity = .resizeAspectFill
 		layer.contents = image.layerContents(forContentsScale: window?.backingScaleFactor ?? 1.0)
 		layer.masksToBounds = true

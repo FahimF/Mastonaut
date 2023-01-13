@@ -36,8 +36,8 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 
 	private var loadingTask: URLSessionTask?
 	private var attachmentGroup: IndexedAttachmentGroup?
-
 	private var playerLooper: AVPlayerLooper?
+	
 	private var currentAttachment: (attachment: Attachment, image: NSImage)? {
 		didSet { playerLooper = nil }
 	}
@@ -50,15 +50,12 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
-
 		hoverView.mouseEntered = {
 			[unowned self] in self.setControlsHidden(false)
 		}
-
 		hoverView.mouseExited = {
 			[unowned self] in self.setControlsHidden(true)
 		}
-
 		if let (attachment, attachmentGroup, senderWindow) = attachmentsPendingWindowLoad {
 			attachmentsPendingWindowLoad = nil
 			set(attachment: attachment, attachmentGroup: attachmentGroup, senderWindow: senderWindow)
@@ -70,13 +67,10 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 			attachmentsPendingWindowLoad = (attachment, attachmentGroup, senderWindow)
 			return
 		}
-
 		guard let currentIndex = attachmentGroup.attachments.firstIndex(of: attachment) else {
 			return
 		}
-
 		self.attachmentGroup = attachmentGroup.asIndexedGroup(initialIndex: currentIndex)
-
 		repositionWindow(for: attachment, senderWindow: senderWindow)
 		setCurrentAttachment(attachment, currentPreview: attachmentGroup.preview(for: attachment))
 	}
@@ -87,14 +81,7 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 			menuItem.title = 🔠("status.action.media.close")
 			return true
 
-		case #selector(nextAttachment(_:)),
-		     #selector(previousAttachment(_:)),
-		     #selector(share(_:)),
-		     #selector(saveToDownloads(_:)),
-		     #selector(saveToLocation(_:)),
-		     #selector(copyImage(_:)),
-		     #selector(copyImageAddress(_:)),
-		     #selector(openInBrowser(_:)):
+		case #selector(nextAttachment(_:)), #selector(previousAttachment(_:)), #selector(share(_:)), #selector(saveToDownloads(_:)), #selector(saveToLocation(_:)), #selector(copyImage(_:)), #selector(copyImageAddress(_:)), #selector(openInBrowser(_:)):
 			return true
 
 		default:
@@ -116,10 +103,8 @@ private extension AttachmentWindowController {
 			button.setInvisible(shouldHide, animated: true)
 			button.isEnabled = true
 		}
-
 		shareButton.setInvisible(shouldHide, animated: true)
 		shareShadowView.setInvisible(shouldHide, animated: true)
-
 		setNextPreviousButtonsHidden(shouldHide)
 	}
 
@@ -143,30 +128,18 @@ private extension AttachmentWindowController {
 	}
 
 	func repositionWindow(for attachment: Attachment, senderWindow: NSWindow) {
-		guard
-			let window = window,
-			let screen = senderWindow.screen,
-			let imageSize = attachment.meta?.original?.size ?? attachmentGroup?.preview(for: attachment)?.size,
-			imageSize.area > 0
-		else {
+		guard let window = window, let screen = senderWindow.screen, let imageSize = attachment.meta?.original?.size ?? attachmentGroup?.preview(for: attachment)?.size, imageSize.area > 0 else {
 			return
 		}
-
 		let visibleFrame = screen.visibleFrame
 		let maxFrame = visibleFrame.insetBy(dx: visibleFrame.width * 0.1, dy: visibleFrame.height * 0.1)
 		let finalSize = imageSize.area < maxFrame.size.area ? imageSize : imageSize.fitting(on: maxFrame.size)
-
-		let finalFrame = NSRect(x: screen.frame.origin.x + (screen.frame.width - finalSize.width) * 0.5,
-		                        y: screen.frame.origin.y + (screen.frame.height - finalSize.height) * 0.5,
-
-		                        width: finalSize.width, height: finalSize.height)
-
+		let finalFrame = NSRect(x: screen.frame.origin.x + (screen.frame.width - finalSize.width) * 0.5, y: screen.frame.origin.y + (screen.frame.height - finalSize.height) * 0.5, width: finalSize.width, height: finalSize.height)
 		window.setFrame(finalFrame, display: true, animate: true)
 	}
 
 	func setCurrentAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		setNextPreviousButtonsHidden(false)
-
 		currentAttachment = currentPreview.map { (attachment, $0) }
 		updateShareMenu(with: attachment, image: currentPreview)
 
@@ -188,12 +161,10 @@ private extension AttachmentWindowController {
 	func setImageAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
-
 		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
 			imageView.image = #imageLiteral(resourceName: "missing")
 			return
 		}
-
 		imageView.image = currentPreview ?? #imageLiteral(resourceName: "missing")
 		imageView.toolTip = attachment.description
 
@@ -218,17 +189,13 @@ private extension AttachmentWindowController {
 
 		let taskPromise = Promise<URLSessionTask>()
 
-		let task = resourcesFetcher.fetchImage(with: url, progress: progressHandler) {
-			[weak self] result in
-
+		let task = resourcesFetcher.fetchImage(with: url, progress: progressHandler) { [weak self] result in
 			DispatchQueue.main.async {
 				// Check if we're still interested in the loaded image
 				guard self?.loadingTask == taskPromise.value, let imageView = self?.imageView else {
 					return
 				}
-
 				self?.loadingTask = nil
-
 				switch result {
 				case let .success(image):
 					imageView.image = image
@@ -239,7 +206,6 @@ private extension AttachmentWindowController {
 					guard (error as NSError).code != NSURLErrorCancelled else {
 						break
 					}
-
 					fallthrough
 
 				case .emptyResponse:
@@ -247,7 +213,6 @@ private extension AttachmentWindowController {
 				}
 			}
 		}
-
 		taskPromise.value = task
 		loadingTask = task
 	}
@@ -255,14 +220,11 @@ private extension AttachmentWindowController {
 	func setVideoAttachment(_ attachment: Attachment, currentPreview _: NSImage?, shouldLoop: Bool) {
 		videoPlayerView.isHidden = false
 		imageView.isHidden = true
-
 		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
 			setFailedLoadingContent()
 			return
 		}
-
 		let player: AVPlayer
-
 		if shouldLoop {
 			let queuePlayer = AVQueuePlayer()
 			playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: AVPlayerItem(url: url))
@@ -270,9 +232,7 @@ private extension AttachmentWindowController {
 		} else {
 			player = AVPlayer(playerItem: AVPlayerItem(url: url))
 		}
-
 		videoPlayerView.player = player
-
 		if Preferences.autoplayVideos {
 			player.play()
 		}
@@ -281,7 +241,6 @@ private extension AttachmentWindowController {
 	func setFailedLoadingContent() {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
-
 		imageView.image = NSImage.previewErrorImage
 	}
 
@@ -289,7 +248,6 @@ private extension AttachmentWindowController {
 		guard let shareItem = shareMenu.item(withTag: 1000) else {
 			return
 		}
-
 		let bestUrl = attachment.bestUrl
 		shareMenu.setSubmenu(ShareMenuFactory.shareMenu(for: bestUrl, previewImage: image), for: shareItem)
 	}

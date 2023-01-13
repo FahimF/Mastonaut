@@ -201,9 +201,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		} else {
 			cardContainerView.isHidden = true
 			warningButton.isHidden = false
-
 			hasSpoiler = true
-
 			contentWarningLabel.set(attributedStringValue: cellModel.visibleStatus.attributedSpoiler, applyingAttributes: statusLabelAttributes(), applyingEmojis: cellModel.visibleStatus.cacheableEmojis)
 			installSpoilerCover()
 			contentWarningContainer.isHidden = false
@@ -277,18 +275,12 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		}
 	}
 
-	private func setupAttachmentsContainerView(for status: Status, poll: Poll?,
-	                                           attachmentPresenter: AttachmentPresenting)
-	{
+	private func setupAttachmentsContainerView(for status: Status, poll: Poll?, attachmentPresenter: AttachmentPresenting) {
 		mediaContainerView.subviews.forEach { $0.removeFromSuperview() }
-
 		if status.mediaAttachments.count > 0 {
 			mediaContainerView.isHidden = false
 
-			let attachmentViewController = AttachmentViewController(attachments: status.mediaAttachments,
-			                                                        attachmentPresenter: attachmentPresenter,
-			                                                        sensitiveMedia: status.sensitive == true,
-			                                                        mediaHidden: self.attachmentViewController?.isMediaHidden)
+			let attachmentViewController = AttachmentViewController(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, sensitiveMedia: status.sensitive == true, mediaHidden: self.attachmentViewController?.isMediaHidden)
 
 			let attachmentView = attachmentViewController.view
 			mediaContainerView.addSubview(attachmentView)
@@ -299,7 +291,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 				mediaContainerView.topAnchor.constraint(equalTo: attachmentView.topAnchor),
 				mediaContainerView.bottomAnchor.constraint(equalTo: attachmentView.bottomAnchor),
 			])
-
 			self.attachmentViewController = attachmentViewController
 		} else if let poll = poll ?? status.poll {
 			mediaContainerView.isHidden = true
@@ -327,18 +318,14 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		}
 
 		let cardUrl = card.url
-
 		cardContainerView.isHidden = false
 		cardTitleLabel.stringValue = card.title
 		cardUrlLabel.stringValue = cardUrl.host ?? ""
-
 		guard card.imageUrl != nil, let currentlyDisplayedStatusId = cellModel?.status.id else {
 			cardImageView.image = nil
 			return
 		}
-
 		cardImageView.image = #imageLiteral(resourceName: "missing")
-
 		card.fetchImage {
 			[weak self] image in
 
@@ -346,7 +333,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 				guard self?.cellModel?.status.id == currentlyDisplayedStatusId else {
 					return
 				}
-
 				self?.cardImageView.image = image
 			}
 		}
@@ -359,14 +345,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
-
 		cellModel = nil
 		statusLabel.alphaValue = 1
 		userDidInteractWithVisibilityControls = false
-
 		pollViewController?.view.removeFromSuperview()
 		pollViewController = nil
-
 		removeSpoilerCover()
 	}
 
