@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.AVKitIBPlugin" version="16097"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <plugIn identifier="com.apple.AVKitIBPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,7 +27,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES" fullSizeContentView="YES"/>
             <windowCollectionBehavior key="collectionBehavior" moveToActiveSpace="YES" transient="YES" participatesInCycle="YES" fullScreenAuxiliary="YES" fullScreenDisallowsTiling="YES"/>
             <rect key="contentRect" x="474" y="323" width="400" height="270"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1440"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO" customClass="BackgroundView" customModule="CoreTootin">
                 <rect key="frame" x="0.0" y="0.0" width="400" height="270"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -38,13 +38,36 @@
                     <avPlayerView controlsStyle="floating" showsFullScreenToggleButton="YES" showsSharingServiceButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zjN-NI-twc">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="270"/>
                     </avPlayerView>
-                    <imageView horizontalHuggingPriority="251" horizontalCompressionResistancePriority="251" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="pRN-xj-C5o" customClass="DraggingImageView" customModule="Mastonaut" customModuleProvider="target">
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" allowsMagnification="YES" maxMagnification="5" minMagnification="1" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZIv-xP-jVT">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="270"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="missing" id="Myp-vn-52g"/>
-                        <connections>
-                            <outlet property="menu" destination="Q5E-t9-TFg" id="5zD-ba-J9D"/>
-                        </connections>
-                    </imageView>
+                        <clipView key="contentView" id="vNG-Hh-xZg">
+                            <rect key="frame" x="1" y="1" width="398" height="268"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <imageView horizontalHuggingPriority="251" horizontalCompressionResistancePriority="251" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="pRN-xj-C5o" customClass="DraggingImageView" customModule="Mastonaut" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="398" height="268"/>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="missing" id="Myp-vn-52g"/>
+                                    <connections>
+                                        <outlet property="menu" destination="Q5E-t9-TFg" id="5zD-ba-J9D"/>
+                                    </connections>
+                                </imageView>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="pRN-xj-C5o" firstAttribute="leading" secondItem="vNG-Hh-xZg" secondAttribute="leading" id="GWp-Tw-BCn"/>
+                                <constraint firstItem="pRN-xj-C5o" firstAttribute="top" secondItem="vNG-Hh-xZg" secondAttribute="top" id="IhV-82-7dS"/>
+                                <constraint firstAttribute="bottom" secondItem="pRN-xj-C5o" secondAttribute="bottom" id="JNv-fX-17M"/>
+                                <constraint firstAttribute="trailing" secondItem="pRN-xj-C5o" secondAttribute="trailing" id="vYT-bN-cYA"/>
+                            </constraints>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="js6-0K-wNR">
+                            <rect key="frame" x="-100" y="-100" width="398" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="696-li-2Nm">
+                            <rect key="frame" x="-100" y="-100" width="16" height="268"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                     <progressIndicator hidden="YES" wantsLayer="YES" maxValue="100" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="4eT-o3-VFV">
                         <rect key="frame" x="-3" y="263" width="406" height="12"/>
                     </progressIndicator>
@@ -83,7 +106,7 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="share_shadow" id="UVt-wT-cHP"/>
                     </imageView>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="eDD-p4-DE9">
-                        <rect key="frame" x="12" y="12" width="15" height="22"/>
+                        <rect key="frame" x="12" y="9" width="15.5" height="30"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="Xbd-gn-fHM"/>
                             <constraint firstAttribute="width" secondItem="eDD-p4-DE9" secondAttribute="height" multiplier="11:16" id="nec-dX-IV6"/>
@@ -101,25 +124,25 @@
                 <constraints>
                     <constraint firstItem="zjN-NI-twc" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="0TR-6t-82c"/>
                     <constraint firstItem="abS-sQ-ah9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="14R-9M-yEN"/>
+                    <constraint firstAttribute="bottom" secondItem="ZIv-xP-jVT" secondAttribute="bottom" id="8bA-Ox-yYl"/>
                     <constraint firstItem="4eT-o3-VFV" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="-3" id="9wv-UG-2lU"/>
                     <constraint firstAttribute="bottom" secondItem="abS-sQ-ah9" secondAttribute="bottom" id="B5Y-Ah-W2x"/>
-                    <constraint firstAttribute="bottom" secondItem="pRN-xj-C5o" secondAttribute="bottom" id="FHa-jb-g03"/>
                     <constraint firstItem="XDk-LK-MyC" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="Fzp-i4-dtc"/>
-                    <constraint firstAttribute="trailing" secondItem="pRN-xj-C5o" secondAttribute="trailing" id="Qa2-43-qDM"/>
                     <constraint firstAttribute="bottom" secondItem="zjN-NI-twc" secondAttribute="bottom" id="RKm-EG-7nM"/>
                     <constraint firstAttribute="trailing" secondItem="f2E-lZ-PqL" secondAttribute="trailing" id="Tuj-M5-3gj"/>
                     <constraint firstItem="XDk-LK-MyC" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="Ucm-h3-20L"/>
                     <constraint firstItem="eDD-p4-DE9" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="12" id="WYZ-JB-x3Z"/>
-                    <constraint firstItem="pRN-xj-C5o" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="bIg-ce-ydT"/>
+                    <constraint firstItem="ZIv-xP-jVT" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="Xi2-4D-y8J"/>
                     <constraint firstItem="KJG-g4-TRP" firstAttribute="centerY" secondItem="eDD-p4-DE9" secondAttribute="centerY" id="coG-4v-lNw"/>
+                    <constraint firstItem="ZIv-xP-jVT" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="isu-KY-0Xq"/>
                     <constraint firstAttribute="trailing" secondItem="abS-sQ-ah9" secondAttribute="trailing" id="jc1-FW-jMi"/>
                     <constraint firstAttribute="trailing" secondItem="4eT-o3-VFV" secondAttribute="trailing" constant="-3" id="jlL-ly-xyN"/>
                     <constraint firstAttribute="trailing" secondItem="zjN-NI-twc" secondAttribute="trailing" id="kLb-R7-968"/>
                     <constraint firstItem="zjN-NI-twc" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="llV-rp-Rqu"/>
+                    <constraint firstAttribute="trailing" secondItem="ZIv-xP-jVT" secondAttribute="trailing" id="mtz-1t-gpd"/>
                     <constraint firstItem="4eT-o3-VFV" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="-5" id="pK0-ff-QI5"/>
                     <constraint firstItem="abS-sQ-ah9" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="qOj-Q1-S9o"/>
                     <constraint firstItem="f2E-lZ-PqL" firstAttribute="centerY" secondItem="se5-gp-TjO" secondAttribute="centerY" id="uvj-Br-fb3"/>
-                    <constraint firstItem="pRN-xj-C5o" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" id="vJr-zS-RL8"/>
                     <constraint firstAttribute="bottom" secondItem="eDD-p4-DE9" secondAttribute="bottom" constant="12" id="vO7-fK-rdf"/>
                     <constraint firstItem="KJG-g4-TRP" firstAttribute="centerX" secondItem="eDD-p4-DE9" secondAttribute="centerX" id="vUY-hd-UzJ"/>
                 </constraints>
@@ -177,7 +200,7 @@
         </menu>
     </objects>
     <resources>
-        <image name="NSShareTemplate" width="11" height="16"/>
+        <image name="NSShareTemplate" width="19" height="22"/>
         <image name="arrow_next" width="15" height="35"/>
         <image name="arrow_next_active" width="15" height="35"/>
         <image name="arrow_prev" width="15" height="35"/>
