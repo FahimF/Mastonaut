@@ -22,12 +22,18 @@ import Cocoa
 @IBDesignable
 open class BackgroundView: NSView {
 	@IBInspectable
-	public var drawsBackground: Bool = true
-	{ didSet { needsDisplay = true } }
+	public var drawsBackground: Bool = true {
+		didSet {
+			needsDisplay = true
+		}
+	}
 
 	@IBInspectable
-	public var backgroundColor: NSColor = .clear
-	{ didSet { needsDisplay = true } }
+	public var backgroundColor: NSColor = .clear {
+		didSet {
+			needsDisplay = true
+		}
+	}
 
 	override public var wantsUpdateLayer: Bool {
 		return true
@@ -35,12 +41,10 @@ open class BackgroundView: NSView {
 
 	override public func updateLayer() {
 		super.updateLayer()
-
 		guard drawsBackground else {
 			layer?.backgroundColor = .clear
 			return
 		}
-
 		layer?.backgroundColor = backgroundColor.cgColor
 	}
 }

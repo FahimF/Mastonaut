@@ -44,7 +44,6 @@ open class BorderView: BackgroundView {
 
 	override public func updateLayer() {
 		super.updateLayer()
-
 		layer?.cornerRadius = borderRadius
 		layer?.borderWidth = borderWidth
 		layer?.borderColor = borderColor.cgColor

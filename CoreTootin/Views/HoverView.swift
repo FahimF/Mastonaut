@@ -24,7 +24,6 @@ public class HoverView: BorderView {
 
 	public required init?(coder: NSCoder) {
 		super.init(coder: coder)
-
 		updateHoverTrackingArea()
 	}
 
@@ -32,12 +31,7 @@ public class HoverView: BorderView {
 		if let oldTrackingArea = hoverTrackingArea {
 			removeTrackingArea(oldTrackingArea)
 		}
-
-		let trackingArea = NSTrackingArea(rect: bounds,
-		                                  options: [.activeAlways, .inVisibleRect, .mouseEnteredAndExited],
-		                                  owner: self,
-		                                  userInfo: nil)
-
+		let trackingArea = NSTrackingArea(rect: bounds, options: [.activeAlways, .inVisibleRect, .mouseEnteredAndExited], owner: self, userInfo: nil)
 		addTrackingArea(trackingArea)
 		hoverTrackingArea = trackingArea
 	}
@@ -55,13 +49,11 @@ public class CallbackHoverView: HoverView {
 
 	override public func mouseEntered(with event: NSEvent) {
 		super.mouseEntered(with: event)
-
 		mouseEntered?()
 	}
 
 	override public func mouseExited(with event: NSEvent) {
 		super.mouseExited(with: event)
-
 		mouseExited?()
 	}
 }
