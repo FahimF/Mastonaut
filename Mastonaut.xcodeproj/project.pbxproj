@@ -1299,6 +1299,8 @@
 				1504F1E321EBD08900D91B8E /* ExpanderCellView.xib */,
 				15A947952495ACB500E413B2 /* FilteredEntryCellView.swift */,
 				15A947942495ACB500E413B2 /* FilteredEntryCellView.xib */,
+				15B25CFE265164B500C90963 /* FilterTableCellView.swift */,
+				15B25D01265164BF00C90963 /* FilterTableCellView.xib */,
 				15DED9C02298B1D1000F11B8 /* FocusedStatusTableCellView.swift */,
 				15DED9C32298B707000F11B8 /* FocusedStatusTableCellView.xib */,
 				150A9F0321FD1BCE00DF42A1 /* FollowCellView.swift */,
@@ -1312,8 +1314,6 @@
 				15053AF02254037B00DEED8F /* ProfileTableCellView.xib */,
 				15C4DD3F21D4280A002AF6DA /* StatusTableCellView.swift */,
 				152DA64321E2C2DB0065CC1B /* StatusTableCellView.xib */,
-				15B25CFE265164B500C90963 /* FilterTableCellView.swift */,
-				15B25D01265164BF00C90963 /* FilterTableCellView.xib */,
 			);
 			path = "Table Cell Views";
 			sourceTree = "<group>";
@@ -1657,23 +1657,23 @@
 		15C4DD3E21D427F2002AF6DA /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				1502C85A234FE3C2005051CC /* Sidebar */,
+				151199C822BFCEE3007F2AEB /* Composer */,
+				15EE539522C95810001BEA58 /* Global Search */,
 				152DA64821E3F9690065CC1B /* Media Attachments */,
 				15E7451B2236FDD0009A1252 /* Placeholder */,
 				1538FB3422188961006B5F78 /* Preferences */,
-				151199C822BFCEE3007F2AEB /* Composer */,
-				15EE539522C95810001BEA58 /* Global Search */,
+				1502C85A234FE3C2005051CC /* Sidebar */,
+				15D9DA6C229F144F006AE6D4 /* CustomEmojiPanelController.swift */,
 				150CEA3321FC963400F815A9 /* ListViewController.swift */,
 				158B997521F9DB0C0046C8D6 /* ListViewController.xib */,
 				150CEA3621FCA5C000F815A9 /* NotificationListViewController.swift */,
+				1595BEB2249ECE850077A150 /* PollResultItemView.xib */,
+				15728A6B22B1B92100EE2BE9 /* PollViewController.swift */,
+				15E9E7EC22B91ACD00C1C701 /* PollViewController.xib */,
 				157D78C02284D27300DAE4A4 /* StatusListViewController.swift */,
 				15845E332438EAE7006DF182 /* TimelinesSplitViewController.swift */,
 				15C78371221CBD8600402C66 /* TimelinesViewController.swift */,
 				15C4DD4421D42F87002AF6DA /* TimelineViewController.swift */,
-				15D9DA6C229F144F006AE6D4 /* CustomEmojiPanelController.swift */,
-				15728A6B22B1B92100EE2BE9 /* PollViewController.swift */,
-				15E9E7EC22B91ACD00C1C701 /* PollViewController.xib */,
-				1595BEB2249ECE850077A150 /* PollResultItemView.xib */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";

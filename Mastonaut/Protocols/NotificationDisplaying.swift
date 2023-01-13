@@ -22,7 +22,6 @@ import Foundation
 
 protocol NotificationDisplaying {
 	var displayedNotificationId: String? { get }
-
 	var displayedStatusId: String? { get }
 
 	func set(displayedNotification: MastodonNotification, attachmentPresenter: AttachmentPresenting, interactionHandler: NotificationInteractionHandling, activeInstance: Instance)

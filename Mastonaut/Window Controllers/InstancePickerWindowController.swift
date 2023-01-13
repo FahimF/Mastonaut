@@ -153,9 +153,7 @@ class InstancePickerWindowController: NSWindowController, NSWindowDelegate {
 	private func waitAndValidateDomain() {
 		nextButton.isEnabled = false
 		progressIndicator.startAnimation(nil)
-
-		InstancePickerWindowController.cancelPreviousPerformRequests(withTarget: self,
-		                                                             selector: #selector(validateDomain), object: nil)
+		InstancePickerWindowController.cancelPreviousPerformRequests(withTarget: self, selector: #selector(validateDomain), object: nil)
 		perform(#selector(validateDomain), with: nil, afterDelay: 0.66)
 	}
 

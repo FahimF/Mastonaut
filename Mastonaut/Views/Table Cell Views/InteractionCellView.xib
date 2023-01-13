@@ -49,7 +49,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cW1-Jf-RNF" customClass="RefreshingFormattedTextField" customModule="Mastonaut" customModuleProvider="target">
+                <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cW1-Jf-RNF" customClass="RefreshingFormattedTextField" customModule="Mastonaut" customModuleProvider="target">
                     <rect key="frame" x="256" y="135" width="62" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" alignment="right" title="Somewhen" id="bzh-lq-VPW">
                         <font key="font" metaFont="controlContent" size="11"/>
@@ -333,6 +333,7 @@
                 <constraint firstItem="Cz9-ri-enf" firstAttribute="leading" secondItem="wfD-6T-hMW" secondAttribute="leading" id="fGE-P5-sW5"/>
                 <constraint firstAttribute="bottom" secondItem="Cz9-ri-enf" secondAttribute="bottom" constant="12" id="gcU-yn-f7F"/>
                 <constraint firstItem="1aE-KA-sFf" firstAttribute="leading" secondItem="XOW-dd-yLi" secondAttribute="leading" id="ies-tC-hCB"/>
+                <constraint firstItem="MRT-NC-KZH" firstAttribute="top" secondItem="cW1-Jf-RNF" secondAttribute="bottom" constant="5" id="oKw-RO-au1"/>
                 <constraint firstItem="XOW-dd-yLi" firstAttribute="top" secondItem="SsG-u2-jcM" secondAttribute="bottom" constant="8" id="pVL-JM-TLq"/>
                 <constraint firstItem="fZB-Y3-kYO" firstAttribute="leading" secondItem="uA5-gi-A8Y" secondAttribute="leading" constant="12" id="q7I-RU-Ya0"/>
                 <constraint firstItem="wfD-6T-hMW" firstAttribute="top" secondItem="MRT-NC-KZH" secondAttribute="bottom" constant="8" id="rVK-44-K6O"/>

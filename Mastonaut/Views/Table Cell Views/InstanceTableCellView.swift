@@ -22,12 +22,10 @@ import Foundation
 class InstanceTableCellView: NSTableCellView {
 	@IBOutlet private unowned var nameLabel: NSTextField!
 	@IBOutlet private unowned var descriptionLabel: NSTextField!
-
 	@IBOutlet private unowned var statusCountLabel: NSTextField!
 	@IBOutlet private unowned var userCountLabel: NSTextField!
 	@IBOutlet private unowned var versionLabel: NSTextField!
 	@IBOutlet private unowned var uptimeLabel: NSTextField!
-
 	@IBOutlet private unowned var safeForWorkFlagView: NSView!
 	@IBOutlet private unowned var adultContentFlagView: NSView!
 

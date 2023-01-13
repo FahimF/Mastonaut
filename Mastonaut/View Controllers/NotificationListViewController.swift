@@ -45,15 +45,12 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-
 		observations.observePreference(\MastonautPreferences.mediaDisplayMode) {
 			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
-
 		observations.observePreference(\MastonautPreferences.spoilerDisplayMode) {
 			[unowned self] _, _ in self.refreshVisibleCellViews()
 		}
-
 		reduceMotionNotificationObserver = NSAccessibility.observeReduceMotionPreference {
 			[unowned self] in self.refreshVisibleCellViews()
 		}
@@ -61,18 +58,13 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 
 	override func registerCells() {
 		super.registerCells()
-
-		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main),
-		                   forIdentifier: CellViewIdentifier.status)
-		tableView.register(NSNib(nibNamed: "InteractionCellView", bundle: .main),
-		                   forIdentifier: CellViewIdentifier.interaction)
-		tableView.register(NSNib(nibNamed: "FollowCellView", bundle: .main),
-		                   forIdentifier: CellViewIdentifier.follow)
+		tableView.register(NSNib(nibNamed: "StatusTableCellView", bundle: .main), forIdentifier: CellViewIdentifier.status)
+		tableView.register(NSNib(nibNamed: "InteractionCellView", bundle: .main), forIdentifier: CellViewIdentifier.interaction)
+		tableView.register(NSNib(nibNamed: "FollowCellView", bundle: .main), forIdentifier: CellViewIdentifier.follow)
 	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
 		tableView.setAccessibilityLabel("Notifications")
 	}
 
@@ -80,9 +72,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		super.clientDidChange(client, oldClient: oldClient)
 
 		setClientEventStream(.user)
-
 		guard let account = authorizedAccountProvider?.currentAccount else { return }
-
 		filterService = FilterService.service(for: account)
 		filterService?.register(observer: self)
 	}
@@ -96,47 +86,32 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 	}
 
 	func set(hasActivePollTask: Bool, for statusID: String) {
-		guard
-			let index = entryList.firstIndex(where: { $0.entryKey == statusID }),
-			let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InteractionCellView
-		else {
+		guard let index = entryList.firstIndex(where: { $0.entryKey == statusID }), let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InteractionCellView else {
 			return
 		}
-
 		cell.setHasActivePollTask(hasActivePollTask)
 	}
 
 	func handle(updatedPoll poll: Poll, statusID: String) {
-		guard
-			let notificationId = statusIdNotificationIdMap[statusID],
-			let index = entryList.firstIndex(where: { $0.entryKey == notificationId })
-		else {
+		guard let notificationId = statusIdNotificationIdMap[statusID], let index = entryList.firstIndex(where: { $0.entryKey == notificationId }) else {
 			return
 		}
-
-		// We update the poll even if we don't update the table cell view, because it might just be out of the visible
-		// range.
+		// We update the poll even if we don't update the table cell view, because it might just be out of the visible range.
 		updatedPolls[poll.id] = poll
-
-		guard
-			let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InteractionCellView
-		else {
+		guard let cell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InteractionCellView else {
 			return
 		}
-
 		cell.set(updatedPoll: poll)
 	}
 
 	func handle<T: UserDescriptionError>(interactionError error: T) {
 		DispatchQueue.main.async {
-			[weak self] in self?.view.window?.windowController?.displayError(error,
-			                                                                 title: 🔠("interaction.notification"))
+			[weak self] in self?.view.window?.windowController?.displayError(error, title: 🔠("interaction.notification"))
 		}
 	}
 
 	func reply(to statusID: String) {
-		if let notificationId = statusIdNotificationIdMap[statusID], let status = entry(for: notificationId)?.status
-		{
+		if let notificationId = statusIdNotificationIdMap[statusID], let status = entry(for: notificationId)?.status {
 			authorizedAccountProvider?.composeReply(for: status, sender: nil)
 		}
 	}
@@ -171,8 +146,7 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		let message: String = isRedrafting ? "The contents of this post will be copied over to the composer, and you'll be able to make changes to it before re-submitting it." : "This action can not be undone."
 		let dialogMode: DialogMode = isRedrafting ? .custom(proceed: "Delete and Redraft", dismiss: "Cancel")
 			: .custom(proceed: "Delete Post", dismiss: "Cancel")
-		view.window?.windowController?.showAlert(style: .informational, title: "Are you sure you want to delete this post?", message: message, dialogMode: dialogMode) {
-			response in
+		view.window?.windowController?.showAlert(style: .informational, title: "Are you sure you want to delete this post?", message: message, dialogMode: dialogMode) { response in
 			completion(response == .alertFirstButtonReturn)
 		}
 	}

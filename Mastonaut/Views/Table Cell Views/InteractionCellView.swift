@@ -46,7 +46,6 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 	private var displayedNotificationTags: [Tag]?
 	private var authorAccount: Account?
 	private var agentAccount: Account?
-
 	private var pollViewController: PollViewController?
 
 	/// Notifications can be relative to a status, so we de technically have to comply with StatusDisplaying
@@ -87,7 +86,6 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-
 		timeLabel.formatter = RelativeDateFormatter.shared
 		statusLabel.linkTextAttributes = InteractionCellView.statusLabelLinkAttributes
 	}
@@ -97,10 +95,8 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			guard let notificationType = displayedNotificationType else {
 				return
 			}
-
 			let emphasized = backgroundStyle == .emphasized
 			statusLabel.isEmphasized = emphasized
-
 			switch notificationType {
 			case .reblog:
 				interactionIcon.image = emphasized ? #imageLiteral(resourceName: "retooted") : #imageLiteral(resourceName: "retooted_active")
@@ -126,15 +122,11 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 				// This should have been catch beforereaching the UI level.
 				break
 			}
-
-			if #available(OSX 10.14, *) {} else {
-				statusLabel.isEmphasized = emphasized
-
-				let effectiveColor: NSColor = emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
-				authorAccountLabel.textColor = effectiveColor
-				timeLabel.textColor = effectiveColor
-				attachmentInfoLabel.textColor = effectiveColor
-			}
+			statusLabel.isEmphasized = emphasized
+			let effectiveColor: NSColor = emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
+			authorAccountLabel.textColor = effectiveColor
+			timeLabel.textColor = effectiveColor
+			attachmentInfoLabel.textColor = effectiveColor
 		}
 	}
 
@@ -193,9 +185,11 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			// This should have been catch beforereaching the UI level.
 			return
 		}
+		// Set notification time
+		timeLabel.objectValue = notification.createdAt
+		timeLabel.toolTip = DateFormatter.longDateFormatter.string(from: notification.createdAt)
 
 		interactionLabel.set(stringValue: interactionMessage, applyingAttributes: messageAttributes, applyingEmojis: notification.account.cacheableEmojis)
-
 		authorAvatarButton.image = #imageLiteral(resourceName: "missing")
 		agentAvatarButton.image = #imageLiteral(resourceName: "missing")
 
@@ -257,25 +251,21 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 		if attachmentCount > 0 {
 			attachmentInfoStackView.isHidden = false
 			attachmentIcon.image = #imageLiteral(resourceName: "attachment")
-			attachmentInfoLabel.stringValue = attachmentCount == 1 ? 🔠("one attachment")
-				: 🔠("%@ attachments", String(attachmentCount))
+			attachmentInfoLabel.stringValue = attachmentCount == 1 ? 🔠("one attachment") : 🔠("%@ attachments", String(attachmentCount))
 		} else {
 			attachmentInfoStackView.isHidden = true
 		}
 	}
 
 	private func set(authorName: String, account: String, emojis: [CacheableEmoji]) {
-		authorNameLabel.set(stringValue: authorName,
-		                    applyingAttributes: InteractionCellView.authorLabelAttributes,
-		                    applyingEmojis: emojis)
-
+		authorNameLabel.set(stringValue: authorName, applyingAttributes: InteractionCellView.authorLabelAttributes, applyingEmojis: emojis)
 		authorAccountLabel.stringValue = account
 	}
 
-	private func set(creationTime: Date) {
-		timeLabel.objectValue = creationTime
-		timeLabel.toolTip = DateFormatter.longDateFormatter.string(from: creationTime)
-	}
+//	private func set(creationTime: Date) {
+//		timeLabel.objectValue = creationTime
+//		timeLabel.toolTip = DateFormatter.longDateFormatter.string(from: creationTime)
+//	}
 
 	private func set(status: Status?, activeInstance: Instance) {
 		guard let status = status else {
@@ -283,27 +273,19 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 			set(attachmentCount: 0)
 			return
 		}
-
 		if status.spoilerText.isEmpty {
 			contentWarningContainerView.isHidden = true
 		} else {
 			contentWarningContainerView.isHidden = false
-			contentWarningLabel.set(attributedStringValue: status.attributedSpoiler,
-			                        applyingAttributes: InteractionCellView.statusLabelAttributes,
-			                        applyingEmojis: status.cacheableEmojis)
+			contentWarningLabel.set(attributedStringValue: status.attributedSpoiler, applyingAttributes: InteractionCellView.statusLabelAttributes, applyingEmojis: status.cacheableEmojis)
 		}
-
 		let attributedStatusContent = status.fullAttributedContent
-
 		if attributedStatusContent.isEmpty {
 			statusLabel.isHidden = true
 		} else {
 			statusLabel.isHidden = false
-			statusLabel.set(attributedStringValue: attributedStatusContent,
-			                applyingAttributes: InteractionCellView.statusLabelAttributes,
-			                applyingEmojis: status.cacheableEmojis)
+			statusLabel.set(attributedStringValue: attributedStatusContent, applyingAttributes: InteractionCellView.statusLabelAttributes, applyingEmojis: status.cacheableEmojis)
 		}
-
 		reblogButton.isEnabled = status.visibility.allowsReblog
 		reblogButton.toolTip = status.visibility.reblogToolTip(didReblog: status.reblogged == true)
 		reblogButton.image = status.visibility.reblogIcon
@@ -312,20 +294,14 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 		favoriteButton.state = status.favourited == true ? .on : .off
 		bookmarkButton.state = status.bookmarked == true ? .on : .off
 
-		set(authorName: status.authorName,
-		    account: status.account.uri(in: activeInstance),
-		    emojis: status.account.cacheableEmojis)
-
+		set(authorName: status.authorName, account: status.account.uri(in: activeInstance), emojis: status.account.cacheableEmojis)
 		set(attachmentCount: status.mediaAttachments.count)
-		set(creationTime: status.createdAt)
-
+//		set(creationTime: status.createdAt)
 		if let poll = status.poll {
 			let viewController = PollViewController()
 			viewController.set(poll: poll)
-
 			stackView.addArrangedSubview(viewController.view)
 			pollViewController = viewController
-
 			stackView.widthAnchor.constraint(equalTo: viewController.view.widthAnchor).isActive = true
 		}
 	}
@@ -336,7 +312,6 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
-
 		displayedNotificationId = nil
 		displayedNotificationType = nil
 		interactionIcon.image = nil
@@ -347,7 +322,6 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 		statusLabel.stringValue = ""
 		attachmentInfoLabel.stringValue = ""
 		timeLabel.stringValue = ""
-
 		pollViewController?.view.removeFromSuperview()
 		pollViewController = nil
 	}
