@@ -60,7 +60,7 @@
                         </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="753" translatesAutoresizingMaskIntoConstraints="NO" id="ndk-SZ-18G">
-                        <rect key="frame" x="166" y="76" width="255" height="14"/>
+                        <rect key="frame" x="166" y="76" width="260" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="© 2022-2023 Fahim Farook. All rights reserved." id="fkg-TA-U2f">
                             <font key="font" usesAppearanceFont="YES"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -105,6 +105,7 @@
                     <constraint firstItem="3hF-b2-x4x" firstAttribute="firstBaseline" secondItem="aKU-Xh-n5s" secondAttribute="firstBaseline" id="dbK-IG-kxH"/>
                     <constraint firstItem="Pi2-Cp-Wtn" firstAttribute="top" secondItem="Y3g-hc-919" secondAttribute="bottom" constant="8" id="fxd-lr-PhB"/>
                     <constraint firstAttribute="bottom" secondItem="Y3g-hc-919" secondAttribute="bottom" constant="40" id="hNJ-RH-D93"/>
+                    <constraint firstAttribute="trailing" secondItem="ndk-SZ-18G" secondAttribute="trailing" constant="16" id="iZr-av-9Fm"/>
                     <constraint firstItem="YT6-si-7jZ" firstAttribute="leading" secondItem="Y3g-hc-919" secondAttribute="trailing" constant="20" id="pEg-3E-9cm"/>
                     <constraint firstItem="Mc0-fw-Wvb" firstAttribute="top" secondItem="YT6-si-7jZ" secondAttribute="bottom" constant="5" id="uKH-ZN-UiZ"/>
                     <constraint firstItem="Mc0-fw-Wvb" firstAttribute="leading" secondItem="YT6-si-7jZ" secondAttribute="leading" id="uSt-Nv-zp2"/>

@@ -27,8 +27,20 @@ class AboutWindowController: NSWindowController {
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
-		if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String, let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
-			versionLabel.stringValue = 🔠("Version: %@ (%@)", version, build)
+		if let dic = Bundle.main.infoDictionary {
+			var ver = "1.0.0"
+			var build = ""
+			if let txt = dic["CFBundleShortVersionString"] as? String {
+				ver = txt
+			}
+			if let txt = dic["CFBundleVersion"] as? String {
+				build = txt
+			}
+			if build.isEmpty {
+				versionLabel.stringValue = "Version: \(ver)"
+			} else {
+				versionLabel.stringValue = "Version: \(ver) (\(build)"
+			}
 		}
 	}
 
