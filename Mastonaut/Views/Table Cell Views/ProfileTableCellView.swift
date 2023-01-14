@@ -42,19 +42,19 @@ class ProfileTableCellView: MastonautTableCellView {
 	@IBOutlet private var fieldsController: ProfileFieldsController!
 
 	private static let bioLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 14),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
 		// vertically when clicked.
 	]
 
 	private static let bioLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.underlineStyle: NSNumber(value: 1),
 	]
 
 	private static let displayNameAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 14, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
 
 	var profileDisplayModeDidChange: ((ProfileViewController.ProfileDisplayMode) -> Void)?

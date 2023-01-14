@@ -39,7 +39,7 @@ class FollowCellView: MastonautTableCellView, NotificationDisplaying {
 	let displayedStatusId: String? = nil
 
 	private static let followLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 	]
 
 	private static let userBioLabelAttributes: [NSAttributedString.Key: AnyObject] = [

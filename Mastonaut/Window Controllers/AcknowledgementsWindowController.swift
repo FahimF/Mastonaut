@@ -53,7 +53,7 @@ private extension Acknowledgements {
 	]
 
 	static let textAttributes: [NSAttributedString.Key: Any] = [
-		.font: NSFont.systemFont(ofSize: 14, weight: .regular),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .regular),
 		.foregroundColor: NSColor.labelColor,
 	]
 

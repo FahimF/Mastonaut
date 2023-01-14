@@ -55,17 +55,17 @@ class InteractionCellView: MastonautTableCellView, NotificationDisplaying {
 
 	private static let reblogLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.statusReblogged,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 	]
 
 	private static let favoriteLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.statusFavorited,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 	]
 
 	private static let interactionLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 	]
 
 	private static let authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
