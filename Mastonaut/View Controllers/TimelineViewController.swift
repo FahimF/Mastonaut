@@ -134,7 +134,6 @@ class TimelineViewController: StatusListViewController {
 			DispatchQueue.main.async { [weak self] in
 				self?.handle(deletedEntry: statusID)
 			}
-			updateCount(count: -1)
 
 		case .notification:
 			break

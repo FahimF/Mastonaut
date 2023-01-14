@@ -48,9 +48,7 @@ class AccountFiltersController: NSObject {
 			if let filters = filterService.filters {
 				self.filters.content = NSMutableArray(array: filters.map(UserFilterWrapper.init))
 			}
-
 			filters.sortDescriptors = [NSSortDescriptor(key: "phrase", ascending: true)]
-
 			filterService.register(observer: self)
 		}
 	}

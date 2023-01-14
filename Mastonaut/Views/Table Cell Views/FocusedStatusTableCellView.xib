@@ -526,11 +526,6 @@
             <point key="canvasLocation" x="59" y="-3"/>
         </tableCellView>
     </objects>
-    <designables>
-        <designable name="mhw-7K-d4x">
-            <size key="intrinsicContentSize" width="400" height="400"/>
-        </designable>
-    </designables>
     <resources>
         <image name="bookmark" width="12" height="14"/>
         <image name="bookmark_active" width="12" height="14"/>

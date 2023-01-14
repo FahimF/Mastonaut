@@ -33,10 +33,10 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	private var accountObservations = [NSKeyValueObservation]()
 
 	// MARK: Toolbar Buttons
-	internal lazy var toolbarContainerView: NSView? = makeToolbarContainerView()
-	internal var currentUserPopUpButton: NSPopUpButton = makeAccountsPopUpButton()
-	private var statusComposerSegmentedControl: NSSegmentedControl = makeStatusComposerSegmentedControl()
-	private var newColumnSegmentedControl: NSSegmentedControl = makeNewColumnSegmentedControl()
+	internal lazy var toolbarContainerView = makeToolbarContainerView()
+	internal var currentUserPopUpButton = makeAccountsPopUpButton()
+	private var statusComposerSegmentedControl = makeStatusComposerSegmentedControl()
+	private var newColumnSegmentedControl = makeNewColumnSegmentedControl()
 	private var userPopUpButtonController: UserPopUpButtonSubcontroller!
 	private var popUpButtonConstraints = [NSLayoutConstraint]()
 	private let columnPopUpButtonMap = NSMapTable<NSViewController, NSPopUpButton>(keyOptions: .weakMemory, valueOptions: .weakMemory)
@@ -837,7 +837,7 @@ extension TimelinesWindowController: AccountsMenuProvider {
 
 private extension TimelinesWindowController {
 	func makeCloseSidebarButton() -> NSSegmentedControl {
-		let button = NSSegmentedControl(images: [#imageLiteral(resourceName: "close_sidebar")], trackingMode: .momentary, target: self, action: #selector(dismissSidebar(_:)))
+		let button = NSSegmentedControl(images: [NSImage(systemSymbolName: "xmark", accessibilityDescription: "Close")!], trackingMode: .momentary, target: self, action: #selector(dismissSidebar(_:)))
 		button.translatesAutoresizingMaskIntoConstraints = false
 		return button
 	}
@@ -858,14 +858,14 @@ private extension TimelinesWindowController {
 
 	// New column button
 	static func makeNewColumnSegmentedControl() -> NSSegmentedControl {
-		let segmentedControl = NSSegmentedControl(images: [#imageLiteral(resourceName: "add_panel")], trackingMode: .momentary, target: nil, action: #selector(addColumnMode(_:)))
+		let segmentedControl = NSSegmentedControl(images: [NSImage(systemSymbolName: "rectangle.split.3x1", accessibilityDescription: "Add New Column")!], trackingMode: .momentary, target: nil, action: #selector(addColumnMode(_:)))
 		segmentedControl.translatesAutoresizingMaskIntoConstraints = false
 		return segmentedControl
 	}
 
 	// Post button
 	static func makeStatusComposerSegmentedControl() -> NSSegmentedControl {
-		let segmentedControl = NSSegmentedControl(images: [#imageLiteral(resourceName: "compose")], trackingMode: .momentary, target: nil, action: #selector(composeStatus(_:)))
+		let segmentedControl = NSSegmentedControl(images: [NSImage(systemSymbolName: "square.and.pencil", accessibilityDescription: "Add Post")!], trackingMode: .momentary, target: nil, action: #selector(composeStatus(_:)))
 		segmentedControl.translatesAutoresizingMaskIntoConstraints = false
 		return segmentedControl
 	}

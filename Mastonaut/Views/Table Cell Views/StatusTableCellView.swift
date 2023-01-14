@@ -313,7 +313,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			cardContainerView.isHidden = true
 			return
 		}
-
 		let cardUrl = card.url
 		cardContainerView.isHidden = false
 		cardTitleLabel.stringValue = card.title
@@ -323,9 +322,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			return
 		}
 		cardImageView.image = #imageLiteral(resourceName: "missing")
-		card.fetchImage {
-			[weak self] image in
-
+		card.fetchImage { [weak self] image in
 			DispatchQueue.main.async {
 				guard self?.cellModel?.status.id == currentlyDisplayedStatusId else {
 					return

@@ -38,7 +38,7 @@
                     <avPlayerView controlsStyle="floating" showsFullScreenToggleButton="YES" showsSharingServiceButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zjN-NI-twc">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="270"/>
                     </avPlayerView>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" allowsMagnification="YES" maxMagnification="5" minMagnification="1" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZIv-xP-jVT">
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" allowsMagnification="YES" maxMagnification="5" minMagnification="1" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="ZIv-xP-jVT">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="270"/>
                         <clipView key="contentView" id="vNG-Hh-xZg">
                             <rect key="frame" x="1" y="1" width="398" height="268"/>

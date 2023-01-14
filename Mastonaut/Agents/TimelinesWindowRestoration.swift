@@ -20,23 +20,15 @@
 import Foundation
 
 @objc class TimelinesWindowRestoration: NSObject, NSWindowRestoration {
-	static func restoreWindow(withIdentifier identifier: NSUserInterfaceItemIdentifier,
-	                          state _: NSCoder,
-	                          completionHandler: @escaping (NSWindow?, Error?) -> Void)
-	{
+	static func restoreWindow(withIdentifier identifier: NSUserInterfaceItemIdentifier, state _: NSCoder, completionHandler: @escaping (NSWindow?, Error?) -> Void) {
 		guard identifier.rawValue == "Timelines" else {
 			completionHandler(nil, Errors.unknownIdentifier)
 			return
 		}
-
-		guard
-			let controller = AppDelegate.shared.makeNewTimelinesWindow(forDecoder: true),
-			let window = controller.window
-		else {
+		guard let controller = AppDelegate.shared.makeNewTimelinesWindow(forDecoder: true), let window = controller.window else {
 			completionHandler(nil, Errors.windowCreationFailed)
 			return
 		}
-
 		completionHandler(window, nil)
 	}
 
