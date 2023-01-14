@@ -165,6 +165,12 @@ class TimelinesViewController: NSViewController {
 		return oldColumnViewController
 	}
 
+	func reload() {
+		for cvc in columnViewControllers {
+			cvc.reload()
+		}
+	}
+	
 	func reloadColumn(at index: Int) {
 		columnViewControllers[index].reload()
 	}

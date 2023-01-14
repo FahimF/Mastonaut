@@ -36,6 +36,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	internal lazy var toolbarContainerView = makeToolbarContainerView()
 	internal var currentUserPopUpButton = makeAccountsPopUpButton()
 	private var statusComposerSegmentedControl = makeStatusComposerSegmentedControl()
+	private var reloadSegmentedControl = makeReloadSegmentedControl()
 	private var newColumnSegmentedControl = makeNewColumnSegmentedControl()
 	private var userPopUpButtonController: UserPopUpButtonSubcontroller!
 	private var popUpButtonConstraints = [NSLayoutConstraint]()
@@ -127,6 +128,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 				window?.title = "Mastonaut — No Account Selected"
 			}
 			statusComposerSegmentedControl.isHidden = !hasUser
+			reloadSegmentedControl.isHidden = !hasUser
 			newColumnSegmentedControl.isHidden = !hasUser
 			timelinesViewController.columnViewControllers.forEach { columnPopUpButtonMap.object(forKey: $0)?.isHidden = !hasUser }
 			columnPopUpButtonMap.objectEnumerator()?.forEach { ($0 as? NSControl)?.isHidden = !hasUser }
@@ -426,7 +428,7 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		var constraints: [NSLayoutConstraint] = []
 		let contentView = timelinesViewController.mainContentView
 
-		[currentUserPopUpButton, statusComposerSegmentedControl, newColumnSegmentedControl].forEach {
+		[currentUserPopUpButton, statusComposerSegmentedControl, reloadSegmentedControl, newColumnSegmentedControl].forEach {
 			toolbarView.addSubview($0)
 			let referenceView = toolbarView.superview ?? toolbarView
 			constraints.append(referenceView.centerYAnchor.constraint(equalTo: $0.centerYAnchor))
@@ -434,7 +436,8 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 		constraints.append(TrackingLayoutConstraint.constraint(trackingMaxXOf: contentView, targetView: newColumnSegmentedControl, containerView: toolbarView, targetAttribute: .trailing, containerAttribute: .leading).with(priority: .defaultLow))
 		constraints.append(contentsOf: [
 			currentUserPopUpButton.leadingAnchor.constraint(equalTo: toolbarView.leadingAnchor, constant: 6),
-			newColumnSegmentedControl.leadingAnchor.constraint(equalTo: statusComposerSegmentedControl.trailingAnchor, constant: 8),
+			reloadSegmentedControl.leadingAnchor.constraint(equalTo: statusComposerSegmentedControl.trailingAnchor, constant: 8),
+			newColumnSegmentedControl.leadingAnchor.constraint(equalTo: reloadSegmentedControl.trailingAnchor, constant: 8),
 			toolbarView.trailingAnchor.constraint(greaterThanOrEqualTo: newColumnSegmentedControl.trailingAnchor, constant: 6),
 		])
 		NSLayoutConstraint.activate(constraints)
@@ -741,6 +744,10 @@ extension TimelinesWindowController {
 		composerWindowController.currentAccount = currentAccount
 	}
 
+	@IBAction func reload(_ sender: Any?) {
+		timelinesViewController.reload()
+	}
+	
 	@IBAction func showSearch(_: Any?) {
 		presentSearchWindow()
 	}
@@ -870,6 +877,12 @@ private extension TimelinesWindowController {
 		return segmentedControl
 	}
 
+	static func makeReloadSegmentedControl() -> NSSegmentedControl {
+		let segmentedControl = NSSegmentedControl(images: [NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: "Reload")!], trackingMode: .momentary, target: nil, action: #selector(reload(_:)))
+		segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+		return segmentedControl
+	}
+	
 	func makeToolbarContainerView() -> NSView? {
 		guard let toolbarView: NSView = (window as? ToolbarWindow)?.toolbarView else {
 			return nil
