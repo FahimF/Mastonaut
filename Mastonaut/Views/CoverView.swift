@@ -57,7 +57,7 @@ class CoverView: BorderView {
 		label.maximumNumberOfLines = 0
 		label.alignment = .center
 		label.textColor = textColor
-		label.font = NSFont.systemFont(ofSize: 12, weight: .semibold)
+		label.font = NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold)
 		label.setContentHuggingPriority(.defaultLow, for: .horizontal)
 		label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 		label.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
