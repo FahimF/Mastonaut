@@ -112,13 +112,14 @@ private extension String {
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		replacementRanges.removeAll()
 		// Mastodon always counts every link URL as having 23 characters, regardless of the actual length of the URL.
-		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) {result, _, _ in
-				guard let result = result, result.numberOfRanges > 1 else {
-					return
-				}
-				let prefix = mutableCopy.substring(with: result.range(at: 1))
-				replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)"
+		NSRegularExpression.uriRegex.enumerateMatches(in: mutableCopy as String, options: [], range: mutableCopy.range) { result, _, _ in
+			guard let result = result, result.numberOfRanges > 1 else {
+				return
 			}
+			let prefix = mutableCopy.substring(with: result.range(at: 1))
+			let suffix = mutableCopy.substring(with: result.range(at: result.numberOfRanges - 1))
+			replacementRanges[result.range] = "\(prefix)\(String.linkPlaceholder)\(suffix)"
+		}
 		mutableCopy.replaceCharacters(in: replacementRanges)
 		return (mutableCopy as String).count
 	}

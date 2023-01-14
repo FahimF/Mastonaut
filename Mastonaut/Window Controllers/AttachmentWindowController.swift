@@ -82,6 +82,9 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 //		repositionWindow(for: attachment, senderWindow: senderWindow)
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
+		shareButton.setInvisible(true, animated: false)
+		shareShadowView.setInvisible(true, animated: false)
+		setNextPreviousButtonsHidden(true)
 		imageView.image = image ?? #imageLiteral(resourceName: "missing")
 	}
 

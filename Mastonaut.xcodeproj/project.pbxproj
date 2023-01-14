@@ -587,6 +587,7 @@
 		DD3DA9BD2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
 		DD3DA9BE2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
 		DD3DA9BF2932F27100AA0ABA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DA9BC2932F27100AA0ABA /* Constants.swift */; };
+		DDB00CCE29728F1A00323AAB /* ReplaceCharactersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDB00CCD29728F1A00323AAB /* ReplaceCharactersTests.swift */; };
 		FFCDECEB3FA1B6319EDD0664 /* Pods_MastonautTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D6AE63926CBA301063B221 /* Pods_MastonautTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -1082,6 +1083,7 @@
 		DD3DA9A9292A40A500AA0ABA /* Bookmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmarks.swift; sourceTree = "<group>"; };
 		DD3DA9AF292CAA5F00AA0ABA /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		DD3DA9BC2932F27100AA0ABA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		DDB00CCD29728F1A00323AAB /* ReplaceCharactersTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceCharactersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1722,10 +1724,11 @@
 			isa = PBXGroup;
 			children = (
 				153709182295A2B3002B99DF /* Resources */,
-				15DE367622443FFA00480949 /* MastonautTests.swift */,
-				153709162295A297002B99DF /* ImageResizeTests.swift */,
 				15DE367822443FFA00480949 /* Info.plist */,
+				153709162295A297002B99DF /* ImageResizeTests.swift */,
+				15DE367622443FFA00480949 /* MastonautTests.swift */,
 				154B6BC6234A16C50025A9DB /* NavigationStackTests.swift */,
+				DDB00CCD29728F1A00323AAB /* ReplaceCharactersTests.swift */,
 			);
 			path = MastonautTests;
 			sourceTree = "<group>";
@@ -2866,6 +2869,7 @@
 			files = (
 				15DE367722443FFA00480949 /* MastonautTests.swift in Sources */,
 				154B6BC7234A16C50025A9DB /* NavigationStackTests.swift in Sources */,
+				DDB00CCE29728F1A00323AAB /* ReplaceCharactersTests.swift in Sources */,
 				153709172295A297002B99DF /* ImageResizeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

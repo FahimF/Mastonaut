@@ -55,6 +55,16 @@
          </AdditionalOption>
       </AdditionalOptions>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "15DE367322443FF900480949"
+               BuildableName = "MastonautTests.xctest"
+               BlueprintName = "MastonautTests"
+               ReferencedContainer = "container:Mastonaut.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
