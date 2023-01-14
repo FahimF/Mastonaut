@@ -18,6 +18,7 @@
 //
 
 import Cocoa
+import CoreTootin
 
 class AcknowledgementsWindowController: NSWindowController {
 	@IBOutlet private var textView: NSTextView!

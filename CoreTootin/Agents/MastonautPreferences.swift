@@ -119,6 +119,16 @@ public class MastonautPreferences: PreferencesController {
 		frames["\(index)"] = NSStringFromRect(frame)
 		prefs.setValue(frames, forKey: "MastonautPreferences.preservedWindowFrames")
 	}
+	
+	// MARK: - Global preferences
+	@objc public dynamic var showBoostsInProfile: Bool {
+		get {
+			return bool(forKey: #keyPath(showBoostsInProfile)) ?? false
+		}
+		set {
+			prefs.setValue(newValue, forKey: #keyPath(showBoostsInProfile))			
+		}
+	}
 }
 
 public extension MastonautPreferences {

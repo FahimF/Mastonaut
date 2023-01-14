@@ -38,8 +38,13 @@ class ProfileTableCellView: MastonautTableCellView {
 	@IBOutlet private unowned var followersCountLabel: NSTextField!
 
 	@IBOutlet private unowned var listSourceSegmentedControl: NSSegmentedControl!
+	@IBOutlet private unowned var showBoostsCheckbox: NSButton!
 
 	@IBOutlet private var fieldsController: ProfileFieldsController!
+
+	enum RelationshipInteraction {
+		case follow, unfollow, block, unblock, mute, unmute
+	}
 
 	private static let bioLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
@@ -71,10 +76,37 @@ class ProfileTableCellView: MastonautTableCellView {
 	override func awakeFromNib() {
 		super.awakeFromNib()
 		userBioLabel.linkTextAttributes = ProfileTableCellView.bioLabelLinkAttributes
+		showBoostsCheckbox.state = MastonautPreferences.instance.showBoostsInProfile ? NSControl.StateValue.on : NSControl.StateValue.off
 		relationshipButtonsContainer.isHidden = true
 		relationshipLabel.isHidden = true
 	}
 
+	// MARK: - Actions
+	@IBAction func profileAvatarClicked(_ sender: Any?) {
+		let controller = AppDelegate.shared.attachmentWindowController
+		if !controller.isWindowLoaded {
+			controller.loadWindow()
+		}
+		controller.set(image: avatarImageView.image)
+		controller.showWindow(nil)
+	}
+	
+	@IBAction func profileModeSegmentedControlAction(_ sender: NSSegmentedControl) {
+		guard let didChangeBlock = profileDisplayModeDidChange else { return }
+
+		switch sender.selectedSegment {
+		case 0: didChangeBlock(.statuses)
+		case 1: didChangeBlock(.statusesAndReplies)
+		case 2: didChangeBlock(.mediaOnly)
+		default: break
+		}
+	}
+
+	@IBAction func showBoostsInProfileChecked(_ sender: NSButton) {
+		MastonautPreferences.instance.showBoostsInProfile = showBoostsCheckbox.state == NSControl.StateValue.on
+	}
+	
+	// MARK: - Internal Methods
 	func clear() {
 		fieldsController.set(account: nil)
 		userBioLabel.stringValue = ""
@@ -152,21 +184,6 @@ class ProfileTableCellView: MastonautTableCellView {
 		} else {
 			headerImageView.image = #imageLiteral(resourceName: "missing_header")
 		}
-	}
-
-	@IBAction func profileModeSegmentedControlAction(_ sender: NSSegmentedControl) {
-		guard let didChangeBlock = profileDisplayModeDidChange else { return }
-
-		switch sender.selectedSegment {
-		case 0: didChangeBlock(.statuses)
-		case 1: didChangeBlock(.statusesAndReplies)
-		case 2: didChangeBlock(.mediaOnly)
-		default: break
-		}
-	}
-
-	enum RelationshipInteraction {
-		case follow, unfollow, block, unblock, mute, unmute
 	}
 }
 

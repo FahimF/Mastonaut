@@ -55,7 +55,7 @@ class ViewingPreferencesController: NSViewController {
 		preferenceObservers.append(PreferenceCheckboxObserver(preference: \.autoplayVideos, checkbox: autoplayVideosButton))
 	}
 	
-	@IBAction func normalTextSizeChanged(sender: AnyObject) {
+	@IBAction func normalTextSizeChanged(sender: Any) {
 		normalTextSizeLabel.stringValue = "Normal text size (\(normalTextSizeSlider.stringValue)px):"
 		MastonautPreferences.instance.normalTextSize = CGFloat(normalTextSizeSlider.intValue)
 	}

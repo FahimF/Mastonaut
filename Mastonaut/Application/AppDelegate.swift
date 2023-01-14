@@ -33,11 +33,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 	private(set) lazy var aboutWindowController = AboutWindowController()
 	private(set) lazy var attachmentWindowController = AttachmentWindowController()
 	private(set) lazy var notificationAgent = UserNotificationAgent()
-	private(set) lazy var accountsService = AccountsService(context: managedObjectContext,
-	                                                        keychainController: keychain.keychainController)
-	private(set) lazy var instanceService = InstanceService(urlSessionConfiguration: URLSessionConfiguration.forClients,
-	                                                        keychainController: keychain.keychainController,
-	                                                        accountsService: accountsService)
+	private(set) lazy var accountsService = AccountsService(context: managedObjectContext, keychainController: keychain.keychainController)
+	private(set) lazy var instanceService = InstanceService(urlSessionConfiguration: URLSessionConfiguration.forClients, keychainController: keychain.keychainController, accountsService: accountsService)
 
 	private var _preferencesWindowController: PreferencesWindowController?
 

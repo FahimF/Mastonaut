@@ -50,11 +50,11 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
-		hoverView.mouseEntered = {
-			[unowned self] in self.setControlsHidden(false)
+		hoverView.mouseEntered = { [unowned self] in
+			self.setControlsHidden(false)
 		}
-		hoverView.mouseExited = {
-			[unowned self] in self.setControlsHidden(true)
+		hoverView.mouseExited = { [unowned self] in
+			self.setControlsHidden(true)
 		}
 		if let (attachment, attachmentGroup, senderWindow) = attachmentsPendingWindowLoad {
 			attachmentsPendingWindowLoad = nil
@@ -73,6 +73,16 @@ class AttachmentWindowController: NSWindowController, NSMenuItemValidation {
 		self.attachmentGroup = attachmentGroup.asIndexedGroup(initialIndex: currentIndex)
 		repositionWindow(for: attachment, senderWindow: senderWindow)
 		setCurrentAttachment(attachment, currentPreview: attachmentGroup.preview(for: attachment))
+	}
+
+	func set(image: NSImage?, senderWindow: NSWindow? = nil) {
+		guard isWindowLoaded else {
+			return
+		}
+//		repositionWindow(for: attachment, senderWindow: senderWindow)
+		videoPlayerView.isHidden = true
+		imageView.isHidden = false
+		imageView.image = image ?? #imageLiteral(resourceName: "missing")
 	}
 
 	func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
@@ -137,8 +147,9 @@ private extension AttachmentWindowController {
 		let finalFrame = NSRect(x: screen.frame.origin.x + (screen.frame.width - finalSize.width) * 0.5, y: screen.frame.origin.y + (screen.frame.height - finalSize.height) * 0.5, width: finalSize.width, height: finalSize.height)
 		window.setFrame(finalFrame, display: true, animate: true)
 	}
-
-	func setCurrentAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
+	
+	// MARK: - Private Methods
+	private func setCurrentAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		setNextPreviousButtonsHidden(false)
 		currentAttachment = currentPreview.map { (attachment, $0) }
 		updateShareMenu(with: attachment, image: currentPreview)
@@ -158,7 +169,7 @@ private extension AttachmentWindowController {
 		}
 	}
 
-	func setImageAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
+	private func setImageAttachment(_ attachment: Attachment, currentPreview: NSImage?) {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
 		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
@@ -217,7 +228,7 @@ private extension AttachmentWindowController {
 		loadingTask = task
 	}
 
-	func setVideoAttachment(_ attachment: Attachment, currentPreview _: NSImage?, shouldLoop: Bool) {
+	private func setVideoAttachment(_ attachment: Attachment, currentPreview _: NSImage?, shouldLoop: Bool) {
 		videoPlayerView.isHidden = false
 		imageView.isHidden = true
 		guard let url = URL(string: attachment.remoteURL ?? attachment.url) else {
@@ -238,13 +249,13 @@ private extension AttachmentWindowController {
 		}
 	}
 
-	func setFailedLoadingContent() {
+	private func setFailedLoadingContent() {
 		videoPlayerView.isHidden = true
 		imageView.isHidden = false
 		imageView.image = NSImage.previewErrorImage
 	}
 
-	func updateShareMenu(with attachment: Attachment, image: NSImage?) {
+	private func updateShareMenu(with attachment: Attachment, image: NSImage?) {
 		guard let shareItem = shareMenu.item(withTag: 1000) else {
 			return
 		}
@@ -252,7 +263,7 @@ private extension AttachmentWindowController {
 		shareMenu.setSubmenu(ShareMenuFactory.shareMenu(for: bestUrl, previewImage: image), for: shareItem)
 	}
 
-	func writeImage(to url: URL) {
+	private func writeImage(to url: URL) {
 		guard let image = currentAttachment?.image, let fileType = currentAttachment?.attachment.parsedUrl.fileUTI else {
 			return
 		}
