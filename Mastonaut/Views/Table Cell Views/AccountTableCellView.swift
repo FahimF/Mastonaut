@@ -29,7 +29,7 @@ class AccountTableCellView: NSTableCellView {
 	@IBOutlet var issueIndicatorImageView: NSImageView!
 
 	private static let nameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
 
 	private(set) var displayedAccountUUID: UUID?

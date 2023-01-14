@@ -60,32 +60,32 @@ class ProfileFieldsController: NSObject {
 	}()
 
 	private static let nameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let verifiedNameLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 13),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let verifiedValueLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.systemGreen, .font: NSFont.labelFont(ofSize: 13),
+		.foregroundColor: NSColor.systemGreen, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.safeControlTintColor, .font: NSFont.systemFont(ofSize: 13, weight: .medium),
+		.foregroundColor: NSColor.safeControlTintColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 
 	private static let valueLabelVerifiedLinkAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: 13, weight: .medium),
+		.foregroundColor: NSColor.systemGreen, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.paragraphStyle: sharedParagraphStyle,
 	]
 

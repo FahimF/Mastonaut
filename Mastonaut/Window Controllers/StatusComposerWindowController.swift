@@ -75,16 +75,16 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 	private lazy var userPopUpButtonController = UserPopUpButtonSubcontroller(display: self)
 
 	private static let authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
 
 	private static let statusLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 13),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 	]
 
 	private static let statusLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
-		.font: NSFont.systemFont(ofSize: 13, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.underlineStyle: NSNumber(value: 1),
 	]
 

@@ -40,12 +40,12 @@ extension Array where Element == AuthorizedAccount {
 				.mutableCopy() as! NSMutableAttributedString
 
 			if attributedTitle.length != (itemTitle as NSString).length {
-				attributedTitle.addAttribute(.font, value: NSFont.menuFont(ofSize: 13), range: NSMakeRange(0, attributedTitle.length))
+				attributedTitle.addAttribute(.font, value: NSFont.menuFont(ofSize: MastonautPreferences.instance.normalTextSize), range: NSMakeRange(0, attributedTitle.length))
 				menuItem.attributedTitle = attributedTitle
 			}
 			if displayNames.count != count, let domain = account.baseDomain {
 				attributedTitle.append(NSAttributedString(string: "\n"))
-				attributedTitle.setAttributes([.font: NSFont.menuFont(ofSize: 13)], range: NSMakeRange(0, attributedTitle.length))
+				attributedTitle.setAttributes([.font: NSFont.menuFont(ofSize: MastonautPreferences.instance.normalTextSize)], range: NSMakeRange(0, attributedTitle.length))
 				let instanceAttributedString = NSAttributedString(string: domain, attributes: [.font: NSFont.menuFont(ofSize: 9)])
 				attributedTitle.append(instanceAttributedString)
 				menuItem.attributedTitle = attributedTitle

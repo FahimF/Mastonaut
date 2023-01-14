@@ -20,7 +20,7 @@
             <rect key="contentRect" x="458" y="351" width="440" height="208"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2056" height="1285"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="440" height="208"/>
+                <rect key="frame" x="0.0" y="0.0" width="474" height="208"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y3g-hc-919">
@@ -60,7 +60,7 @@
                         </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="753" translatesAutoresizingMaskIntoConstraints="NO" id="ndk-SZ-18G">
-                        <rect key="frame" x="166" y="76" width="260" height="14"/>
+                        <rect key="frame" x="166" y="76" width="294" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="© 2022-2023 Fahim Farook. All rights reserved." id="fkg-TA-U2f">
                             <font key="font" usesAppearanceFont="YES"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

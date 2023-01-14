@@ -49,7 +49,7 @@ class StatusSearchResultsViewController: SearchResultsViewController<Account> {
 
 class StatusResultTableCellView: NSTableCellView {
 	private static let displayNameAttributes: [NSAttributedString.Key: AnyObject] = [
-		.font: NSFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: NSColor.labelColor,
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold), .foregroundColor: NSColor.labelColor,
 		.underlineStyle: NSNumber(value: 0),
 	]
 

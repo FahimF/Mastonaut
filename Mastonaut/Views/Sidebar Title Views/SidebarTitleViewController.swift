@@ -18,6 +18,7 @@
 //
 
 import Cocoa
+import CoreTootin
 
 class SidebarTitleViewController: NSViewController {
 	@IBOutlet unowned var leftSideButton: NSButton!
@@ -27,7 +28,7 @@ class SidebarTitleViewController: NSViewController {
 	private var observations: [NSKeyValueObservation] = []
 
 	static let standaloneTitleAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
 
 	static let titleAttributes: [NSAttributedString.Key: AnyObject] = [

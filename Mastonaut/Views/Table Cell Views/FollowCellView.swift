@@ -43,14 +43,14 @@ class FollowCellView: MastonautTableCellView, NotificationDisplaying {
 	]
 
 	private static let userBioLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 13),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
 		// vertically when clicked.
 	]
 
 	private static let bioLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
-		.font: NSFont.systemFont(ofSize: 13, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.underlineStyle: NSNumber(value: 1),
 	]
 
