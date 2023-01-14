@@ -27,13 +27,8 @@ class AboutWindowController: NSWindowController {
 
 	override func windowDidLoad() {
 		super.windowDidLoad()
-
-		// Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-		if
-			let bundleVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
-			let bundleBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
-		{
-			versionLabel.stringValue = 🔠("Version: %@ (%@)", bundleVersion, bundleBuild)
+		if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String, let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
+			versionLabel.stringValue = 🔠("Version: %@ (%@)", version, build)
 		}
 	}
 
@@ -42,11 +37,11 @@ class AboutWindowController: NSWindowController {
 	}
 
 	@IBAction func openHomepage(_: Any?) {
-		NSWorkspace.shared.open(URL(string: "https://mastonaut.app")!)
+		NSWorkspace.shared.open(URL(string: "https://github.com/FahimF/Mastonaut")!)
 	}
 
 	@IBAction func openPrivacyPolicy(_: Any?) {
-		NSWorkspace.shared.open(URL(string: "https://mastonaut.app/privacy")!)
+		NSWorkspace.shared.open(URL(string: "https://github.com/FahimF/Mastonaut")!)
 	}
 
 	@IBAction func orderFrontAcknowledgementsWindow(_ sender: Any?) {

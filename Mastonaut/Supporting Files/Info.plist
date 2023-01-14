@@ -51,7 +51,7 @@
 		<true/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2019-2021 Bruno Philipe. All rights reserved.</string>
+	<string>Copyright © 2022-2023 Fahim Farook. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
