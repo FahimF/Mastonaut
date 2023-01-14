@@ -541,8 +541,8 @@
                             </connections>
                         </segmentedControl>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CRn-vo-GVd">
-                            <rect key="frame" x="-2" y="-1" width="147" height="18"/>
-                            <buttonCell key="cell" type="check" title="Do not show boosts" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Tl9-SC-gne">
+                            <rect key="frame" x="-2" y="-1" width="224" height="18"/>
+                            <buttonCell key="cell" type="check" title="Show boosted posts by this user" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Tl9-SC-gne">
                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>

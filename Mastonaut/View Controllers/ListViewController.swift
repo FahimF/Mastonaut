@@ -161,28 +161,27 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 	internal func reloadList() {
 		assert(Thread.isMainThread)
-
 		let entryCount = entryList.count
 		var removedIndexSet = IndexSet(0 ..< entryCount)
-
-		pendingFetchTasks.forEach { $0.task?.cancel() }
+		pendingFetchTasks.forEach {
+			$0.task?.cancel()
+		}
 		pendingFetchTasks.removeAll()
-
 		entryList.removeAll(where: { $0.isSpecial == false })
 		cleanupSpecialRows(&entryList)
-
 		entryMap.removeAll()
-
 		entryList.enumerated().forEach { removedIndexSet.remove($0.0) }
-
 		guard tableView != nil else { return }
-
 		if client != nil {
 			tableView.removeRows(at: removedIndexSet, withAnimation: .effectFade)
-			if entryList.isEmpty { insertSpecialRows() }
+			if entryList.isEmpty {
+				insertSpecialRows()
+			}
 			fetchEntries(for: .above)
 		} else {
-			if entryList.isEmpty { insertSpecialRows() }
+			if entryList.isEmpty {
+				insertSpecialRows()
+			}
 			tableView.reloadData()
 		}
 	}
@@ -269,7 +268,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 
 	internal func run(request: Request<[Entry]>, for insertion: InsertionPoint) {
 		let futurePromise = Promise<FutureTask>()
-
 		guard let future = client?.run(request, resumeImmediately: false, completion: {[weak self] result in
 			DispatchQueue.main.async {
 				guard let self = self else { return }
@@ -294,16 +292,16 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 			return
 		}
 		futurePromise.value = future
-		// If you hit this you have thread safety issues because pendingFetchTasks
-		// is not synchronized and is accessed from the main thread in other places.
+		// If you hit this you have thread safety issues because pendingFetchTasks is not synchronized and is accessed from the main thread in other places.
 		assert(Thread.isMainThread)
 		pendingFetchTasks.insert(future)
-		future.resolutionHandler = { task in task.resume() }
+		future.resolutionHandler = {
+			task in task.resume()
+		}
 	}
 
 	internal func failedLoadingEntries(for request: Request<[Entry]>, error: Error?, insertion: InsertionPoint) {
 		log.info("Failed fetching timeline: \(error?.localizedDescription ?? "nil error")")
-
 		if case let .atIndex(index) = insertion {
 			expandersPendingLoadCompletion.remove(index)
 			if let expanderCell = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? ExpanderCellView {
@@ -311,7 +309,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 			}
 			return
 		}
-
 		// FIXME: This should be handled better. For now we simply retry after a delay:
 		DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
 			[weak self] in self?.run(request: request, for: insertion)
@@ -349,7 +346,6 @@ class ListViewController<Entry: ListViewPresentable & Codable>: NSViewController
 		guard let entryIndex = entryList.firstIndex(where: { $0 == entryReference }) else {
 			return
 		}
-
 		entryList.remove(at: entryIndex)
 		entryReference.entryKey.map { _ = entryMap.removeValue(forKey: $0) }
 		tableView.removeRowsAnimatingIfVisible(at: IndexSet(integer: entryIndex))

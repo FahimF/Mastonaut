@@ -46,6 +46,9 @@ class ProfileTableCellView: MastonautTableCellView {
 		case follow, unfollow, block, unblock, mute, unmute
 	}
 
+	var profileDisplayModeDidChange: ((ProfileViewController.ProfileDisplayMode, Bool) -> Void)?
+	var relationshipInteractionHandler: ((RelationshipInteraction) -> Void)?
+
 	private static let bioLabelAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
@@ -61,9 +64,6 @@ class ProfileTableCellView: MastonautTableCellView {
 	private static let displayNameAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
-
-	var profileDisplayModeDidChange: ((ProfileViewController.ProfileDisplayMode) -> Void)?
-	var relationshipInteractionHandler: ((RelationshipInteraction) -> Void)?
 
 	func setProfileDisplayMode(_ mode: ProfileViewController.ProfileDisplayMode) {
 		switch mode {
@@ -93,17 +93,23 @@ class ProfileTableCellView: MastonautTableCellView {
 	
 	@IBAction func profileModeSegmentedControlAction(_ sender: NSSegmentedControl) {
 		guard let didChangeBlock = profileDisplayModeDidChange else { return }
-
 		switch sender.selectedSegment {
-		case 0: didChangeBlock(.statuses)
-		case 1: didChangeBlock(.statusesAndReplies)
-		case 2: didChangeBlock(.mediaOnly)
+		case 0: didChangeBlock(.statuses, false)
+		case 1: didChangeBlock(.statusesAndReplies, false)
+		case 2: didChangeBlock(.mediaOnly, false)
 		default: break
 		}
 	}
 
 	@IBAction func showBoostsInProfileChecked(_ sender: NSButton) {
 		MastonautPreferences.instance.showBoostsInProfile = showBoostsCheckbox.state == NSControl.StateValue.on
+		guard let didChangeBlock = profileDisplayModeDidChange else { return }
+		switch listSourceSegmentedControl.selectedSegment {
+		case 0: didChangeBlock(.statuses, true)
+		case 1: didChangeBlock(.statusesAndReplies, true)
+		case 2: didChangeBlock(.mediaOnly, true)
+		default: break
+		}
 	}
 	
 	// MARK: - Internal Methods

@@ -29,19 +29,31 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 	private var pinnedStatusList: [String] = []
 
 	private var displayMode: ProfileDisplayMode = .statuses {
-		didSet { account.map { source = displayMode.listSource(for: $0.id) } }
+		didSet {
+			account.map {
+				source = displayMode.listSource(for: $0.id)
+			}
+		}
 	}
 
 	internal var account: Account? {
-		didSet { account.map { prepareToDisplay(account: $0) } }
+		didSet {
+			account.map {
+				prepareToDisplay(account: $0)
+			}
+		}
 	}
 
 	private var accountAvatarImage: NSImage? {
-		didSet { updateAvatarImage() }
+		didSet {
+			updateAvatarImage()
+		}
 	}
 
 	private var accountHeaderImage: NSImage? {
-		didSet { updateHeaderImage() }
+		didSet {
+			updateHeaderImage()
+		}
 	}
 
 	var sidebarModelValue: SidebarModel {
@@ -57,7 +69,6 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 			let font = SidebarTitleViewController.titleAttributes[.font] as? NSFont
 			let emojiTitle = NSAttributedString(string: account.bestDisplayName)
 				.applyingEmojiAttachments(account.cacheableEmojis, font: font)
-
 			return .subtitle(title: emojiTitle, subtitle: NSAttributedString(string: accountURI))
 		} else {
 			return .title(accountURI)
@@ -67,41 +78,33 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 	init(account: Account, instance: Instance) {
 		accountURI = account.uri(in: instance)
 		self.account = account
-
 		super.init(source: displayMode.listSource(for: account.id))
 	}
 
 	init(uri: String, currentAccount: AuthorizedAccount?, client: ClientType) {
 		accountURI = uri
-
 		super.init(source: nil)
 
 		clearProfileView()
 
 		if currentAccount?.uri == uri {
-			client.run(Accounts.currentUser()) {
-				[weak self, client] result in
-
+			client.run(Accounts.currentUser()) { [weak self, client] result in
 				DispatchQueue.main.async {
 					guard case let .success(account, _) = result else {
 						self?.setProfileNotFound()
 						return
 					}
-
 					self?.setRecreatedAccount(account)
 					self?.client = client
 				}
 			}
 		} else {
-			client.run(Accounts.search(query: uri, limit: 1, resolve: true)) {
-				[weak self, client] result in
-
+			client.run(Accounts.search(query: uri, limit: 1, resolve: true)) { [weak self, client] result in
 				DispatchQueue.main.async {
 					guard case let .success(accounts, _) = result, let account = accounts.first else {
 						self?.setProfileNotFound()
 						return
 					}
-
 					self?.setRecreatedAccount(account)
 					self?.client = client
 				}
@@ -128,16 +131,13 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 
 	override func clientDidChange(_ client: ClientType?, oldClient: ClientType?) {
 		super.clientDidChange(client, oldClient: oldClient)
-
 		guard let account = account else { return }
-
 		prepareToDisplay(account: account)
 		fetchPinnedStatuses()
 	}
 
 	override func sourceDidChange(source: TimelineViewController.Source?) {
 		reloadList()
-
 		if case .some(.userStatuses) = source {
 			fetchPinnedStatuses()
 		}
@@ -145,7 +145,6 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 
 	private func fetchPinnedStatuses() {
 		guard let client = client, let accountID = account?.id else { return }
-
 		client.run(Accounts.statuses(id: accountID, pinnedOnly: true)) {
 			[weak self] result in
 
@@ -178,8 +177,17 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 	}
 
 	override func prepareNewEntries(_ entries: [Status], for insertion: ListViewController<Status>.InsertionPoint, pagination: Pagination?) -> Int {
-		let (pinnedEntries, filteredEntries) = entries.segregated(using: { $0.pinned == true })
+		var (pinnedEntries, filteredEntries) = entries.segregated(using: { $0.pinned == true })
 		prepareNewPinnedStatuses(pinnedEntries)
+		// Filter filtered entries if hide boosts is on
+		if !MastonautPreferences.instance.showBoostsInProfile {
+			filteredEntries = filteredEntries.filter({ post in
+				if let boost = post.reblog {
+					return false
+				}
+				return true
+			})
+		}
 		return super.prepareNewEntries(filteredEntries, for: insertion, pagination: pagination)
 	}
 
@@ -323,38 +331,31 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 
 	private func updateAccountControls() {
 		guard !entryList.isEmpty, let profileCellView = profileCellView() else { return }
-
 		guard let account = account else {
 			profileCellView.clear()
 			return
 		}
-
 		profileCellView.updateAccountControls(with: account)
 		profileCellView.setProfileDisplayMode(displayMode)
-		profileCellView.profileDisplayModeDidChange = { [unowned self] in self.displayMode = $0 }
-
+		profileCellView.profileDisplayModeDidChange = { [unowned self] mode, forceChange in
+			self.displayMode = mode
+			if forceChange {
+				reloadList()
+			}
+		}
 		if let linkHandler = authorizedAccountProvider {
 			profileCellView.set(linkHandler: linkHandler)
 		}
-
-		guard
-			let authorizedAccount = authorizedAccountProvider?.currentAccount,
-			let client = client
-		else { return }
-
+		guard let authorizedAccount = authorizedAccountProvider?.currentAccount, let client = client else { return }
 		let relationshipService = RelationshipsService(client: client, authorizedAccount: authorizedAccount)
-
 		relationshipService.relationship(with: account) { profileCellView.setRelationship($0) }
-		profileCellView.relationshipInteractionHandler = {
-			[unowned self] interaction in
-
+		profileCellView.relationshipInteractionHandler = { [unowned self] interaction in
 			self.process(relationshipInteraction: interaction, relationshipService: relationshipService)
 		}
 	}
 
 	private func process(relationshipInteraction: ProfileTableCellView.RelationshipInteraction, relationshipService service: RelationshipsService) {
 		guard let account = account else { return }
-
 		let completion: (Result<AccountReference, RelationshipsService.Errors>) -> Void = {[weak self, account] result in
 			guard let profileCellView = self?.profileCellView() else { return }
 			guard case let .success(reference) = result else {
@@ -375,7 +376,6 @@ class ProfileViewController: TimelineViewController, SidebarPresentable, Account
 
 	private func updateAvatarImage() {
 		guard let account = account, let profileCellView = profileCellView() else { return }
-
 		if let avatarImage = accountAvatarImage {
 			profileCellView.setAvatar(with: avatarImage)
 		} else if let avatarURL = account.avatarURL {
