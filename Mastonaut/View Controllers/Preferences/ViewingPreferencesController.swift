@@ -21,6 +21,9 @@ import Cocoa
 import CoreTootin
 
 class ViewingPreferencesController: NSViewController {
+	@IBOutlet private var normalTextSizeLabel: NSTextField!
+	@IBOutlet private var normalTextSizeSlider: NSSlider!
+	
 	@IBOutlet private var sensitiveMediaHideSensitiveButton: NSButton!
 	@IBOutlet private var sensitiveMediaAlwaysRevealButton: NSButton!
 	@IBOutlet private var sensitiveMediaAlwaysHideButton: NSButton!
@@ -35,26 +38,25 @@ class ViewingPreferencesController: NSViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+		normalTextSizeSlider.intValue = Int32(MastonautPreferences.instance.normalTextSize)
+		normalTextSizeLabel.stringValue = "Normal text size (\(normalTextSizeSlider.stringValue)px):"
 		let sensitiveMediaButtonMap: [MastonautPreferences.MediaDisplayMode: NSButton] = [
 			.alwaysHide: sensitiveMediaAlwaysHideButton,
 			.hideSensitiveMedia: sensitiveMediaHideSensitiveButton,
 			.alwaysReveal: sensitiveMediaAlwaysRevealButton,
 		]
-
-		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.mediaDisplayMode,
-		                                                       buttonMap: sensitiveMediaButtonMap))
-
+		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.mediaDisplayMode, buttonMap: sensitiveMediaButtonMap))
 		let spoilerStatusButtonMap: [MastonautPreferences.SpoilerDisplayMode: NSButton] = [
 			.alwaysHide: spoilerStatusHideAllContentButton,
 			.hideMedia: spoilerStatusRevealTextButton,
 			.alwaysReveal: spoilerStatusRevealAllButton,
 		]
-
-		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.spoilerDisplayMode,
-		                                                       buttonMap: spoilerStatusButtonMap))
-
-		preferenceObservers.append(PreferenceCheckboxObserver(preference: \.autoplayVideos,
-		                                                      checkbox: autoplayVideosButton))
+		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.spoilerDisplayMode, buttonMap: spoilerStatusButtonMap))
+		preferenceObservers.append(PreferenceCheckboxObserver(preference: \.autoplayVideos, checkbox: autoplayVideosButton))
+	}
+	
+	@IBAction func normalTextSizeChanged(sender: AnyObject) {
+		normalTextSizeLabel.stringValue = "Normal text size (\(normalTextSizeSlider.stringValue)px):"
+		MastonautPreferences.instance.normalTextSize = CGFloat(normalTextSizeSlider.intValue)
 	}
 }

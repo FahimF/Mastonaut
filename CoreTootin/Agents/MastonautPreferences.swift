@@ -43,8 +43,7 @@ public class MastonautPreferences: PreferencesController {
 		set { prefs.setValue(newValue?.uuidString, forKey: #keyPath(currentUser)) }
 	}
 
-	// General preferences
-
+	// MARK: - General preferences
 	@objc public dynamic var timelinesResizeMode: TimelinesResizeMode {
 		get { return integerRepresentable(for: #keyPath(timelinesResizeMode), default: .expandWindowFirst) }
 		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(timelinesResizeMode)) }
@@ -60,8 +59,7 @@ public class MastonautPreferences: PreferencesController {
 		set { prefs.setValue(newValue, forKey: #keyPath(didMigrateToSharedLocalKeychain)) }
 	}
 
-	// Viewing preferences
-
+	// MARK: - Viewing preferences
 	@objc public dynamic var mediaDisplayMode: MediaDisplayMode {
 		get { return integerRepresentable(for: #keyPath(mediaDisplayMode), default: .hideSensitiveMedia) }
 		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(mediaDisplayMode)) }
@@ -77,8 +75,16 @@ public class MastonautPreferences: PreferencesController {
 		set { prefs.setValue(newValue, forKey: #keyPath(autoplayVideos)) }
 	}
 
-	// Composing preferences
+	@objc public dynamic var normalTextSize: CGFloat {
+		get {
+			return CGFloat(number(forKey: #keyPath(normalTextSize)) ?? 14)
+		}
+		set {
+			prefs.setValue(newValue, forKey: #keyPath(normalTextSize))
+		}
+	}
 
+	// MARK: - Composing preferences
 	@objc public dynamic var defaultStatusAudience: StatusAudience {
 		get { return integerRepresentable(for: #keyPath(defaultStatusAudience), default: .public) }
 		set { prefs.setValue(newValue.rawValue, forKey: #keyPath(defaultStatusAudience)) }

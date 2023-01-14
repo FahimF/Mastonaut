@@ -78,26 +78,25 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	}
 
 	private lazy var spoilerCoverView: NSView = {
-		let coverView = CoverView(backgroundColor: NSColor(named: "SpoilerCoverBackground")!,
-		                          message: 🔠("Content Hidden: Click warning button below to toggle display."))
+		let coverView = CoverView(backgroundColor: NSColor(named: "SpoilerCoverBackground")!, message: 🔠("Content Hidden: Click warning button below to toggle display."))
 		coverView.target = self
 		coverView.action = #selector(toggleContentVisibility)
 		return coverView
 	}()
 
 	private static let _authorLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 14, weight: .semibold),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .semibold),
 	]
 
 	private static let _statusLabelAttributes: [NSAttributedString.Key: AnyObject] = [
-		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: 14),
+		.foregroundColor: NSColor.labelColor, .font: NSFont.labelFont(ofSize: MastonautPreferences.instance.normalTextSize),
 		.underlineStyle: NSNumber(value: 0), // <-- This is a hack to prevent the label's contents from shifting
 		// vertically when clicked.
 	]
 
 	private static let _statusLabelLinkAttributes: [NSAttributedString.Key: AnyObject] = [
 		.foregroundColor: NSColor.safeControlTintColor,
-		.font: NSFont.systemFont(ofSize: 14, weight: .medium),
+		.font: NSFont.systemFont(ofSize: MastonautPreferences.instance.normalTextSize, weight: .medium),
 		.underlineStyle: NSNumber(value: 1),
 	]
 
@@ -123,11 +122,11 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-
 		timeLabel.formatter = RelativeDateFormatter.shared
 		statusLabel.linkTextAttributes = statusLabelLinkAttributes()
-
-		cardContainerView.clickHandler = { [weak self] in self?.cellModel?.openCardLink() }
+		cardContainerView.clickHandler = { [weak self] in
+			self?.cellModel?.openCardLink()
+		}
 	}
 
 	override var backgroundStyle: NSView.BackgroundStyle {
@@ -139,12 +138,10 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			let effectiveColor: NSColor = emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
 			cardContainerView.borderColor = effectiveColor
 
-			if #available(OSX 10.14, *) {} else {
-				authorAccountLabel.textColor = effectiveColor
-				timeLabel.textColor = effectiveColor
-				cardTitleLabel.textColor = effectiveColor
-				cardUrlLabel.textColor = effectiveColor
-			}
+			authorAccountLabel.textColor = effectiveColor
+			timeLabel.textColor = effectiveColor
+			cardTitleLabel.textColor = effectiveColor
+			cardUrlLabel.textColor = effectiveColor
 		}
 	}
 

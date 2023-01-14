@@ -24,12 +24,9 @@ class PreferencesWindowController: NSWindowController {
 	var tabViewController: NSTabViewController? {
 		return contentViewController as? NSTabViewController
 	}
-
 	lazy var accountsPreferencesViewController: AccountsPreferencesController? = tabViewController?.children.first(where: { $0 is AccountsPreferencesController }) as? AccountsPreferencesController
-
 	func showAccountPreferences() {
-		if let tabIndex = tabViewController?.children.firstIndex(where: { $0 is AccountsPreferencesController })
-		{
+		if let tabIndex = tabViewController?.children.firstIndex(where: { $0 is AccountsPreferencesController }) {
 			tabViewController?.selectedTabViewItemIndex = tabIndex
 		}
 	}
@@ -64,21 +61,13 @@ extension PreferencesWindowController: AccountsMenuProvider {
 	}
 
 	var accountsMenuItems: [NSMenuItem] {
-		return accounts.makeMenuItems(currentUser: accountsPreferencesViewController?.selectedAccountUUID,
-		                              action: #selector(PreferencesWindowController.selectAccount(_:)),
-		                              target: self,
-		                              emojiContainer: nil,
-		                              setKeyEquivalents: true).menuItems
+		return accounts.makeMenuItems(currentUser: accountsPreferencesViewController?.selectedAccountUUID, action: #selector(PreferencesWindowController.selectAccount(_:)), target: self, emojiContainer: nil, setKeyEquivalents: true).menuItems
 	}
 
 	@objc func selectAccount(_ sender: Any?) {
-		guard
-			let uuid = (sender as? NSMenuItem)?.representedObject as? UUID,
-			let accountsViewIndex = tabViewController?.children.firstIndex(where: { $0 is AccountsPreferencesController })
-		else {
+		guard let uuid = (sender as? NSMenuItem)?.representedObject as? UUID, let accountsViewIndex = tabViewController?.children.firstIndex(where: { $0 is AccountsPreferencesController }) else {
 			return
 		}
-
 		tabViewController?.selectedTabViewItemIndex = accountsViewIndex
 		accountsPreferencesViewController?.selectedAccountUUID = uuid
 	}

@@ -31,21 +31,16 @@ class GeneralPreferencesController: NSViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
 		let timelinesResizeModeButtonMap: [MastonautPreferences.TimelinesResizeMode: NSButton] = [
 			.expandWindowFirst: timelinesResizeExpandFirstButton,
 			.shrinkColumnsFirst: timelinesResizeShrinkFirstButton,
 		]
 
-		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.timelinesResizeMode,
-		                                                       buttonMap: timelinesResizeModeButtonMap))
-
+		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.timelinesResizeMode, buttonMap: timelinesResizeModeButtonMap))
 		let newWindowAccountModeButtonMap: [MastonautPreferences.NewWindowAccountMode: NSButton] = [
 			.ask: newWindowAccountModeAskButton,
 			.pickFirstOne: newWindowAccountModePickFirstOneButton,
 		]
-
-		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.newWindowAccountMode,
-		                                                       buttonMap: newWindowAccountModeButtonMap))
+		preferenceObservers.append(PreferenceEnumRadioObserver(preference: \MastonautPreferences.newWindowAccountMode, buttonMap: newWindowAccountModeButtonMap))
 	}
 }
