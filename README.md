@@ -57,15 +57,7 @@ The following instructions assume Xcode 14.1 on macOS 12.6.
 
 ### Setup
 
-- Make a copy of the file `userspecific.xcconfig.template` as `userspecific.xcconfig`.
-
-- In the new `userspecific.xcconfig` file, set `MASTONAUT_BUNDLE_ID_BASE` to a bundle ID for the app that works with your Apple ID.
-
-- Enter your Team ID instead of the `xxxxxxxxxx` next to `DEVELOPMENT_TEAM` (It looks something like `74J34U3R6X`).
-
-- **Do not add `userspecific.xcconfig` to your Git commits!**
-
-That should be it.
+The code used to make user of an XCConfig file to configure the project but it interfered with getting code-signing working for the 1.2 release and I didn't have time to look into the issue to figure out what was going on. So I've opted for manual code-signing in the project but this means that you'll need to figure out the various places the changes have to be made in order to make the code work. Sorry about that, but I will try to add some documentation for that here at some poing.
 
 ### Bundle IDs
 
