@@ -344,7 +344,8 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	}
 
 	func adjustWindowFrame(adjustment: WindowSizeAdjustment) {
-		guard let window = window, window.styleMask.contains(.fullScreen) == false, let screen = window.screen else { return
+		guard let window = window, window.styleMask.contains(.fullScreen) == false, let screen = window.screen else {
+			return
 		}
 		let originalWindowFrame = window.frame
 		var frame = originalWindowFrame

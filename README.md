@@ -14,19 +14,33 @@ Someone asked for a binary build and so I've created a binary. It should be acce
 
 Here are some changes from the original Mastonaut. There might be other changes and minor fixes, but these are the things that I do remember at the moment. (I might update this section as I add more features, or I might forget to 😛)
 
-![timelines](assets/timelines.jpg)
+### 1.0 (November 2022)
 
-* Added displaying favourites and bookmarks timelines.
-* Added ability to bookmark items from a post/status (the ability to favourite was already there but no favourites timeline was present.)
-* Added displaying counts for replies, boosts, and favourites.
-* Added ability to open more than one instance of the same timeline (for example to compare a Homeline from the previous night to find the spot where you left off so that you can scroll back 🙂)
+<img src="assets/timelines.jpg" alt="timelines" style="zoom:50%;" />
+
+* Displaying favourites and bookmarks timelines.
+* Ability to bookmark items from a post/status (the ability to favourite was already there but no favourites timeline was present.)
+* Display counts for replies, boosts, and favourites.
+* Ability to open more than one instance of the same timeline (for example to compare a Homeline from the previous night to find the spot where you left off so that you can scroll back 🙂)
 * Set the main Mastodon window to not close when you tap the close button. Otherwise, when you click on the icon in the dock, a new instance opens and you lose your original place on the timeline.
 * Changed the open new timeline menu to always remain the same without changing the order of items.
 * Fixed several issues with the post composer where it would get the character count wrong, wouldn't warn you when you exceeded the character count etc. all surrounding URLs in the post.
 * Changed all references to "toots" to say "post" instead 😛
 * Changed the connection status indicator to show even in production builds and added a tooltip to it so that you know what's wrong when there's an error by hovering over the status indicator.
-* Added showing a badge count for new home timeline entries when the app is closed/minimized. (The count might be off if you have two home timelines open at the same time.)
-* Added logging to a file with log rotation so that debugging is made easier (this feature if not fully in place.)
+* Show a badge count for new home timeline entries when the app is closed/minimized. (The count might be off if you have two home timelines open at the same time.)
+* Log to a file with log rotation so that debugging is made easier (this feature if not fully in place.)
+
+### 1.2 (January 2023)
+
+<img src="assets/boost_filter.jpg" style="zoom:50%;" />
+
+* Ability to filter posts in a profile to remove boosts and to only show posts by the user.
+* Show filter phrase / reason for filtered post markers
+* Show the actual action date (rather than the original post date) for notifications such as boosts and favourites.
+* Ability to zoom images in posts and profile.
+* Ability to change text size in posts so that you can make the text larger or smaller to suit your preference.
+* A global reload button to reload all visible columns.
+* Better handling of URLs for counting characters when creating a post.
 
 ## What's changed in the project
 

@@ -73,16 +73,10 @@ class TimelinesViewController: NSViewController {
 	}
 
 	private func appendColumn(_ columnViewController: ColumnViewController, expand: Bool) {
-		if expand, Preferences.timelinesResizeMode == .expandWindowFirst,
-		   let windowController = timelinesWindowController,
-		   let statusListWidth = columnViewControllers.first?.view.frame.width
-		{
-			NSAnimationContext.runAnimationGroup {
-				context in
-
+		if expand, Preferences.timelinesResizeMode == .expandWindowFirst, let windowController = timelinesWindowController, let statusListWidth = columnViewControllers.first?.view.frame.width {
+			NSAnimationContext.runAnimationGroup { context in
 				context.allowsImplicitAnimation = true
 				installColumn(columnViewController)
-
 				let neededWidth = statusListWidth + stackView.spacing
 				windowController.adjustWindowFrame(adjustment: .expand(by: neededWidth))
 			}
@@ -90,9 +84,7 @@ class TimelinesViewController: NSViewController {
 			// No animations in case this is the first column
 			installColumn(columnViewController, animated: false)
 		} else {
-			NSAnimationContext.runAnimationGroup {
-				context in
-
+			NSAnimationContext.runAnimationGroup { context in
 				context.allowsImplicitAnimation = true
 				installColumn(columnViewController)
 			}
@@ -106,7 +98,6 @@ class TimelinesViewController: NSViewController {
 			columnViewControllers.append(columnViewController)
 			return
 		}
-
 		let columnView = columnViewController.view
 		columnView.isHidden = true
 		addChild(columnViewController)
@@ -126,8 +117,7 @@ class TimelinesViewController: NSViewController {
 		}
 	}
 
-	func replaceColumn(at index: Int, with newColumnViewController: ColumnViewController) -> ColumnViewController
-	{
+	func replaceColumn(at index: Int, with newColumnViewController: ColumnViewController) -> ColumnViewController {
 		let oldColumnViewController = columnViewControllers[index]
 		let newColumnView = newColumnViewController.view
 
@@ -149,19 +139,13 @@ class TimelinesViewController: NSViewController {
 
 		columnViewControllers.remove(at: index)
 
-		if contract, Preferences.timelinesResizeMode == .expandWindowFirst,
-		   let windowController = timelinesWindowController,
-		   let statusListWidth = columnViewControllers.first?.view.frame.width
-		{
-			windowController.adjustWindowFrame(adjustment: .contract(by: statusListWidth + stackView.spacing,
-			                                                         poppingPreservedFrameIfPossible: true))
+		if contract, Preferences.timelinesResizeMode == .expandWindowFirst, let windowController = timelinesWindowController, let statusListWidth = columnViewControllers.first?.view.frame.width {
+			windowController.adjustWindowFrame(adjustment: .contract(by: statusListWidth + stackView.spacing, poppingPreservedFrameIfPossible: true))
 		}
-
 		stackView.setArrangedSubview(oldColumnViewController.view, hidden: true, animated: true) {
 			oldColumnViewController.removeFromParent()
 			oldColumnViewController.view.removeFromSuperview()
 		}
-
 		return oldColumnViewController
 	}
 
@@ -186,18 +170,13 @@ class TimelinesViewController: NSViewController {
 
 		let columns: [BaseColumnViewController] = (columnViewControllers + [sidebarViewController]).compacted()
 
-		if let firstResponder = firstResponder,
-		   let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder })
-		{
+		if let firstResponder = firstResponder, let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder }) {
 			let nextIndex = columns.index(after: activeIndex)
-
 			if nextIndex == columns.endIndex {
 				NSSound.beep()
 				return
 			}
-
-			makeTimelineColumnFirstResponder(columns[nextIndex],
-			                                 currentFocusRegion: columns[activeIndex].currentFocusRegion)
+			makeTimelineColumnFirstResponder(columns[nextIndex], currentFocusRegion: columns[activeIndex].currentFocusRegion)
 		} else if let column = columns.first {
 			makeTimelineColumnFirstResponder(column, currentFocusRegion: nil)
 		}
@@ -212,26 +191,19 @@ class TimelinesViewController: NSViewController {
 
 		let columns: [BaseColumnViewController] = (columnViewControllers + [sidebarViewController]).compacted()
 
-		if let firstResponder = firstResponder,
-		   let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder })
-		{
+		if let firstResponder = firstResponder, let activeIndex = columns.firstIndex(where: { $0.mainResponder === firstResponder }) {
 			if activeIndex == columns.startIndex {
 				NSSound.beep()
 				return
 			}
-
 			let previousIndex = columns.index(before: activeIndex)
-
-			makeTimelineColumnFirstResponder(columns[previousIndex],
-			                                 currentFocusRegion: columns[activeIndex].currentFocusRegion)
+			makeTimelineColumnFirstResponder(columns[previousIndex], currentFocusRegion: columns[activeIndex].currentFocusRegion)
 		} else if let column = columns.first {
 			makeTimelineColumnFirstResponder(column, currentFocusRegion: nil)
 		}
 	}
 
-	private func makeTimelineColumnFirstResponder(_ columnViewController: BaseColumnViewController,
-	                                              currentFocusRegion: NSRect?)
-	{
+	private func makeTimelineColumnFirstResponder(_ columnViewController: BaseColumnViewController, currentFocusRegion: NSRect?) {
 		view.window?.makeFirstResponder(columnViewController.mainResponder)
 		columnViewController.activateKeyboardNavigation(preferredFocusRegion: currentFocusRegion)
 	}
