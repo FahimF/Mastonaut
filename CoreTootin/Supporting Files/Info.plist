@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>MTNAppGroupIdentifier</key>
-	<string>$(DEVELOPMENT_TEAM).org.farook.mastonaut.mac</string>
+	<string>$(DEVELOPMENT_TEAM).$(MASTONAUT_BUNDLE_ID_BASE).mac</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2022-2023 Fahim Farook. All rights reserved.</string>
 </dict>
