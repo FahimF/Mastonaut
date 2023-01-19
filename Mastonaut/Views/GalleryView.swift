@@ -63,11 +63,16 @@ class GalleryView: NSScrollView {
 		// Add attachments to gallery
 		for att in attachmentGroup.attachments {
 			let iv = AttachmentImageView()
-			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI. This will avoid unecessary layout passes when the image is loaded and set to the image view
-			var sz = NSSize(width: 395, height: 200)
+			// Set up image view
+			iv.cornerRadius = 8
+			iv.borderWidth = 1
+			iv.borderColor = NSColor.gray.cgColor
+			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI. This will avoid unecessary layout passes when the image is loaded and set to the image view. Default is: 395 x 200
+			let ht = bounds.size.height
+			let wd = 395 * (ht / 200)
+			var sz = NSSize(width: wd, height: ht)
 			if let meta = att.meta, let orig = meta.original, let size = orig.size {
-				let w = (200 / size.height) * size.width
-				sz = size.limit(width: w, height: 200)
+				sz.width = (ht / size.height) * size.width
 			}
 			iv.defaultContentSize = sz
 			iv.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +86,7 @@ class GalleryView: NSScrollView {
 				playGlyphView.bezelStyle = .regularSquare
 				playGlyphView.isBordered = false
 				playGlyphView.translatesAutoresizingMaskIntoConstraints = false
-				addSubview(playGlyphView)
+				iv.addSubview(playGlyphView)
 				previewAttachments.append(playGlyphView)
 				NSLayoutConstraint.activate([
 					iv.leadingAnchor.constraint(equalTo: playGlyphView.leadingAnchor),

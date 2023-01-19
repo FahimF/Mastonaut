@@ -39,6 +39,24 @@ public class AttachmentImageView: NSControl {
 	}
 
 	@IBInspectable
+	public var borderWidth: CGFloat = 0.0 {
+		didSet {
+			if let layer = layer {
+				layer.borderWidth = borderWidth
+			}
+		}
+	}
+
+	@IBInspectable
+	public var borderColor: CGColor = NSColor.clear.cgColor {
+		didSet {
+			if let layer = layer {
+				layer.borderColor = borderColor
+			}
+		}
+	}
+
+	@IBInspectable
 	public var exposureAdjust: CGFloat = 0 {
 		didSet {
 			applyExposureFilterIfNecessary()
@@ -96,10 +114,12 @@ public class AttachmentImageView: NSControl {
 			layer.contents = nil
 			return
 		}
-		layer.contentsGravity = .resizeAspectFill
+		layer.contentsGravity = .resizeAspect
 		layer.contents = image.layerContents(forContentsScale: window?.backingScaleFactor ?? 1.0)
 		layer.masksToBounds = true
 		layer.cornerRadius = cornerRadius
+		layer.borderWidth = borderWidth
+		layer.borderColor = borderColor
 		applyExposureFilterIfNecessary()
 	}
 

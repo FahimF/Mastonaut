@@ -287,6 +287,11 @@
                                     <color key="value" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
+                            <connections>
+                                <outlet property="imageView" destination="mhw-7K-d4x" id="7an-Or-DEn"/>
+                                <outlet property="titleLabel" destination="HHf-0w-Cz8" id="jUu-v1-7jd"/>
+                                <outlet property="urlLabel" destination="SEL-3T-ISm" id="FYS-rj-1lJ"/>
+                            </connections>
                         </customView>
                         <stackView distribution="fillProportionally" orientation="horizontal" alignment="top" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8hE-N6-yIa">
                             <rect key="frame" x="0.0" y="0.0" width="135" height="16"/>

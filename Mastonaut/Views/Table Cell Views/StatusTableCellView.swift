@@ -49,10 +49,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	@IBOutlet private unowned var infoLabel: NSTextField!
 
 	@IBOutlet private unowned var cardContainerView: CardView!
-	@IBOutlet private unowned var cardImageView: AttachmentImageView!
-	@IBOutlet private unowned var cardTitleLabel: NSTextField!
-	@IBOutlet private unowned var cardUrlLabel: NSTextField!
-
 	private var pollViewController: PollViewController?
 
 	private(set) var hasMedia = false
@@ -133,14 +129,9 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			let emphasized = backgroundStyle == .emphasized
 			statusLabel.isEmphasized = emphasized
 			contentWarningLabel.isEmphasized = emphasized
-
 			let effectiveColor: NSColor = emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
-			cardContainerView.borderColor = effectiveColor
-
 			authorAccountLabel.textColor = effectiveColor
 			timeLabel.textColor = effectiveColor
-			cardTitleLabel.textColor = effectiveColor
-			cardUrlLabel.textColor = effectiveColor
 		}
 	}
 
@@ -190,7 +181,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			contentWarningContainer.isHidden = true
 			warningButton.isHidden = true
 			set(displayedCard: cellModel.visibleStatus.card)
-
 			hasSpoiler = false
 			contentWarningLabel.stringValue = ""
 			contentWarningLabel.toolTip = nil
@@ -273,6 +263,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	private func setupAttachmentsContainerView(for status: Status, poll: Poll?, attachmentPresenter: AttachmentPresenting) {
 		vwGallery.clearGallery()
+		infoLabel.isHidden = true
 		if status.mediaAttachments.count > 0 {
 			vwGallery.isHidden = false
 			vwGallery.set(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, mediaHidden: isMediaHidden)
@@ -281,8 +272,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			if cnt > 1 {
 				infoLabel.isHidden = false
 				infoLabel.stringValue = "\(cnt) images. Scroll to see all."
-			} else {
-				infoLabel.isHidden = true
 			}
 		} else if let poll = poll ?? status.poll {
 			vwGallery.isHidden = true
@@ -303,23 +292,8 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			cardContainerView.isHidden = true
 			return
 		}
-		let cardUrl = card.url
 		cardContainerView.isHidden = false
-		cardTitleLabel.stringValue = card.title
-		cardUrlLabel.stringValue = cardUrl.host ?? ""
-		guard card.imageUrl != nil, let currentlyDisplayedStatusId = cellModel?.status.id else {
-			cardImageView.image = nil
-			return
-		}
-		cardImageView.image = #imageLiteral(resourceName: "missing")
-		card.fetchImage { [weak self] image in
-			DispatchQueue.main.async {
-				guard self?.cellModel?.status.id == currentlyDisplayedStatusId else {
-					return
-				}
-				self?.cardImageView.image = image
-			}
-		}
+		cardContainerView.set(card: card, statusID: cellModel?.status.id)
 	}
 
 	func setContentLabelsSelectable(_ selectable: Bool) {
@@ -384,20 +358,16 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	@objc func toggleContentVisibility() {
 		guard hasSpoiler else { return }
-
 		setContentHidden(!isContentHidden)
 		if isMediaHidden, !isContentHidden {
 			setMediaHidden(isContentHidden)
 		}
-
 		userDidInteractWithVisibilityControls = true
 	}
 
 	func toggleMediaVisibility() {
 		guard hasMedia else { return }
-
 		setMediaHidden(!isMediaHidden)
-
 		userDidInteractWithVisibilityControls = true
 	}
 
@@ -439,12 +409,9 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	internal func installSpoilerCover() {
 		removeSpoilerCover()
-
 		let spolierCover = spoilerCoverView
 		addSubview(spolierCover)
-
 		let spacing = mainContentStackView.spacing
-
 		NSLayoutConstraint.activate([
 			spolierCover.topAnchor.constraint(equalTo: contentWarningContainer.bottomAnchor, constant: spacing),
 			spolierCover.bottomAnchor.constraint(equalTo: mainContentStackView.bottomAnchor, constant: 2),

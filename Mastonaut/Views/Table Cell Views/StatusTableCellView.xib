@@ -449,6 +449,11 @@
                                                     <color key="value" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
+                                            <connections>
+                                                <outlet property="imageView" destination="mhw-7K-d4x" id="LjC-rh-yzM"/>
+                                                <outlet property="titleLabel" destination="HHf-0w-Cz8" id="Rji-7f-wVK"/>
+                                                <outlet property="urlLabel" destination="SEL-3T-ISm" id="74w-24-jGH"/>
+                                            </connections>
                                         </customView>
                                     </subviews>
                                     <constraints>
