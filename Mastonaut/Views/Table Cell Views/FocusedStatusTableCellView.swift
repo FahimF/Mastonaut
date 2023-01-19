@@ -54,20 +54,9 @@ class FocusedStatusTableCellView: StatusTableCellView {
 		return FocusedStatusTableCellView._statusLabelLinkAttributes
 	}
 
-	override func set(displayedStatus status: Status,
-	                  poll: Poll?,
-	                  attachmentPresenter: AttachmentPresenting,
-	                  interactionHandler: StatusInteractionHandling,
-	                  activeInstance: Instance)
-	{
-		super.set(displayedStatus: status,
-		          poll: poll,
-		          attachmentPresenter: attachmentPresenter,
-		          interactionHandler: interactionHandler,
-		          activeInstance: activeInstance)
-
+	override func set(displayedStatus status: Status, poll: Poll?, attachmentPresenter: AttachmentPresenting, interactionHandler: StatusInteractionHandling, activeInstance: Instance) {
+		super.set(displayedStatus: status, poll: poll, attachmentPresenter: attachmentPresenter, interactionHandler: interactionHandler, activeInstance: activeInstance)
 		setContentLabelsSelectable(true)
-
 		if let application = status.application {
 			sourceApplication = application
 			appNameLabel.title = application.name
@@ -81,16 +70,13 @@ class FocusedStatusTableCellView: StatusTableCellView {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
-
 		sourceApplication = nil
 	}
 
 	@IBAction func showStatusApp(_: Any?) {
-		guard let applicationWebsite = sourceApplication?.website, let url = URL(string: applicationWebsite)
-		else {
+		guard let applicationWebsite = sourceApplication?.website, let url = URL(string: applicationWebsite) else {
 			return
 		}
-
 		NSWorkspace.shared.open(url)
 	}
 }

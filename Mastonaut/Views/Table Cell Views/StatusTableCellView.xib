@@ -14,10 +14,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="250.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="499" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G7t-be-Ghj" userLabel="Cell Stack">
-                    <rect key="frame" x="12" y="12" width="466" height="463"/>
+                    <rect key="frame" x="12" y="12" width="466" height="446"/>
                     <subviews>
                         <customView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="SiD-b1-e60" userLabel="Header">
-                            <rect key="frame" x="0.0" y="443" width="466" height="20"/>
+                            <rect key="frame" x="0.0" y="426" width="466" height="20"/>
                             <subviews>
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="752" verticalHuggingPriority="752" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gc5-oL-gsB" userLabel="Header Horizontal">
                                     <rect key="frame" x="40" y="0.0" width="188" height="20"/>
@@ -137,10 +137,10 @@
                             </connections>
                         </customView>
                         <customView verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0qJ-GZ-vyA" userLabel="Content">
-                            <rect key="frame" x="0.0" y="0.0" width="466" height="435"/>
+                            <rect key="frame" x="0.0" y="0.0" width="466" height="418"/>
                             <subviews>
                                 <customView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZOF-P9-3K0" userLabel="Avatar" customClass="BorderView" customModule="CoreTootin">
-                                    <rect key="frame" x="0.0" y="379" width="54" height="54"/>
+                                    <rect key="frame" x="0.0" y="362" width="54" height="54"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="SPv-5a-3fl">
                                             <rect key="frame" x="0.0" y="0.0" width="54" height="54"/>
@@ -176,7 +176,7 @@
                                     </userDefinedRuntimeAttributes>
                                 </customView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="3" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="751" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cfb-GA-Wje" userLabel="Author">
-                                    <rect key="frame" x="66" y="402" width="400" height="33"/>
+                                    <rect key="frame" x="66" y="385" width="400" height="33"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Mr1-Dk-o1f">
                                             <rect key="frame" x="0.0" y="17" width="109" height="16"/>
@@ -208,16 +208,16 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView wantsLayer="YES" distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="751" horizontalHuggingPriority="249" verticalHuggingPriority="751" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NiZ-P1-sSE" userLabel="Main Content">
-                                    <rect key="frame" x="66" y="28" width="400" height="368"/>
+                                    <rect key="frame" x="66" y="28" width="400" height="351"/>
                                     <subviews>
                                         <customView placeholderIntrinsicWidth="238" placeholderIntrinsicHeight="23" translatesAutoresizingMaskIntoConstraints="NO" id="FqU-Ny-Ix8" userLabel="CW" customClass="BorderView" customModule="CoreTootin">
-                                            <rect key="frame" x="0.0" y="347" width="238" height="21"/>
+                                            <rect key="frame" x="0.0" y="328" width="238" height="23"/>
                                             <subviews>
                                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="Rhy-uU-pzk" customClass="BackgroundView" customModule="CoreTootin">
-                                                    <rect key="frame" x="0.0" y="0.0" width="32" height="21"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="32" height="23"/>
                                                     <subviews>
                                                         <textField toolTip="Content Warning" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="x18-6K-zTd">
-                                                            <rect key="frame" x="4" y="3" width="24" height="14"/>
+                                                            <rect key="frame" x="4" y="5" width="24" height="14"/>
                                                             <textFieldCell key="cell" lineBreakMode="clipping" title="CW" id="Ml7-JJ-J49">
                                                                 <font key="font" metaFont="systemSemibold" size="11"/>
                                                                 <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -238,7 +238,7 @@
                                                     </userDefinedRuntimeAttributes>
                                                 </customView>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NBR-vf-Qi5" customClass="AttributedLabel">
-                                                    <rect key="frame" x="38" y="3" width="194" height="16"/>
+                                                    <rect key="frame" x="38" y="3" width="194" height="18"/>
                                                     <textFieldCell key="cell" selectable="YES" allowsUndo="NO" alignment="left" title="The quick brown fox" allowsEditingTextAttributes="YES" id="LJk-pU-oYV">
                                                         <font key="font" metaFont="system"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -275,7 +275,7 @@
                                             </userDefinedRuntimeAttributes>
                                         </customView>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xUb-sD-bkH" customClass="AttributedLabel">
-                                            <rect key="frame" x="-2" y="323" width="75" height="16"/>
+                                            <rect key="frame" x="-2" y="304" width="75" height="16"/>
                                             <textFieldCell key="cell" selectable="YES" allowsUndo="NO" title="Hello there!" allowsEditingTextAttributes="YES" id="ayh-RZ-PqU">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -283,7 +283,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <customView horizontalHuggingPriority="246" translatesAutoresizingMaskIntoConstraints="NO" id="bPV-VO-5yH">
-                                            <rect key="frame" x="0.0" y="299" width="400" height="16"/>
+                                            <rect key="frame" x="0.0" y="280" width="400" height="16"/>
                                             <subviews>
                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="r69-M3-2Tj">
                                                     <rect key="frame" x="254" y="0.0" width="146" height="16"/>
@@ -307,10 +307,10 @@
                                             </constraints>
                                         </customView>
                                         <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PSj-iG-1Sb" userLabel="Gallery Stack">
-                                            <rect key="frame" x="0.0" y="72" width="400" height="219"/>
+                                            <rect key="frame" x="0.0" y="72" width="400" height="200"/>
                                             <subviews>
                                                 <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="Cq2-l2-ari" customClass="GalleryView" customModule="Mastonaut" customModuleProvider="target">
-                                                    <rect key="frame" x="0.0" y="19" width="400" height="200"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="400" height="200"/>
                                                     <clipView key="contentView" drawsBackground="NO" id="79p-Fv-hes">
                                                         <rect key="frame" x="0.0" y="0.0" width="400" height="200"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -339,8 +339,8 @@
                                                         <outlet property="imageStack" destination="tw6-Ol-Pcz" id="Jlf-ja-4ER"/>
                                                     </connections>
                                                 </scrollView>
-                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Fx-8E-5Rx">
-                                                    <rect key="frame" x="180" y="0.0" width="41" height="15"/>
+                                                <textField hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Fx-8E-5Rx">
+                                                    <rect key="frame" x="-2" y="185" width="41" height="15"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Label" id="2cK-12-L2e">
                                                         <font key="font" metaFont="systemSemibold" size="12"/>
                                                         <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
