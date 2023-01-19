@@ -45,27 +45,26 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	@IBOutlet private unowned var contextButton: NSButton?
 	@IBOutlet private unowned var contextImageView: NSImageView?
 
-	@IBOutlet private unowned var mediaContainerView: NSView!
+	@IBOutlet private unowned var vwGallery: GalleryView!
+	@IBOutlet private unowned var infoLabel: NSTextField!
 
 	@IBOutlet private unowned var cardContainerView: CardView!
 	@IBOutlet private unowned var cardImageView: AttachmentImageView!
 	@IBOutlet private unowned var cardTitleLabel: NSTextField!
 	@IBOutlet private unowned var cardUrlLabel: NSTextField!
 
-	private var attachmentViewController: AttachmentViewController?
-
 	private var pollViewController: PollViewController?
 
-	private(set) var hasMedia: Bool = false
-	private(set) var hasSensitiveMedia: Bool = false
-	private(set) var hasSpoiler: Bool = false
+	private(set) var hasMedia = false
+	private(set) var hasSensitiveMedia = false
+	private(set) var hasSpoiler = false
 
 	var isContentHidden: Bool {
 		return warningButton.state == .off
 	}
 
 	var isMediaHidden: Bool {
-		return sensitiveContentButton.state == .off
+		return sensitiveContentButton.state == .on
 	}
 
 	private var userDidInteractWithVisibilityControls = false
@@ -205,8 +204,8 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		}
 		setUpInteractions(status: cellModel.visibleStatus)
 		setupAttachmentsContainerView(for: cellModel.visibleStatus, poll: poll, attachmentPresenter: attachmentPresenter)
-		hasMedia = attachmentViewController != nil
-		hasSensitiveMedia = attachmentViewController?.sensitiveMedia == true
+		hasMedia = status.mediaAttachments.count > 0
+		hasSensitiveMedia = status.sensitive == true
 	}
 
 	func updateAccessibilityAttributes() {
@@ -273,38 +272,29 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	}
 
 	private func setupAttachmentsContainerView(for status: Status, poll: Poll?, attachmentPresenter: AttachmentPresenting) {
-		mediaContainerView.subviews.forEach { $0.removeFromSuperview() }
+		vwGallery.clearGallery()
 		if status.mediaAttachments.count > 0 {
-			mediaContainerView.isHidden = false
-
-			let attachmentViewController = AttachmentViewController(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, sensitiveMedia: status.sensitive == true, mediaHidden: self.attachmentViewController?.isMediaHidden)
-
-			let attachmentView = attachmentViewController.view
-			mediaContainerView.addSubview(attachmentView)
-
-			NSLayoutConstraint.activate([
-				mediaContainerView.leftAnchor.constraint(equalTo: attachmentView.leftAnchor),
-				mediaContainerView.rightAnchor.constraint(equalTo: attachmentView.rightAnchor),
-				mediaContainerView.topAnchor.constraint(equalTo: attachmentView.topAnchor),
-				mediaContainerView.bottomAnchor.constraint(equalTo: attachmentView.bottomAnchor),
-			])
-			self.attachmentViewController = attachmentViewController
+			vwGallery.isHidden = false
+			vwGallery.set(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, mediaHidden: isMediaHidden)
+			// Show/hide label
+			let cnt = status.mediaAttachments.count
+			if cnt > 1 {
+				infoLabel.isHidden = false
+				infoLabel.stringValue = "\(cnt) images. Scroll to see all."
+			} else {
+				infoLabel.isHidden = true
+			}
 		} else if let poll = poll ?? status.poll {
-			mediaContainerView.isHidden = true
-
+			vwGallery.isHidden = true
 			let pollViewController = PollViewController()
 			pollViewController.set(poll: poll)
 			pollViewController.delegate = cellModel
-
 			let pollView = pollViewController.view
 			mainContentStackView.addArrangedSubview(pollView)
-
 			mainContentStackView.widthAnchor.constraint(equalTo: pollView.widthAnchor).isActive = true
-
 			self.pollViewController = pollViewController
 		} else {
-			mediaContainerView.isHidden = true
-			attachmentViewController = nil
+			vwGallery.isHidden = true
 		}
 	}
 
@@ -428,23 +418,20 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	}
 
 	func setMediaHidden(_ hideMedia: Bool) {
-		attachmentViewController?.setMediaHidden(hideMedia)
+		vwGallery.setMediaHidden(hideMedia)
 		sensitiveContentButton.state = hideMedia ? .off : .on
 	}
 
 	func setContentHidden(_ hideContent: Bool) {
 		let coverView = spoilerCoverView
-		let hasSensitiveMedia = attachmentViewController?.sensitiveMedia == true
-
+//		let hasSensitiveMedia = attachmentViewController?.sensitiveMedia == true
 		warningButton.state = hideContent ? .off : .on
-
 		statusLabel.animator().alphaValue = hideContent ? 0 : 1
 		statusLabel.setAccessibilityEnabled(!hideContent)
-		attachmentViewController?.view.animator().alphaValue = hideContent ? 0 : 1
-		attachmentViewController?.view.setAccessibilityEnabled(!hideContent)
+		vwGallery.animator().alphaValue = hideContent ? 0 : 1
+		vwGallery.setAccessibilityEnabled(!hideContent)
 		coverView.setHidden(!hideContent, animated: true)
 		statusLabel.isEnabled = !hideContent
-
 		if hasSensitiveMedia {
 			sensitiveContentButton.setHidden(hideContent, animated: true)
 		}
@@ -473,7 +460,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 extension StatusTableCellView: MediaPresenting {
 	func makePresentableMediaVisible() {
-		attachmentViewController?.presentAttachment(nil)
+		vwGallery.presentAttachment(nil)
 	}
 }
 

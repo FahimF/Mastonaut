@@ -82,7 +82,6 @@
 		1523C6E621E94C7F006DE234 /* ResourcesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA64621E3F46B0065CC1B /* ResourcesFetcher.swift */; };
 		1523C6E821E94C7F006DE234 /* StatusComposerWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CD5BE721DEEA9300E06C2F /* StatusComposerWindowController.swift */; };
 		1523C6E921E94C7F006DE234 /* NSWindow+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CD5BD521DAC89700E06C2F /* NSWindow+Additions.swift */; };
-		1523C6EA21E94C7F006DE234 /* AttachmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA64921E3F9CD0065CC1B /* AttachmentViewController.swift */; };
 		1523C6EC21E94C7F006DE234 /* StatusDisplaying.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F9B63921DA5A2B008D95FE /* StatusDisplaying.swift */; };
 		1523C6EE21E94C7F006DE234 /* InstancePickerWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1507924221D6E707009EE4A3 /* InstancePickerWindowController.swift */; };
 		1523C6F221E94C7F006DE234 /* String+HTMLEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA63E21E23FD30065CC1B /* String+HTMLEntities.swift */; };
@@ -90,17 +89,12 @@
 		1523C6F421E94C7F006DE234 /* AuthWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CD5BD121DAC76B00E06C2F /* AuthWindowController.swift */; };
 		1523C6F821E94C7F006DE234 /* StatusTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C4DD3F21D4280A002AF6DA /* StatusTableCellView.swift */; };
 		1523C6F921E94C7F006DE234 /* AuthorizedAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CD5BE521DEBDBE00E06C2F /* AuthorizedAccount.swift */; };
-		1523C70021E94C7F006DE234 /* MultipleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA65521E3FE760065CC1B /* MultipleAttachmentView.xib */; };
 		1523C70121E94C7F006DE234 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 15C4DD1421D41EC0002AF6DA /* Assets.xcassets */; };
-		1523C70221E94C7F006DE234 /* DoubleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64D21E3FAE00065CC1B /* DoubleAttachmentView.xib */; };
 		1523C70321E94C7F006DE234 /* StatusComposerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 15CD5BE821DEEA9300E06C2F /* StatusComposerWindowController.xib */; };
-		1523C70521E94C7F006DE234 /* QuadrupleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64F21E3FCB30065CC1B /* QuadrupleAttachmentView.xib */; };
 		1523C70621E94C7F006DE234 /* StatusTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64321E2C2DB0065CC1B /* StatusTableCellView.xib */; };
 		1523C70721E94C7F006DE234 /* InstancePickerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1507924321D6E707009EE4A3 /* InstancePickerWindowController.xib */; };
 		1523C70821E94C7F006DE234 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 15C4DD1621D41EC0002AF6DA /* MainMenu.xib */; };
 		1523C70921E94C7F006DE234 /* AuthWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 15CD5BD221DAC76B00E06C2F /* AuthWindowController.xib */; };
-		1523C70A21E94C7F006DE234 /* TripleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA65021E3FCB40065CC1B /* TripleAttachmentView.xib */; };
-		1523C70C21E94C7F006DE234 /* SingleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64B21E3FA180065CC1B /* SingleAttachmentView.xib */; };
 		15249AEC234012A80088B9EE /* InstanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15249AEB234012A80088B9EE /* InstanceService.swift */; };
 		15249AF023401C7D0088B9EE /* NonVibrantPopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15249AEF23401C7D0088B9EE /* NonVibrantPopUpButton.swift */; };
 		15249AF123401C7D0088B9EE /* NonVibrantPopUpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15249AEF23401C7D0088B9EE /* NonVibrantPopUpButton.swift */; };
@@ -114,12 +108,6 @@
 		152DA63F21E23FD30065CC1B /* String+HTMLEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA63E21E23FD30065CC1B /* String+HTMLEntities.swift */; };
 		152DA64521E2C2DB0065CC1B /* StatusTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64321E2C2DB0065CC1B /* StatusTableCellView.xib */; };
 		152DA64721E3F46B0065CC1B /* ResourcesFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA64621E3F46B0065CC1B /* ResourcesFetcher.swift */; };
-		152DA64A21E3F9CD0065CC1B /* AttachmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152DA64921E3F9CD0065CC1B /* AttachmentViewController.swift */; };
-		152DA64C21E3FA180065CC1B /* SingleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64B21E3FA180065CC1B /* SingleAttachmentView.xib */; };
-		152DA64E21E3FAE00065CC1B /* DoubleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64D21E3FAE00065CC1B /* DoubleAttachmentView.xib */; };
-		152DA65121E3FCB40065CC1B /* QuadrupleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA64F21E3FCB30065CC1B /* QuadrupleAttachmentView.xib */; };
-		152DA65221E3FCB40065CC1B /* TripleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA65021E3FCB40065CC1B /* TripleAttachmentView.xib */; };
-		152DA65621E3FE760065CC1B /* MultipleAttachmentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 152DA65521E3FE760065CC1B /* MultipleAttachmentView.xib */; };
 		1530429022AEF5A100489F31 /* InfoWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1530428F22AEF5A100489F31 /* InfoWindow.swift */; };
 		1530429122AEF5A100489F31 /* InfoWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1530428F22AEF5A100489F31 /* InfoWindow.swift */; };
 		1531B8BE230216FA006D9DDB /* UserNotificationTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1531B8BD230216FA006D9DDB /* UserNotificationTool.swift */; };
@@ -503,6 +491,7 @@
 		15FD4C34223870B000D699EF /* TransientWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FD4C32223870B000D699EF /* TransientWindow.swift */; };
 		5512395A291847DB0026C1D5 /* AuthorizedAccount+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55123959291847DB0026C1D5 /* AuthorizedAccount+Image.swift */; };
 		C98AE162223D7FB700A8DD22 /* AvatarImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98AE161223D7FB700A8DD22 /* AvatarImageCache.swift */; };
+		DD245121297921410099C0DF /* GalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD245120297921410099C0DF /* GalleryView.swift */; };
 		DD3DA7D829290D0E00AA0ABA /* Mastonaut-acknowledgements.plist in Resources */ = {isa = PBXBuildFile; fileRef = DD3DA7D729290D0E00AA0ABA /* Mastonaut-acknowledgements.plist */; };
 		DD3DA7DB29291C0E00AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DA29291C0E00AA0ABA /* Starscream */; };
 		DD3DA7DD29291C9700AA0ABA /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DD3DA7DC29291C9700AA0ABA /* Starscream */; };
@@ -740,13 +729,7 @@
 		152DA63E21E23FD30065CC1B /* String+HTMLEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HTMLEntities.swift"; sourceTree = "<group>"; };
 		152DA64321E2C2DB0065CC1B /* StatusTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatusTableCellView.xib; sourceTree = "<group>"; };
 		152DA64621E3F46B0065CC1B /* ResourcesFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourcesFetcher.swift; sourceTree = "<group>"; };
-		152DA64921E3F9CD0065CC1B /* AttachmentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentViewController.swift; sourceTree = "<group>"; };
-		152DA64B21E3FA180065CC1B /* SingleAttachmentView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SingleAttachmentView.xib; sourceTree = "<group>"; };
-		152DA64D21E3FAE00065CC1B /* DoubleAttachmentView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DoubleAttachmentView.xib; sourceTree = "<group>"; };
-		152DA64F21E3FCB30065CC1B /* QuadrupleAttachmentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = QuadrupleAttachmentView.xib; sourceTree = "<group>"; };
-		152DA65021E3FCB40065CC1B /* TripleAttachmentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TripleAttachmentView.xib; sourceTree = "<group>"; };
 		152DA65321E3FD250065CC1B /* AttachmentImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentImageView.swift; sourceTree = "<group>"; };
-		152DA65521E3FE760065CC1B /* MultipleAttachmentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MultipleAttachmentView.xib; sourceTree = "<group>"; };
 		152DA65721E545F80065CC1B /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		1530427422AE83E300489F31 /* PostingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostingService.swift; sourceTree = "<group>"; };
 		1530427722AE8F4300489F31 /* ResolverService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResolverService.swift; sourceTree = "<group>"; };
@@ -1011,6 +994,7 @@
 		55123959291847DB0026C1D5 /* AuthorizedAccount+Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AuthorizedAccount+Image.swift"; sourceTree = "<group>"; };
 		C98AE161223D7FB700A8DD22 /* AvatarImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarImageCache.swift; sourceTree = "<group>"; };
 		D0D2DCB52811AC15559D8AE9 /* Pods_Mastonaut__Mock_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Mastonaut__Mock_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD245120297921410099C0DF /* GalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryView.swift; sourceTree = "<group>"; };
 		DD3DA7D729290D0E00AA0ABA /* Mastonaut-acknowledgements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mastonaut-acknowledgements.plist"; sourceTree = "<group>"; };
 		DD3DA914292A2BEC00AA0ABA /* URLComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLComponents.swift; sourceTree = "<group>"; };
 		DD3DA915292A2BEC00AA0ABA /* FutureTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FutureTask.swift; sourceTree = "<group>"; };
@@ -1172,6 +1156,7 @@
 				150CEA3921FCBF7900F815A9 /* Table Cell Views */,
 				15BF72C92342B3200020CE70 /* Sidebar Title Views */,
 				1507919621D5AB77009EE4A3 /* FlippedView.swift */,
+				DD245120297921410099C0DF /* GalleryView.swift */,
 				1598919D21FFC0A000FA92F7 /* RefreshingFormattedTextField.swift */,
 				15570C2622025C920030DAFB /* CardView.swift */,
 				15722EA722123D2A00A672C6 /* ClickThroughTextField.swift */,
@@ -1340,19 +1325,6 @@
 				DD3DA9AE292CAA4300AA0ABA /* Shared */,
 			);
 			name = Dependencies;
-			sourceTree = "<group>";
-		};
-		152DA64821E3F9690065CC1B /* Media Attachments */ = {
-			isa = PBXGroup;
-			children = (
-				152DA64921E3F9CD0065CC1B /* AttachmentViewController.swift */,
-				152DA64B21E3FA180065CC1B /* SingleAttachmentView.xib */,
-				152DA64D21E3FAE00065CC1B /* DoubleAttachmentView.xib */,
-				152DA65021E3FCB40065CC1B /* TripleAttachmentView.xib */,
-				152DA64F21E3FCB30065CC1B /* QuadrupleAttachmentView.xib */,
-				152DA65521E3FE760065CC1B /* MultipleAttachmentView.xib */,
-			);
-			path = "Media Attachments";
 			sourceTree = "<group>";
 		};
 		153709182295A2B3002B99DF /* Resources */ = {
@@ -1664,7 +1636,6 @@
 			children = (
 				151199C822BFCEE3007F2AEB /* Composer */,
 				15EE539522C95810001BEA58 /* Global Search */,
-				152DA64821E3F9690065CC1B /* Media Attachments */,
 				15E7451B2236FDD0009A1252 /* Placeholder */,
 				1538FB3422188961006B5F78 /* Preferences */,
 				1502C85A234FE3C2005051CC /* Sidebar */,
@@ -2198,12 +2169,10 @@
 			files = (
 				15997185220E4AA300401585 /* mock_data_timeline_home.json in Resources */,
 				DD60CAA8297693DD00B88D1F /* userspecific.xcconfig in Resources */,
-				1523C70021E94C7F006DE234 /* MultipleAttachmentView.xib in Resources */,
 				151199CE22BFCF05007F2AEB /* ComposerPollViewController.xib in Resources */,
 				1561C09721FE5AB400476467 /* BackgroundTableRowView.xib in Resources */,
 				157945BE225566BC0053D4C3 /* mock_data_account.json in Resources */,
 				1523C70121E94C7F006DE234 /* Assets.xcassets in Resources */,
-				1523C70221E94C7F006DE234 /* DoubleAttachmentView.xib in Resources */,
 				150A9F0221FD1B1500DF42A1 /* FollowCellView.xib in Resources */,
 				15D9DA77229F175C006AE6D4 /* EmojiCollectionViewItem.xib in Resources */,
 				15A947972495ACB600E413B2 /* FilteredEntryCellView.xib in Resources */,
@@ -2226,7 +2195,6 @@
 				15A1CA0A221F4BAF00CF51F1 /* AccountTableCellView.xib in Resources */,
 				15DED9C52298B708000F11B8 /* FocusedStatusTableCellView.xib in Resources */,
 				157D338722163DCA000E1112 /* Preferences.storyboard in Resources */,
-				1523C70521E94C7F006DE234 /* QuadrupleAttachmentView.xib in Resources */,
 				15B25D0D2651CBAC00C90963 /* FilterEditorWindowController.xib in Resources */,
 				15053AF22254037B00DEED8F /* ProfileTableCellView.xib in Resources */,
 				150CEA3F21FCC18600F815A9 /* InteractionCellView.xib in Resources */,
@@ -2240,11 +2208,9 @@
 				15BF72D22342B3AF0020CE70 /* SidebarTitleViewController.xib in Resources */,
 				1523C70821E94C7F006DE234 /* MainMenu.xib in Resources */,
 				1523C70921E94C7F006DE234 /* AuthWindowController.xib in Resources */,
-				1523C70A21E94C7F006DE234 /* TripleAttachmentView.xib in Resources */,
 				1594392D2299917800E47DBB /* InstanceTableCellView.xib in Resources */,
 				151E9A2E230C830500A76DB0 /* DebugWindowController.xib in Resources */,
 				1538FB3D2218A817006B5F78 /* Preferences.xcassets in Resources */,
-				1523C70C21E94C7F006DE234 /* SingleAttachmentView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2281,7 +2247,6 @@
 				DD3DA7D829290D0E00AA0ABA /* Mastonaut-acknowledgements.plist in Resources */,
 				15C7836C221CBCB100402C66 /* Timelines.storyboard in Resources */,
 				15DED9C42298B708000F11B8 /* FocusedStatusTableCellView.xib in Resources */,
-				152DA65621E3FE760065CC1B /* MultipleAttachmentView.xib in Resources */,
 				15E745192236FDBA009A1252 /* welcome.svg in Resources */,
 				1594392C2299917800E47DBB /* InstanceTableCellView.xib in Resources */,
 				15B25D0C2651CBAC00C90963 /* FilterEditorWindowController.xib in Resources */,
@@ -2289,7 +2254,6 @@
 				15E745202236FDF5009A1252 /* WelcomePlaceholderController.xib in Resources */,
 				1561C09621FE5AB400476467 /* BackgroundTableRowView.xib in Resources */,
 				15C4DD1521D41EC0002AF6DA /* Assets.xcassets in Resources */,
-				152DA64E21E3FAE00065CC1B /* DoubleAttachmentView.xib in Resources */,
 				150A9F0121FD1B1500DF42A1 /* FollowCellView.xib in Resources */,
 				15D9DA76229F175C006AE6D4 /* EmojiCollectionViewItem.xib in Resources */,
 				15E7452422371DCB009A1252 /* AccountsPlaceholderController.xib in Resources */,
@@ -2306,7 +2270,6 @@
 				1595BEB3249ECE850077A150 /* PollResultItemView.xib in Resources */,
 				15E7452C2237236A009A1252 /* accounts.svg in Resources */,
 				152B731C220E35A7004121F1 /* AcknowledgementsWindowController.xib in Resources */,
-				152DA65121E3FCB40065CC1B /* QuadrupleAttachmentView.xib in Resources */,
 				150CEA3E21FCC18600F815A9 /* InteractionCellView.xib in Resources */,
 				15BF72D12342B3AF0020CE70 /* SidebarTitleViewController.xib in Resources */,
 				15A947962495ACB600E413B2 /* FilteredEntryCellView.xib in Resources */,
@@ -2319,9 +2282,7 @@
 				15C4DD1821D41EC0002AF6DA /* MainMenu.xib in Resources */,
 				157D338622163DCA000E1112 /* Preferences.storyboard in Resources */,
 				15CD5BD421DAC76B00E06C2F /* AuthWindowController.xib in Resources */,
-				152DA65221E3FCB40065CC1B /* TripleAttachmentView.xib in Resources */,
 				15B25D02265164BF00C90963 /* FilterTableCellView.xib in Resources */,
-				152DA64C21E3FA180065CC1B /* SingleAttachmentView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2470,7 +2431,6 @@
 				1523C6E921E94C7F006DE234 /* NSWindow+Additions.swift in Sources */,
 				15BCDB14221B41CF007BFFAF /* AttachmentGroup.swift in Sources */,
 				15E7452722371DCB009A1252 /* AccountsPlaceholderController.swift in Sources */,
-				1523C6EA21E94C7F006DE234 /* AttachmentViewController.swift in Sources */,
 				15B981B7234FE549008391F8 /* FavoritesViewController.swift in Sources */,
 				1538FB3722188978006B5F78 /* ViewingPreferencesController.swift in Sources */,
 				15EE539E22C95854001BEA58 /* SearchResultsPresenter.swift in Sources */,
@@ -2793,7 +2753,6 @@
 				15BCDB13221B41CF007BFFAF /* AttachmentGroup.swift in Sources */,
 				15E7452622371DCB009A1252 /* AccountsPlaceholderController.swift in Sources */,
 				DD3DA9B0292CAA5F00AA0ABA /* Logging.swift in Sources */,
-				152DA64A21E3F9CD0065CC1B /* AttachmentViewController.swift in Sources */,
 				15B981B6234FE549008391F8 /* FavoritesViewController.swift in Sources */,
 				1538FB3622188978006B5F78 /* ViewingPreferencesController.swift in Sources */,
 				15EE539D22C95854001BEA58 /* SearchResultsPresenter.swift in Sources */,
@@ -2828,6 +2787,7 @@
 				15BC415E2262A8CA00C2A150 /* SidebarSubcontroller.swift in Sources */,
 				155B9389237A23E5006EBF3C /* AnyObject+Helpers.swift in Sources */,
 				15BB378C22A854880094B5A3 /* EmphasizedTextField.m in Sources */,
+				DD245121297921410099C0DF /* GalleryView.swift in Sources */,
 				15D3B9C824A298CB00DC3B10 /* BPAnimatedImageLayer.swift in Sources */,
 				152DA63F21E23FD30065CC1B /* String+HTMLEntities.swift in Sources */,
 				15C4DD1021D41EC0002AF6DA /* AppDelegate.swift in Sources */,
