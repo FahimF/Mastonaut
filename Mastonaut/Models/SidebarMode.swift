@@ -27,6 +27,7 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 	case tag(String)
 	case status(uri: String, status: Status?)
 	case favorites
+	case edits(status: Status?, edits: [StatusEdit]?)
 
 	var rawValue: String {
 		switch self {
@@ -41,6 +42,9 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 
 		case .favorites:
 			return "favorites"
+			
+		case .edits(let status, _):
+			return "edits\n\(status?.id ?? "")"
 		}
 	}
 
@@ -50,7 +54,6 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 
 	init?(rawValue: String) {
 		let components = rawValue.split(separator: "\n")
-
 		if components.count == 2 {
 			if components.first == "profile" {
 				self = .profile(uri: String(components[1]), account: nil)
@@ -68,10 +71,7 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 		}
 	}
 
-	func makeViewController(client: ClientType,
-	                        currentAccount: AuthorizedAccount?,
-	                        currentInstance: Instance) -> SidebarViewController
-	{
+	func makeViewController(client: ClientType, currentAccount: AuthorizedAccount?, currentInstance: Instance) -> SidebarViewController {
 		switch self {
 		case .profile(let uri, nil):
 			return ProfileViewController(uri: uri, currentAccount: currentAccount, client: client)
@@ -91,6 +91,9 @@ enum SidebarMode: RawRepresentable, SidebarModel, Equatable {
 
 		case .favorites:
 			return FavoritesViewController()
+			
+		case .edits(let status, let edits):
+			return EditHistoryViewController(status: status, edits: edits)
 		}
 	}
 

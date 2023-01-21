@@ -61,6 +61,8 @@ public class Status: Codable {
     public let card: Card?
     /// A poll
     public let poll: Poll?
+	/// Timestamp of when the status was last edited.
+	public let editedAt: Date?
 	
 	// New properties
 	/// How many replies this status has received
@@ -76,6 +78,7 @@ public class Status: Codable {
         case favouritesCount = "favourites_count"
 		case spoilerText = "spoiler_text"
 		case mediaAttachments = "media_attachments"
+		case editedAt = "edited_at"
 		case repliesCount = "replies_count"
     }
 

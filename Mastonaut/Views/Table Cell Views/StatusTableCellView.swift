@@ -19,6 +19,7 @@
 
 import Cocoa
 import CoreTootin
+import Sdifft
 
 @IBDesignable
 class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInteractionPresenter {
@@ -27,6 +28,8 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	@IBOutlet private unowned var statusLabel: AttributedLabel!
 	@IBOutlet private unowned var fullContentDisclosureView: NSView?
 	@IBOutlet private unowned var timeLabel: NSTextField!
+	@IBOutlet private unowned var editInfoContainer: NSStackView!
+	@IBOutlet private unowned var editedTimeLabel: NSTextField!
 	@IBOutlet private unowned var mainContentStackView: NSStackView!
 
 	@IBOutlet private unowned var contentWarningContainer: BorderView!
@@ -154,6 +157,14 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		replyCount.stringValue = "\(status.repliesCount)"
 		reblogCount.stringValue = "\(status.reblogsCount)"
 		favouriteCount.stringValue = "\(status.favouritesCount)"
+
+		if let editedAt = cellModel.visibleStatus.editedAt {
+			editInfoContainer.isHidden = false
+			editedTimeLabel.objectValue = "Edited \(RelativeDateFormatter.shared.string(from: editedAt))"
+			editedTimeLabel.toolTip = DateFormatter.longDateFormatter.string(from: editedAt)
+		} else {
+			editInfoContainer.isHidden = true
+		}
 
 		let attributedStatus = cellModel.visibleStatus.attributedContent
 
@@ -313,6 +324,17 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		pollViewController?.view.removeFromSuperview()
 		pollViewController = nil
 		removeSpoilerCover()
+	}
+
+	@IBAction func viewHistoryClicked(_ sender: NSButton) {
+		guard let status = cellModel?.visibleStatus, let interactionHandler = cellModel?.interactionHandler else { return }
+		let handler = cellModel?.interactionHandler
+		interactionHandler.fetchEditHistory(for: status.id) {
+			success in DispatchQueue.main.async {
+				guard let edits = success else { return }
+				interactionHandler.showStatusEdits(status: status, edits: edits)
+			}
+		}
 	}
 
 	@IBAction private func interactionButtonClicked(_ sender: NSButton) {

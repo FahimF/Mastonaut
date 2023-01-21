@@ -134,6 +134,10 @@ class NotificationListViewController: ListViewController<MastodonNotification>, 
 		authorizedAccountProvider?.presentInSidebar(SidebarMode.tag(tag.name))
 	}
 
+	func showStatusEdits(status: Status, edits: [StatusEdit]) {
+		authorizedAccountProvider?.presentInSidebar(SidebarMode.edits(status: status, edits: edits))
+	}
+	
 	func canDelete(status: Status) -> Bool {
 		return currentUserIsAuthor(of: status)
 	}

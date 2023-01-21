@@ -100,6 +100,11 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		authorizedAccountProvider?.presentInSidebar(SidebarMode.tag(tag.name))
 	}
 
+	func showStatusEdits(status: Status, edits: [StatusEdit]) {
+		let sidebarMode = SidebarMode.edits(status: status, edits: edits)
+		authorizedAccountProvider?.presentInSidebar(sidebarMode)
+	}
+
 	func canDelete(status: Status) -> Bool {
 		return currentUserIsAuthor(of: status)
 	}
