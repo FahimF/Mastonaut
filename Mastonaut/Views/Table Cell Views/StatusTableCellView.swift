@@ -168,8 +168,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 		let attributedStatus = cellModel.visibleStatus.attributedContent
 
-		// We test the attributed string since it might produce a visually empty result if the contents were simply the
-		// same link URL as the link on a card, for example.
+		// We test the attributed string since it might produce a visually empty result if the contents were simply the same link URL as the link on a card, for example.
 		if attributedStatus.isEmpty, status.mediaAttachments.isEmpty == false {
 			statusLabel.stringValue = ""
 			statusLabel.toolTip = nil

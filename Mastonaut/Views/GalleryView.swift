@@ -62,6 +62,11 @@ class GalleryView: NSScrollView {
 	}
 
 	func clearGallery() {
+		coverView.isHidden = true
+		if coverView.superview != nil {
+			coverView.removeFromSuperview()
+		}
+		images.removeAll()
 		imageStack.subviews.forEach {
 			$0.removeFromSuperview()
 		}
