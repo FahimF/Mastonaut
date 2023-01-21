@@ -20,8 +20,7 @@
 import CoreTootin
 import Foundation
 
-class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate
-{
+class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
 	@IBOutlet private(set) var tableView: NSTableView!
 
 	internal let resourceFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
@@ -49,10 +48,7 @@ class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSo
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
-		tableView.register(NSNib(nibNamed: "AccountTableCellView", bundle: .main),
-		                   forIdentifier: CellViewIdentifiers.account)
-
+		tableView.register(NSNib(nibNamed: "AccountTableCellView", bundle: .main), forIdentifier: CellViewIdentifiers.account)
 		accounts = AppDelegate.shared.accountsService.authorizedAccounts
 	}
 
@@ -64,37 +60,24 @@ class BaseAccountsPreferencesViewController: NSViewController, NSTableViewDataSo
 
 	func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
 		let view = tableView.makeView(withIdentifier: CellViewIdentifiers.account, owner: nil)
-
 		guard let cellView = view as? AccountTableCellView, let account = accounts?[row] else {
 			return view
 		}
-
 		cellView.setUp(with: account, index: row)
-
 		guard let avatarUrl = account.avatarURL else {
 			return cellView
 		}
-
 		let accountUUID = account.uuid
-
-		resourceFetcher.fetchImage(with: avatarUrl) {
-			[weak self] result in
-
+		resourceFetcher.fetchImage(with: avatarUrl) { [weak self] result in
 			if case let .success(image) = result {
 				DispatchQueue.main.async {
-					guard
-						let accountIndex = self?.accounts?.firstIndex(where: { $0.uuid == accountUUID }),
-						let view = self?.tableView.view(atColumn: 0, row: accountIndex, makeIfNecessary: false),
-						let cellView = view as? AccountTableCellView
-					else {
+					guard let accountIndex = self?.accounts?.firstIndex(where: { $0.uuid == accountUUID }), let view = self?.tableView.view(atColumn: 0, row: accountIndex, makeIfNecessary: false), let cellView = view as? AccountTableCellView else {
 						return
 					}
-
 					cellView.setAvatar(image)
 				}
 			}
 		}
-
 		return cellView
 	}
 }

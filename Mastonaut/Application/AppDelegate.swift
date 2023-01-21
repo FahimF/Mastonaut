@@ -284,42 +284,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		else {
 			return false
 		}
-
 		managedObjectContext.delete(account)
-
 		updateAccountsMenu()
-		timelineWindowControllers.forEach {
-			windowController in
-
+		timelineWindowControllers.forEach { windowController in
 			if windowController.currentUser == userUUID {
 				windowController.currentUser = nil
 			}
-
 			windowController.updateUserPopUpButton()
 		}
-
 		// Make sure new user data is persisted.
 		saveContext()
-
 		return true
 	}
 
 	func startAuthorizationRefresh(for account: AuthorizedAccount) {
-		guard
-			let authorizingEntity = NSApp.keyWindow?.windowController as? (AnyObject & AccountAuthorizationSource),
-			let window = authorizingEntity.sourceWindow
-		else {
+		guard let authorizingEntity = NSApp.keyWindow?.windowController as? (AnyObject & AccountAuthorizationSource), let window = authorizingEntity.sourceWindow else {
 			return
 		}
-
 		self.authorizingEntity = authorizingEntity
-
 		authorizingEntity.prepareForAuthorization()
 		authController.refreshAuthorization(for: account, with: window)
 	}
 
-	// MARK: Core Data stack
-
+	// MARK: - Core Data stack
 	private lazy var persistence = Persistence()
 
 	lazy var persistentContainer: NSPersistentContainer = {
@@ -327,7 +314,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 			Persistence.overwritePersistenceStorage(with: legacyPersistenceContents)
 			sunsetLegacyPersistentContainerContents()
 		}
-
 		return persistence.persistentContainer
 	}()
 
@@ -335,18 +321,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		return persistentContainer.viewContext
 	}
 
-	// MARK: Legacy stack migration to shared stack
-
+	// MARK: - Legacy stack migration to shared stack
 	private func legacyPersistentContainerContents() -> FileWrapper? {
 		let legacyPersistenceDataURL = NSPersistentContainer.defaultDirectoryURL()
-
-		if let contents = try? FileWrapper(url: legacyPersistenceDataURL, options: .immediate),
-		   contents.isDirectory,
-		   contents.fileWrappers?.count ?? 0 > 0
-		{
+		if let contents = try? FileWrapper(url: legacyPersistenceDataURL, options: .immediate), contents.isDirectory,
+		   contents.fileWrappers?.count ?? 0 > 0 {
 			return contents
 		}
-
 		return nil
 	}
 
@@ -359,42 +340,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		guard Preferences.didMigrateToSharedLocalKeychain == false else {
 			return
 		}
-
 		let errors = accountsService.migrateAllAccountsToSharedLocalKeychain(keychainController: keychainController)
-
 		guard errors.isEmpty == false else {
 			Preferences.didMigrateToSharedLocalKeychain = true
 			return
 		}
-
 		var accountURIs = [String]()
-
 		for error in errors {
 			error.account.needsAuthorization = true
 			accountURIs.append(error.account.uri!)
 		}
 
 		// Schedule the error display to when applicationDidFinishLaunching is called
-		migrationErrorPresenter = {
-			[unowned self] in
-
-			let alert = NSAlert(style: .warning,
-			                    title: 🔠("error.migration.title"),
-			                    message: 🔠("error.migration.message", accountURIs.joined(separator: "\n")))
-
+		migrationErrorPresenter = { [unowned self] in
+			let alert = NSAlert(style: .warning, title: 🔠("error.migration.title"), message: 🔠("error.migration.message", accountURIs.joined(separator: "\n")))
 			alert.addButton(withTitle: 🔠("error.migration.button.accountsettings"))
 			alert.addButton(withTitle: 🔠("error.migration.button.moreinfo"))
 			alert.addButton(withTitle: "Cancel")
-
 			if alert.runModal() == .alertFirstButtonReturn {
 				self.showAccountsPreferences()
 			} else if alert.runModal() == .alertSecondButtonReturn {
 				let message = errors.map { "\($0.account.uri!): \($0.underlyingError)" }.joined(separator: "\n\n")
-				let alert = NSAlert(style: .informational, title: "Error Listing",
-				                    message: message)
-
+				let alert = NSAlert(style: .informational, title: "Error Listing", message: message)
 				alert.addButton(withTitle: "Close")
-
 				alert.runModal()
 			}
 		}
@@ -431,16 +399,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
 	func application(_: NSApplication, open urls: [URL]) {
 		for url in urls {
-			if url.pathComponents.count > 3,
-			   url.pathComponents[1] == "grant",
-			   url.pathComponents[3] == "code",
-			   let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-			   let code = components.queryItems?.first(where: { $0.name == "code" })?.value
-			{
+			if url.pathComponents.count > 3, url.pathComponents[1] == "grant", url.pathComponents[3] == "code", let components = URLComponents(url: url, resolvingAgainstBaseURL: false), let code = components.queryItems?.first(where: { $0.name == "code" })?.value {
 				DispatchQueue.main.async {
 					self.authController.completeAuthorization(from: url.pathComponents[2], grantCode: code)
 				}
-
 				return
 			}
 		}
@@ -449,27 +411,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 	func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
 		// Save changes in the application's managed object context before the application terminates.
 		let context = persistentContainer.viewContext
-
 		if !context.commitEditing() {
 			log.info("\(NSStringFromClass(type(of: self))) unable to commit editing to terminate")
 			return .terminateCancel
 		}
-
 		if !context.hasChanges {
 			return .terminateNow
 		}
-
 		do {
 			try context.save()
 		} catch {
 			let nserror = error as NSError
-
 			// Customize this code block to include application-specific recovery steps.
 			let result = sender.presentError(nserror)
 			if result {
 				return .terminateCancel
 			}
-
 			let question = NSLocalizedString("Could not save changes while quitting. Quit anyway?", comment: "Quit without saves error question message")
 			let info = NSLocalizedString("Quitting now will lose any changes you have made since the last successful save", comment: "Quit without saves error question info")
 			let quitButton = NSLocalizedString("Quit anyway", comment: "Quit anyway button title")
@@ -479,7 +436,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 			alert.informativeText = info
 			alert.addButton(withTitle: quitButton)
 			alert.addButton(withTitle: cancelButton)
-
 			let answer = alert.runModal()
 			if answer == .alertSecondButtonReturn {
 				return .terminateCancel
@@ -491,7 +447,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
 	private func updateAppIsReady() {
 		let isReady = didUpdateAllAccounts && allCachesLoaded
-
 		guard isReady != appIsReady else { return }
 		appIsReady = isReady
 	}
@@ -504,8 +459,7 @@ extension AppDelegate: CacheDelegate {
 	}
 
 	func cacheDidFinishLoadingFromDisk(_: Cache) {
-		DispatchQueue.main.async {
-			[weak self] in
+		DispatchQueue.main.async { [weak self] in
 			// Eventually, when other caches are created, all their `isLoaded` states must be true for
 			// `appIsReady` to be true as well
 			self?.updateAppIsReady()
@@ -522,29 +476,22 @@ extension AppDelegate {
 		statusComposerWindowControllers.append(newComposerWindow)
 		newComposerWindow.showWindow(sender)
 		newComposerWindow.currentAccount = nil
-
 		if !NSApp.isActive {
 			NSApp.activate(ignoringOtherApps: true)
 		}
 	}
 
 	@IBAction func newAuthorization(_: Any?) {
-		guard
-			let authorizingEntity = NSApp.keyWindow?.windowController as? (AnyObject & AccountAuthorizationSource),
-			let window = authorizingEntity.sourceWindow
-		else {
+		guard let authorizingEntity = NSApp.keyWindow?.windowController as? (AnyObject & AccountAuthorizationSource), let window = authorizingEntity.sourceWindow else {
 			return
 		}
-
 		self.authorizingEntity = authorizingEntity
-
 		authorizingEntity.prepareForAuthorization()
 		authController.newAuthorization(with: window)
 	}
 
 	@IBAction func newWindow(_: Any?) {
 		makeNewTimelinesWindow(forDecoder: false)
-
 		if !NSApp.isActive {
 			NSApp.activate(ignoringOtherApps: true)
 		}
@@ -586,7 +533,6 @@ extension AppDelegate: AuthControllerDelegate {
 	func authController(_: AuthController, failedAuthorizingWithError error: AuthController.Errors) {
 		DispatchQueue.main.async { [unowned self] in
 			self.resetAuthorizationState()
-
 			let alert = NSAlert(style: .warning, title: 🔠("authorization.title"), message: error.localizedDescription)
 			alert.runModal()
 		}
@@ -598,9 +544,7 @@ extension AppDelegate: AuthControllerDelegate {
 			self.informOpenWindowsOfNewAccountCredentials(forAccountUUID: uuid)
 			self.resetAuthorizationState()
 		}
-
 		timelineWindowControllers.forEach { $0.updateUserPopUpButton() }
-
 		// Make sure new user data is persisted.
 		saveContext()
 	}
