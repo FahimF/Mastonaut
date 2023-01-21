@@ -60,7 +60,7 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 	}
 
 	var isMediaHidden: Bool {
-		return sensitiveContentButton.state == .on
+		return sensitiveContentButton.state == .off
 	}
 
 	private var userDidInteractWithVisibilityControls = false
@@ -192,10 +192,10 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 			installSpoilerCover()
 			contentWarningContainer.isHidden = false
 		}
-		setUpInteractions(status: cellModel.visibleStatus)
-		setupAttachmentsContainerView(for: cellModel.visibleStatus, poll: poll, attachmentPresenter: attachmentPresenter)
 		hasMedia = status.mediaAttachments.count > 0
 		hasSensitiveMedia = status.sensitive == true
+		setUpInteractions(status: cellModel.visibleStatus)
+		setupAttachmentsContainerView(for: cellModel.visibleStatus, poll: poll, attachmentPresenter: attachmentPresenter)
 	}
 
 	func updateAccessibilityAttributes() {
@@ -232,7 +232,6 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 
 	func updateContentsVisibility() {
 		guard userDidInteractWithVisibilityControls == false else { return }
-
 		if hasSpoiler {
 			switch Preferences.spoilerDisplayMode {
 			case .alwaysHide:
@@ -266,7 +265,12 @@ class StatusTableCellView: MastonautTableCellView, StatusDisplaying, StatusInter
 		infoLabel.isHidden = true
 		if status.mediaAttachments.count > 0 {
 			vwGallery.isHidden = false
-			vwGallery.set(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, mediaHidden: isMediaHidden)
+			var hidden = false
+			if Preferences.mediaDisplayMode == .alwaysHide || Preferences.mediaDisplayMode == .hideSensitiveMedia {
+				hidden = true
+			}
+			hidden = hidden && status.sensitive ?? false
+			vwGallery.set(attachments: status.mediaAttachments, attachmentPresenter: attachmentPresenter, mediaHidden: hidden)
 			// Show/hide label
 			let cnt = status.mediaAttachments.count
 			if cnt > 1 {

@@ -28,9 +28,7 @@ class CoverView: BorderView {
 
 	init(backgroundColor: NSColor, textColor: NSColor = .labelColor, message: String) {
 		super.init(frame: .zero)
-		setUp(backgroundColor: backgroundColor,
-		      textColor: textColor,
-		      message: message)
+		setUp(backgroundColor: backgroundColor, textColor: textColor, message: message)
 	}
 
 	override init(frame frameRect: NSRect) {

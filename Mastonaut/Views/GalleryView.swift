@@ -13,11 +13,10 @@ protocol AttachmentPresenting: AnyObject {
 	func present(attachment: Attachment, from group: AttachmentGroup, senderWindow: NSWindow)
 }
 
-class GalleryView: NSScrollView {
+class GalleryView: NSScrollView {	
+	private let resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 	private var images = [AttachmentImageView]()
 	@IBOutlet private var imageStack: NSStackView!
-
-	private let resourcesFetcher = ResourcesFetcher(urlSession: AppDelegate.shared.resourcesUrlSession)
 
 	private weak var attachmentPresenter: AttachmentPresenting!
 
@@ -34,21 +33,32 @@ class GalleryView: NSScrollView {
 		self.attachmentPresenter = attachmentPresenter
 		self.isMediaHidden = mediaHidden
 		setup()
-//		mediaHidden.map { setMediaHidden($0, animated: false) }
 	}
 
 	// MARK: - Internal Methods
 	@objc
 	func presentAttachment(_ sender: Any?) {
-		guard let control = sender as? NSControl ?? images.first, let window = control.window, let attachment = imageViewAttachmentMap.object(forKey: control), let attachmentPresenter = attachmentPresenter else {
+		guard let attachmentPresenter = attachmentPresenter else {
 			return
 		}
-		attachmentPresenter.present(attachment: attachment, from: attachmentGroup, senderWindow: window)
+		guard let ctrl = sender as? NSControl, let window = ctrl.window else {
+			return
+		}
+		var attachment = images.first?.attachment
+		if let att = imageViewAttachmentMap.object(forKey: ctrl) {
+			attachment = att
+		}
+		if let attachment = attachment {
+			attachmentPresenter.present(attachment: attachment, from: attachmentGroup, senderWindow: window)
+		}
 	}
 
 	func setMediaHidden(_ hideMedia: Bool, animated: Bool = true) {
-		coverView.setHidden(!hideMedia, animated: animated)
-		(images + previewAttachments).forEach { $0.setHidden(hideMedia, animated: animated) }
+		if hideMedia {
+			addCoverView()
+		} else {
+			coverView.removeFromSuperview()
+		}
 	}
 
 	func clearGallery() {
@@ -59,10 +69,14 @@ class GalleryView: NSScrollView {
 	
 	// MARK: - Private Methods
 	private func setup() {
-		setupCoverView()
+		images.removeAll()
+		if coverView.superview != nil {
+			coverView.removeFromSuperview()
+		}
 		// Add attachments to gallery
 		for att in attachmentGroup.attachments {
 			let iv = AttachmentImageView()
+			iv.attachment = att
 			// Set up image view
 			iv.cornerRadius = 8
 			iv.borderWidth = 1
@@ -100,6 +114,7 @@ class GalleryView: NSScrollView {
 			}
 			// Add image to stack view
 			imageStack?.addArrangedSubview(iv)
+			images.append(iv)
 		}
 		setMediaHidden(isMediaHidden)
 	}
@@ -110,8 +125,12 @@ class GalleryView: NSScrollView {
 		setMediaHidden(isMediaHidden)
 	}
 
-	private func setupCoverView() {
-		addSubview(coverView)
+	private func addCoverView() {
+		guard let parent = superview else { return }
+		if coverView.superview != nil {
+			coverView.removeFromSuperview()
+		}
+		parent.addSubview(coverView)
 		coverView.target = self
 		coverView.action = #selector(toggleMediaVisibility)
 		// FIXME: Fast double-clicks can cause the view to re-hide.

@@ -25,18 +25,14 @@ extension NSView {
 			// Nothing to do
 			return
 		}
-
 		guard animated else {
 			isHidden = shouldHide
 			return
 		}
-
 		if !shouldHide, isHidden {
 			isHidden = false
 		}
-
-		NSAnimationContext.runAnimationGroup({ _ in self.animator().alphaValue = shouldHide ? 0.0 : 1.0 },
-		                                     completionHandler: { self.isHidden = shouldHide })
+		NSAnimationContext.runAnimationGroup({ _ in self.animator().alphaValue = shouldHide ? 0.0 : 1.0 }, completionHandler: { self.isHidden = shouldHide })
 	}
 
 	/// Hides a view without changing the `isHidden` property. Caution: if `isHidden` is already `true`, then

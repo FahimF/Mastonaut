@@ -21,6 +21,8 @@ import Cocoa
 
 @IBDesignable
 public class AttachmentImageView: NSControl {
+	public var attachment: Attachment!
+	
 	private lazy var clickGestureRecognizer: NSClickGestureRecognizer = {
 		let recognizer = NSClickGestureRecognizer()
 		recognizer.numberOfClicksRequired = 1
@@ -123,6 +125,7 @@ public class AttachmentImageView: NSControl {
 		applyExposureFilterIfNecessary()
 	}
 
+	// MARK: - Private Methods
 	@objc private func gestureRecognizer(_: Any?) {
 		sendAction(action, to: target)
 	}
@@ -133,5 +136,5 @@ public class AttachmentImageView: NSControl {
 		} else {
 			layer?.filters = nil
 		}
-	}
+	}	
 }
