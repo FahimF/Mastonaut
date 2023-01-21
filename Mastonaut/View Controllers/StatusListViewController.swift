@@ -105,7 +105,7 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 		authorizedAccountProvider?.presentInSidebar(sidebarMode)
 	}
 
-	func canDelete(status: Status) -> Bool {
+	func canDeleteOrEdit(status: Status) -> Bool {
 		return currentUserIsAuthor(of: status)
 	}
 
@@ -125,6 +125,10 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 
 	func redraft(status: Status) {
 		authorizedAccountProvider?.redraft(status: status)
+	}
+
+	func edit(status: Status) {
+		authorizedAccountProvider?.edit(status: status)
 	}
 
 	override func menuItems(for entryReference: EntryReference) -> [NSMenuItem] {
@@ -198,7 +202,6 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	}
 
 	// MARK: - Filtering
-
 	override func applicableFilters() -> [UserFilter] {
 		return filterService?.filters ?? []
 	}
@@ -212,7 +215,6 @@ class StatusListViewController: ListViewController<Status>, StatusInteractionHan
 	}
 
 	// MARK: - Reuse Identifiers
-
 	enum CellViewIdentifier {
 		static let status = NSUserInterfaceItemIdentifier("status")
 	}

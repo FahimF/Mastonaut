@@ -85,9 +85,10 @@ class StatusMenuItemsController: MenuItemsController {
 				{ handler.mention(userHandle: "@\(author.acct)", directMessage: true) },
 		].compacted()
 
-		if handler.canDelete(status: status) {
+		if handler.canDeleteOrEdit(status: status) {
 			items.append(.separator())
 			items.append(contentsOf: makeDeleteStatusItems(status: status, interactionHandler: handler))
+			items.append(contentsOf: makeEditStatusItem(status: status, interactionHandler: handler))
 		}
 
 		if handler.canPin(status: status) {
@@ -150,6 +151,12 @@ class StatusMenuItemsController: MenuItemsController {
 		return [
 			makeActionItem(title: "Delete") { interactionHandler.delete(status: status, redraft: false) },
 			makeActionItem(title: "Delete & Re-draft") { interactionHandler.delete(status: status, redraft: true) },
+		]
+	}
+
+	private func makeEditStatusItem(status: Status, interactionHandler: StatusInteractionHandling) -> [NSMenuItem] {
+		return [
+			makeActionItem(title: 🔠("Edit")) { interactionHandler.edit(status: status) }
 		]
 	}
 

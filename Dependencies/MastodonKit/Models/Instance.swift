@@ -29,18 +29,12 @@ public class Instance: Codable {
     public let urls: InstanceURLs?
     /// The account of the instance administrator.
     public let contactAccount: Account?
+	public let configuration: InstanceConfiguration?
 
     enum CodingKeys: String, CodingKey {
-        case uri
-        case title
-        case description
-        case email
-        case version
-        case thumbnail
-        case stats
-        case languages
-        case urls
+        case uri, title, description, email, version, thumbnail, stats, languages, urls
         case contactAccount = "contact_account"
+		case configuration
     }
 }
 
@@ -66,4 +60,24 @@ public struct InstanceURLs: Codable {
     enum CodingKeys: String, CodingKey {
         case streaming = "streaming_api"
     }
+}
+
+public struct InstanceConfiguration: Codable {
+	public let statuses: InstanceStatusConfiguration?
+
+	enum CodingKeys: String, CodingKey {
+		case statuses
+	}
+}
+
+public struct InstanceStatusConfiguration: Codable {
+	public let maxCharacters: Int
+	public let maxMediaAttachments: Int
+	public let charactersReservedPerUrl: Int
+
+	enum InstanceStatusConfiguration: String, CodingKey {
+		case maxCharacters = "max_characters"
+		case maxMediaAttachments = "max_media_attachments"
+		case charactersReservedPerUrl = "characters_reserved_per_url"
+	}
 }

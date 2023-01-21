@@ -276,22 +276,25 @@ class TimelinesWindowController: NSWindowController, UserPopUpButtonDisplaying {
 	}
 
 	func redraft(status: Status) {
-		AppDelegate.shared.composeStatus(self)
-		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		let composerWindowController = AppDelegate.shared.statusComposerWindowController
 		composerWindowController.showWindow(nil)
 		composerWindowController.setUpAsRedraft(of: status, using: currentAccount)
 	}
 
+	func edit(status: Status) {
+		let composerWindowController = AppDelegate.shared.statusComposerWindowController
+		composerWindowController.showWindow(nil)
+		composerWindowController.setUpAsEdit(of: status, using: currentAccount)
+	}
+
 	func composeReply(for status: Status, sender: Any?) {
-		AppDelegate.shared.composeStatus(self)
-		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		let composerWindowController = AppDelegate.shared.statusComposerWindowController
 		composerWindowController.showWindow(sender)
 		composerWindowController.setupAsReply(to: status, using: currentAccount, senderWindowController: self)
 	}
 
 	func composeMention(userHandle: String, directMessage: Bool) {
-		AppDelegate.shared.composeStatus(self)
-		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		let composerWindowController = AppDelegate.shared.statusComposerWindowController
 		composerWindowController.showWindow(nil)
 		composerWindowController.setupAsMention(handle: userHandle, using: currentAccount, directMessage: directMessage)
 	}
@@ -732,8 +735,7 @@ extension TimelinesWindowController: AuthorizedAccountProviding {
 // IBActions
 extension TimelinesWindowController {
 	@IBAction func composeStatus(_ sender: Any?) {
-		AppDelegate.shared.composeStatus(sender)
-		guard let composerWindowController = AppDelegate.shared.statusComposerWindowControllers.last else { return }
+		let composerWindowController = AppDelegate.shared.statusComposerWindowController
 		guard let composerWindow = composerWindowController.window else { return }
 		if let composerScreen = composerWindow.screen, let timelinesScreen = window?.screen,
 		   composerScreen !== timelinesScreen {

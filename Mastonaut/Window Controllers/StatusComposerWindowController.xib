@@ -38,6 +38,7 @@
                 <outlet property="replyStatusContentsLabel" destination="T1a-as-iZQ" id="vai-hZ-1Fm"/>
                 <outlet property="submitSegmentedControl" destination="Y1e-gF-Lwj" id="orS-HN-Grr"/>
                 <outlet property="submitStatusIndicator" destination="F9e-xX-aiM" id="XY5-H6-Bha"/>
+                <outlet property="submitToolbarItem" destination="J1z-pE-aui" id="kqG-UY-hvk"/>
                 <outlet property="textView" destination="xJy-2A-0H6" id="SZB-jI-ufk"/>
                 <outlet property="visibilitySegmentedControl" destination="Gv5-7N-KPa" id="B9a-8z-WkA"/>
                 <outlet property="window" destination="0jZ-D2-fmk" id="jHc-mb-bDw"/>

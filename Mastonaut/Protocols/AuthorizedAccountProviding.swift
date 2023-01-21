@@ -28,6 +28,7 @@ protocol AuthorizedAccountProviding: AttributedLabelLinkHandler {
 	func composeReply(for status: Status, sender: Any?)
 	func composeMention(userHandle: String, directMessage: Bool)
 	func redraft(status: Status)
+	func edit(status: Status)
 
 	func handle(linkURL: URL, knownTags: [Tag]?)
 

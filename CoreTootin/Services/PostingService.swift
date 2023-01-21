@@ -80,6 +80,35 @@ public class PostingService: NSObject {
 		}
 	}
 
+	public func edit(existingID: String, isSensitive: Bool, attachmentIds: [String], poll: PollPayload?, completion: @escaping (Swift.Result<Status, Error>) -> Void) {
+		let isSensitive = attachmentIds.count > 0 && isSensitive
+		let editStatusRequest = Statuses.edit(id: existingID, status: status, mediaIDs: attachmentIds, sensitive: isSensitive, spoilerText: contentWarning, poll: poll)
+		let taskPromise = Promise<URLSessionTask>()
+		guard let future = client.run(editStatusRequest, resumeImmediately: false, completion:
+			{ [weak self] result in
+				DispatchQueue.main.async {
+					guard let self = self else { return }
+					if self.submitTaskFuture === taskPromise.value {
+						self.submitTaskFuture = nil
+					}
+					switch result {
+					case .success(let status, _):
+						completion(.success(status))
+
+					case .failure(let error):
+						completion(.failure(error))
+					}
+				}
+		}) else {
+			return
+		}
+		submitTaskFuture = future
+		future.resolutionHandler = { task in
+			taskPromise.value = task
+			task.resume()
+		}
+	}
+
 	private func updateCharacterCount() {
 		characterCount = status.mastodonCount + (contentWarning?.count ?? 0)
 	}
