@@ -18,6 +18,7 @@ class GalleryView: NSScrollView {
 	private var images = [AttachmentImageView]()
 	@IBOutlet private var imageStack: NSStackView!
 
+	private var viewHeight: CGFloat = 200
 	private weak var attachmentPresenter: AttachmentPresenting!
 
 	private var imageViewAttachmentMap = NSMapTable<NSControl, Attachment>(keyOptions: .weakMemory, valueOptions: .structPersonality)
@@ -87,18 +88,7 @@ class GalleryView: NSScrollView {
 			iv.borderWidth = 1
 			iv.borderColor = NSColor.gray.cgColor
 			// If we don't have a meta size, we use a placeholder one that closely matches the best size on the UI. This will avoid unecessary layout passes when the image is loaded and set to the image view. Default is: 395 x 200
-			let ht = bounds.size.height
-			let wd = 395 * (ht / 200)
-			var sz = NSSize(width: wd, height: ht)
-			if let meta = att.meta, let orig = meta.original, let size = orig.size {
-				sz.width = (ht / size.height) * size.width
-			}
-			iv.defaultContentSize = sz
-			iv.translatesAutoresizingMaskIntoConstraints = false
-			NSLayoutConstraint.activate([
-				iv.widthAnchor.constraint(equalToConstant: sz.width),
-				iv.heightAnchor.constraint(equalToConstant: sz.height)
-			])
+			viewHeight = bounds.size.height
 			fetchImage(with: att.parsedPreviewUrl ?? att.parsedUrl, fallbackUrl: att.parsedUrl, from: att, placingInto: iv)
 			if [.video, .gifv].contains(att.type) {
 				let playGlyphView = NSButton(image: #imageLiteral(resourceName: "play_big"), target: self, action: #selector(self.presentAttachment(_:)))
@@ -159,8 +149,9 @@ class GalleryView: NSScrollView {
 				return
 			}
 			let finalImage: NSImage
-			if image.pixelSize.area > NSSize(width: 1024, height: 1024).area {
-				finalImage = image.resizedImage(withSize: NSSize(width: 1024, height: 1024))
+			if image.pixelSize.height > self!.viewHeight {
+				let wd = image.pixelSize.width / (image.pixelSize.height / self!.viewHeight)
+				finalImage = image.resizedImage(withSize: NSSize(width: wd, height: self!.viewHeight))
 			} else {
 				finalImage = image
 			}

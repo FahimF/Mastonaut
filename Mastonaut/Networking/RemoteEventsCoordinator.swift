@@ -140,8 +140,7 @@ extension RemoteEventsCoordinator: RemoteEventsListenerDelegate {
 	}
 
 	func remoteEventsListenerDidDisconnect(_ remoteEventsListener: RemoteEventsListener, code: UInt16) {
-		guard let streamIdentifier = (remoteEventsListener as?  TaggedRemoteEventsListener)?.streamIdentifier
-		else {
+		guard let streamIdentifier = (remoteEventsListener as?  TaggedRemoteEventsListener)?.streamIdentifier else {
 			return
 		}
 		if code == 404 {
@@ -154,8 +153,7 @@ extension RemoteEventsCoordinator: RemoteEventsListenerDelegate {
 	}
 
 	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, didHandleEvent event: ClientEvent) {
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
-		else {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else {
 			return
 		}
 		streamReceiverMap[streamIdentifier]?.forEach {
@@ -164,8 +162,7 @@ extension RemoteEventsCoordinator: RemoteEventsListenerDelegate {
 	}
 
 	func remoteEventsListener(_ remoteEventsListener: RemoteEventsListener, parserProducedError error: Error) {
-		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier
-		else {
+		guard let streamIdentifier = (remoteEventsListener as? TaggedRemoteEventsListener)?.streamIdentifier else {
 			return
 		}
 		streamReceiverMap[streamIdentifier]?.forEach {
@@ -190,7 +187,7 @@ private struct AnyRemoteEventsReceiver: Hashable, ReceiverRef {
 		streamIdentifier = stream
 		description = (receiver as? NSObject)?.description ?? String(describing: receiver)
 
-		eventHandler = {[weak receiver] in
+		eventHandler = { [weak receiver] in
 			assert(receiver != nil)
 			receiver?.remoteEventsCoordinator(streamIdentifier: $0, didHandleEvent: $1)
 		}
