@@ -28,14 +28,8 @@ class HTMLParsingService {
 		return cache
 	}()
 
-	func parse(HTML htmlString: String,
-	           removingTrailingUrl url: URL? = nil,
-	           removingInvisibleSpans removeInvisibles: Bool = true) -> NSAttributedString
-	{
-		let cacheReference = CacheReference(htmlString: htmlString,
-		                                    removedTrailingURL: url,
-		                                    removedInvisibleSpans: removeInvisibles)
-
+	func parse(HTML htmlString: String, removingTrailingUrl url: URL? = nil, removingInvisibleSpans removeInvisibles: Bool = true) -> NSAttributedString {
+		let cacheReference = CacheReference(htmlString: htmlString, removedTrailingURL: url, removedInvisibleSpans: removeInvisibles)
 		if let cachedParsedString = cache.object(forKey: cacheReference) {
 			return cachedParsedString
 		}
@@ -72,9 +66,6 @@ private class CacheReference: NSObject {
 
 	override func isEqual(_ object: Any?) -> Bool {
 		guard let other = object as? CacheReference else { return false }
-
-		return htmlString == other.htmlString
-			&& removedTrailingURL == other.removedTrailingURL
-			&& removedInvisibleSpans == other.removedInvisibleSpans
+		return htmlString == other.htmlString && removedTrailingURL == other.removedTrailingURL && removedInvisibleSpans == other.removedInvisibleSpans
 	}
 }

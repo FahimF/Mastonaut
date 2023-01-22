@@ -158,15 +158,11 @@
 
 @implementation NSAttributedString (SimpleHTML)
 
-+ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString
-{
++ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString {
 	return [self attributedStringWithSimpleHTML:htmlString removingTrailingUrl:nil removingInvisibleSpans:YES];
 }
 
-+ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString
-								   removingTrailingUrl:(nullable NSURL *)url
-								removingInvisibleSpans:(BOOL)removeInvisibles
-{
++ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString removingTrailingUrl:(nullable NSURL *)url removingInvisibleSpans:(BOOL)removeInvisibles {
 	NSMutableCharacterSet *htmlTagNameEndCharset = [[NSCharacterSet alphanumericCharacterSet] mutableCopy];
 	[htmlTagNameEndCharset addCharactersInString:@"/"];
 	[htmlTagNameEndCharset invert];
@@ -180,118 +176,76 @@
 	NSString *scannedString = nil;
 	BOOL didRemoveTrailingLinkInvisibles = NO;
 
-	while ([scanner scanUpToString:@"<" intoString:&scannedString] || ![scanner isAtEnd])
-	{
-		if (scannedString != nil)
-		{
-			if (pendingLinkTag != nil)
-			{
+	while ([scanner scanUpToString:@"<" intoString:&scannedString] || ![scanner isAtEnd]) {
+		if (scannedString != nil) {
+			if (pendingLinkTag != nil) {
 				[pendingLinkTag appendToContents:[scannedString decodingHTMLEntities]];
-			}
-			else
-			{
+			} else {
 				[output appendString:[scannedString decodingHTMLEntities]];
 			}
 		}
-
-		if ([scanner isAtEnd])
-		{
+		if ([scanner isAtEnd]) {
 			break;
 		}
-
 		// Skip the opening < tag
 		[scanner advanceBy:1];
-
 		// Scan the tag name (such as span, p, a...)
 		[scanner scanUpToCharactersFromSet:htmlTagNameEndCharset intoString:&scannedString];
-
 		BOOL needsScanToEndOfTag = YES;
-
-		if ([scannedString isEqualToString:@"br"])
-		{
+		if ([scannedString isEqualToString:@"br"]) {
 			// BR is a line break, which we convert to a newline char
 			[output appendString:@"\n"];
-		}
-		else if ([scannedString isEqualToString:@"a"])// && [scanner scanUpToAndIncludingString:@"href=\"" intoString:nil])
-		{
+//      } else if ([scannedString isEqualToString:@"a"]) && [scanner scanUpToAndIncludingString:@"href=\"" intoString:nil])
+		} else if ([scannedString isEqualToString:@"a"]) {
 			NSString *tagName = nil;
-
-			while (![scanner isAtEnd])
-			{
+			while (![scanner isAtEnd]) {
 				// Find href or class tag
-				[scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"=\""]
-										intoString:&tagName];
-
-				if ([tagName hasPrefix:@">"])
-				{
+				[scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"=\""] intoString:&tagName];
+				if ([tagName hasPrefix:@">"]) {
 					// Overshot and scanned the next tag. Go back and breakout.
 					[scanner advanceBy: - [tagName length]];
 					break;
-				}
-				else if ([tagName hasSuffix:@"href"])
-				{
+				} else if ([tagName hasSuffix:@"href"]) {
 					NSString *linkDestination = nil;
-
 					// Skip first double-quote
 					[scanner scanUpToAndIncludingString:@"\"" intoString:nil];
-
 					// Scan link destination
 					[scanner scanUpToString:@"\"" intoString:&linkDestination];
-
 					// Store the link info to be used when the closing tag is found.
 					[PendingTagInfo tagInfo:&pendingLinkTag addTagInfoValue:linkDestination forKey:@"href"];
 					if (![scanner isAtEnd]) { [scanner advanceBy:1]; }
-				}
-				else if ([tagName hasSuffix:@"class"])
-				{
+				} else if ([tagName hasSuffix:@"class"]) {
 					NSString *className = nil;
-
 					// Skip first double-quote
 					[scanner scanUpToAndIncludingString:@"\"" intoString:nil];
-
 					// Scan class name
 					[scanner scanUpToString:@"\"" intoString:&className];
-
 					// Store the link info to be used when the closing tag is found.
 					[PendingTagInfo tagInfo:&pendingLinkTag addTagInfoValue:className forKey:@"class"];
 					if (![scanner isAtEnd]) { [scanner advanceBy:1]; }
-				}
-				else
-				{
+				} else {
 					// Ignore this tag's contents
 					[scanner scanUpToAndIncludingString:@"\"" intoString:nil];
 					[scanner scanUpToAndIncludingString:@"\"" intoString:nil];
 				}
-
 				tagName = nil;
 			}
-		}
-		else if ([scannedString isEqualToString:@"span"])
-		{
+		} else if ([scannedString isEqualToString:@"span"]) {
 			NSString *spanAttributes = nil;
-
 			// Scan the tag contents, check for "invisible" keyword.
-			if ([scanner scanUpToAndIncludingString:@">" intoString:&spanAttributes]
-				&& [spanAttributes containsString:@"invisible"] && removeInvisibles)
-			{
+			if ([scanner scanUpToAndIncludingString:@">" intoString:&spanAttributes] && [spanAttributes containsString:@"invisible"] && removeInvisibles) {
 				NSString *spanContents;
 
 				// Ignore this part of the contents, it's not meant to be visible.
 				[scanner scanUpToAndIncludingString:@"</span>" intoString:&spanContents];
 
-				if ([spanContents length] > 7
-					&& [[pendingLinkTag contents] length] > 0
-					&& ![[pendingLinkTag contents] hasSuffix:@"…"])
-				{
+				if ([spanContents length] > 7 && [[pendingLinkTag contents] length] > 0 && ![[pendingLinkTag contents] hasSuffix:@"…"]) {
 					didRemoveTrailingLinkInvisibles = YES;
 				}
 			}
-
 			// In either case we have already scanned the tag's contents. Doing that again will skip to the next tag.
 			needsScanToEndOfTag = NO;
-		}
-		else if ([scannedString isEqualToString:@"/a"] && pendingLinkTag != nil)
-		{
+		} else if ([scannedString isEqualToString:@"/a"] && pendingLinkTag != nil) {
 			NSString *linkDestination = [[pendingLinkTag tagInfo] objectForKey:@"href"];
 			NSString *className = [[pendingLinkTag tagInfo] objectForKey:@"class"];
 
@@ -299,42 +253,28 @@
 
 			__auto_type attributes = [self linkAttributesFor: linkDestination className:className];
 
-			if (didRemoveTrailingLinkInvisibles)
-			{
+			if (didRemoveTrailingLinkInvisibles) {
 				[pendingLinkTag appendToContents:@"…"];
 				didRemoveTrailingLinkInvisibles = NO;
 			}
-
-			NSAttributedString *link = [[NSAttributedString alloc] initWithString:[pendingLinkTag contents]
-																	   attributes:attributes];
-
+			NSAttributedString *link = [[NSAttributedString alloc] initWithString:[pendingLinkTag contents] attributes:attributes];
 			[output appendAttributedString:link];
-
 			pendingLinkTag = nil;
-		}
-		else if ([scannedString isEqualToString:@"/p"])
-		{
+		} else if ([scannedString isEqualToString:@"/p"]) {
 			// Ignore anything else inside the tag
-			if ([scanner scanUpToAndIncludingString:@">" intoString:nil] && ![scanner isAtEnd] && [output length] > 0)
-			{
+			if ([scanner scanUpToAndIncludingString:@">" intoString:nil] && ![scanner isAtEnd] && [output length] > 0) {
 				// Insert paragraph separator, but only if there is more content left in order to avoid a blank space in the bottom.
 				[output appendString:@"\n\r"];
 			}
 		}
-
-		if (needsScanToEndOfTag)
-		{
+		if (needsScanToEndOfTag) {
 			// Ignore anything else inside the tag
 			[scanner scanUpToAndIncludingString:@">" intoString:nil];
 		}
-
 		scannedString = nil;
 	}
-
 	NSString *trailingUrlString = [url absoluteString];
-
-	if (trailingUrlString != nil && [[output string] hasSuffix:trailingUrlString])
-	{
+	if (trailingUrlString != nil && [[output string] hasSuffix:trailingUrlString]) {
 		NSRange trailingRange = NSMakeRange([output length] - [trailingUrlString length], [trailingUrlString length]);
 		[output deleteCharactersInRange:trailingRange];
 	}
@@ -352,49 +292,31 @@
 	return output;
 }
 
-+ (NSDictionary<NSAttributedStringKey, id> *)linkAttributesFor:(NSString *)address className:(nullable NSString *)className
-{
++ (NSDictionary<NSAttributedStringKey, id> *)linkAttributesFor:(NSString *)address className:(nullable NSString *)className {
 	NSURL *url = [NSURL urlBySanitizingAddress:address];
-
-	if (url == nil)
-	{
+	if (url == nil) 	{
 		return @{};
 	}
-
-	if (className != nil)
-	{
+	if (className != nil) {
 		url = [url urlWithAnnotation:className];
 	}
-
 	return @{NSLinkAttributeName: url};
 }
 
-- (NSAttributedString *)attributedStringRemovingLinks
-{
+- (NSAttributedString *)attributedStringRemovingLinks {
 	NSMutableAttributedString *mutableString = [self mutableCopy];
-
 	NSMutableArray<NSValue *> *rangesToRemove = [NSMutableArray new];
-
-	[mutableString enumerateAttribute:NSLinkAttributeName
-							  inRange:NSMakeRange(0, mutableString.length)
-							  options:0
-						   usingBlock:^(id _Nullable value, NSRange range, BOOL * _Nonnull stop)
-		{
-			if (value != nil)
-			{
+	[mutableString enumerateAttribute:NSLinkAttributeName inRange:NSMakeRange(0, mutableString.length) options:0 usingBlock:^(id _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+			if (value != nil) {
 				[rangesToRemove addObject:[NSValue valueWithRange:range]];
 			}
 		}];
-
 	NSInteger lengthOffset = 0;
-
-	for (NSValue *value in rangesToRemove)
-	{
+	for (NSValue *value in rangesToRemove) {
 		NSRange range = [value rangeValue];
 		[mutableString deleteCharactersInRange:NSMakeRange(range.location + lengthOffset, range.length)];
 		lengthOffset -= range.length;
 	}
-
 	return mutableString;
 }
 

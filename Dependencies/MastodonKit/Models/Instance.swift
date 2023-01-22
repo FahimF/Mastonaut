@@ -75,7 +75,7 @@ public struct InstanceStatusConfiguration: Codable {
 	public let maxMediaAttachments: Int
 	public let charactersReservedPerUrl: Int
 
-	enum InstanceStatusConfiguration: String, CodingKey {
+	enum CodingKeys: String, CodingKey {
 		case maxCharacters = "max_characters"
 		case maxMediaAttachments = "max_media_attachments"
 		case charactersReservedPerUrl = "characters_reserved_per_url"

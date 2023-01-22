@@ -30,17 +30,9 @@ class ComposingPreferencesController: NSViewController {
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-
-		preferenceObservers.append(PreferenceEnumPopUpObserver(preference: \MastonautPreferences.defaultStatusAudience,
-		                                                       popUpButton: defaultAudiencePopUpButton))
-
-		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.markMediaAsSensitive,
-		                                                      checkbox: defaultMarkAsSensitiveButton))
-
-		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertDoubleNewLines,
-		                                                      checkbox: insertDoubleNewLinesButton))
-
-		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertJoinersBetweenEmojis,
-		                                                      checkbox: insertZWJCharactersButton))
+		preferenceObservers.append(PreferenceEnumPopUpObserver(preference: \MastonautPreferences.defaultStatusAudience, popUpButton: defaultAudiencePopUpButton))
+		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.markMediaAsSensitive, checkbox: defaultMarkAsSensitiveButton))
+		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertDoubleNewLines, checkbox: insertDoubleNewLinesButton))
+		preferenceObservers.append(PreferenceCheckboxObserver(preference: \MastonautPreferences.insertJoinersBetweenEmojis, checkbox: insertZWJCharactersButton))
 	}
 }

@@ -10,59 +10,59 @@ import Foundation
 
 public class Status: Codable {
     /// The ID of the status.
-    public let id: String
+    public var id = ""
     /// A Fediverse-unique resource ID.
-    public let uri: String
+    public var uri = ""
     /// URL to the status page (can be remote).
-    public let url: URL?
+    public var url: URL?
     /// The Account which posted the status.
-    public let account: Account
+    public var account = Account()
     /// null or the ID of the status it replies to.
-    public let inReplyToID: String?
+    public var inReplyToID: String?
     /// null or the ID of the account it replies to.
-    public let inReplyToAccountID: String?
+    public var inReplyToAccountID: String?
     /// Body of the status; this will contain HTML (remote HTML already sanitized).
-    public let content: String
+    public var content = ""
     /// The time the status was created.
-    public let createdAt: Date
+    public var createdAt = Date()
     /// An array of Emoji.
-    public let emojis: [Emoji]
+    public var emojis = [Emoji]()
     /// The number of reblogs for the status.
-    public let reblogsCount: Int
+    public var reblogsCount = 0
     /// The number of favourites for the status.
-    public let favouritesCount: Int
+    public var favouritesCount = 0
     /// Whether the authenticated user has reblogged the status.
-    public let reblogged: Bool?
+    public var reblogged: Bool?
     /// Whether the authenticated user has favourited the status.
-    public let favourited: Bool?
+    public var favourited: Bool?
 	/// Whether the authenticated user has bookmarked the status.
-	public let bookmarked: Bool?
+	public var bookmarked: Bool?
     /// Whether media attachments should be hidden by default.
-    public let sensitive: Bool?
+    public var sensitive: Bool?
     /// If not empty, warning text that should be displayed before the actual content.
-    public let spoilerText: String
+    public var spoilerText = ""
     /// The visibility of the status.
-    public let visibility: Visibility
+    public var visibility: Visibility!
     /// An array of attachments.
-    public let mediaAttachments: [Attachment]
+    public var mediaAttachments = [Attachment]()
     /// An array of mentions.
-    public let mentions: [Mention]
+    public var mentions = [Mention]()
     /// An array of tags.
-    public let tags: [Tag]
+    public var tags = [Tag]()
     /// Application from which the status was posted.
-    public let application: Application?
+    public var application: Application?
     /// The detected language for the status.
-    public let language: String?
+    public var language: String?
     /// The reblogged Status
-    public let reblog: Status?
+    public var reblog: Status?
     /// Whether this is the pinned status for the account that posted it.
     public private(set) var pinned: Bool?
     /// A content card with linked content.
-    public let card: Card?
+    public var card: Card?
     /// A poll
-    public let poll: Poll?
+    public var poll: Poll?
 	/// Timestamp of when the status was last edited.
-	public let editedAt: Date?
+	public var editedAt: Date?
 	
 	// New properties
 	/// How many replies this status has received
@@ -81,6 +81,78 @@ public class Status: Codable {
 		case editedAt = "edited_at"
 		case repliesCount = "replies_count"
     }
+
+	required public init(from decoder: Decoder) throws {
+		do {
+			let values = try decoder.container(keyedBy: CodingKeys.self)
+			id = try values.decode(String.self, forKey: .id)
+			uri = try values.decode(String.self, forKey: .uri)
+			if let u = try? values.decode(URL.self, forKey: .url) {
+				url = u
+			}
+			if let a = try? values.decode(Account.self, forKey: .account) {
+				account = a
+			}
+			if let txt = try? values.decode(String.self, forKey: .inReplyToID) {
+				inReplyToID = txt
+			}
+			if let txt = try? values.decode(String.self, forKey: .inReplyToAccountID) {
+				inReplyToAccountID = txt
+			}
+			content = try values.decode(String.self, forKey: .content)
+			createdAt = try values.decode(Date.self, forKey: .createdAt)
+			emojis = try values.decode([Emoji].self, forKey: .emojis)
+			reblogsCount = try values.decode(Int.self, forKey: .reblogsCount)
+			favouritesCount = try values.decode(Int.self, forKey: .favouritesCount)
+			if let val = try? values.decode(Bool.self, forKey: .reblogged) {
+				reblogged = val
+			}
+			if let val = try? values.decode(Bool.self, forKey: .favourited) {
+				favourited = val
+			}
+			if let val = try? values.decode(Bool.self, forKey: .bookmarked) {
+				bookmarked = val
+			}
+			if let val = try? values.decode(Bool.self, forKey: .sensitive) {
+				sensitive = val
+			}
+			spoilerText = try values.decode(String.self, forKey: .spoilerText)
+			visibility = try values.decode(Visibility.self, forKey: .visibility)
+			mediaAttachments = try values.decode([Attachment].self, forKey: .mediaAttachments)
+			mentions = try values.decode([Mention].self, forKey: .mentions)
+			if let t = try? values.decode([Tag].self, forKey: .tags) {
+				tags = t
+			}
+			if let app = try? values.decode(Application.self, forKey: .application) {
+				application = app
+			}
+			if let txt = try? values.decode(String.self, forKey: .language) {
+				language = txt
+			}
+			if let r = try? values.decode(Status.self, forKey: .reblog) {
+				reblog = r
+			}
+			if let val = try? values.decode(Bool.self, forKey: .pinned) {
+				pinned = val
+			}
+			if let c = try? values.decode(Card.self, forKey: .card) {
+				card = c
+			}
+			if let p = try? values.decode(Poll.self, forKey: .poll) {
+				poll = p
+			}
+			if let dt = try? values.decode(Date.self, forKey: .editedAt) {
+				editedAt = dt
+			}
+			repliesCount = try values.decode(Int.self, forKey: .repliesCount)
+//			if let arr = try? values.decode([Filtered].self, forKey: .filtered) {
+//				filtered = arr
+//			}
+		} catch {
+			NSLog("*** Error decoding Status: \(error)")
+			throw error
+		}
+	}
 
     public func markAsPinned() {
         pinned = true

@@ -283,9 +283,6 @@ class StatusComposerWindowController: NSWindowController, UserPopUpButtonDisplay
 		didSet {
 			currentAccountObservations.removeAll()
 			if let currentAccount = currentAccount {
-				if let prefs = currentAccount.accountPreferences {
-					statusCharacterLimit = prefs.customTootLengthLimit?.intValue ?? 500
-				}
 				let accountUUID = currentAccount.uuid
 				client = Client.create(for: currentAccount)
 				authorAvatarView.image = #imageLiteral(resourceName: "missing.png")

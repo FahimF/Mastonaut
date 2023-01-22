@@ -9,65 +9,58 @@
 import Foundation
 
 public class Account: Codable {
+	public struct Source: Codable {
+		/// Unformatted biography of user.
+		public let note: String?
+		/// Unformatted metadata fields in the user's profile, if any.
+		public let fields: [VerifiableMetadataField]?
+	}
+	
     /// The ID of the account.
-    public let id: String
+    public var id = ""
     /// The username of the account.
-    public let username: String
+    public var username = ""
     /// Equals username for local users, includes @domain for remote ones.
-    public let acct: String
+    public var acct = ""
     /// The account's display name.
-    public let displayName: String
+    public var displayName = ""
     /// Biography of user.
-    public let note: String
+    public var note = ""
     /// URL of the user's profile page (can be remote).
-    public let url: URL
+	public var url = URL(string: "http://google.com")!
     /// URL to the avatar image.
-    public let avatar: String?
+    public var avatar: String?
     /// URL to the avatar static image
-    public let avatarStatic: String?
+    public var avatarStatic: String?
     /// URL to the header image.
-    public let header: String?
+    public var header: String?
     /// URL to the header static image
-    public let headerStatic: String?
+    public var headerStatic: String?
     /// Boolean for when the account cannot be followed without waiting for approval first.
-    public let locked: Bool
+    public var locked = false
     /// The time the account was created.
-    public let createdAt: Date
+    public var createdAt = Date()
     /// The number of followers for the account.
-    public let followersCount: Int
+    public var followersCount = 0
     /// The number of accounts the given account is following.
-    public let followingCount: Int
+    public var followingCount = 0
     /// The number of statuses the account has made.
-    public let statusesCount: Int
+    public var statusesCount = 0
     /// Reference to the account this user has moved to, if any.
-    public let moved: Account?
+    public var moved: Account?
     /// Metadata fields in the user's profile, if any.
-    public let fields: [VerifiableMetadataField]?
+    public var fields: [VerifiableMetadataField]?
     /// Whether this account is a bot.
-    public let bot: Bool?
+    public var bot: Bool?
     /// Unformatted versions of some of the account fields.
-    public let source: Source?
-
+    public var source: Source?
     /// An array of `Emoji`.
-    public var emojis: [Emoji] {
-        return _emojis ?? []
-    }
-
-    /// Real storage of emojis.
-    ///
-    /// According to the [documentation](https://docs.joinmastodon.org/api/entities/#account),
-    /// property emoji is added in 2.4.0, and it is non-optional. But for compibility with older version instance, we
-    /// use `[Emoji]?` as storage and use `[Emoji]` as public API.
-    private let _emojis: [Emoji]?
+    public var emojis = [Emoji]()
 
     private enum CodingKeys: String, CodingKey {
-        case id
-        case username
-        case acct
+        case id, username, acct
         case displayName = "display_name"
-        case note
-        case url
-        case avatar
+        case note, url, avatar
         case avatarStatic = "avatar_static"
         case header
         case headerStatic = "header_static"
@@ -76,18 +69,7 @@ public class Account: Codable {
         case followersCount = "followers_count"
         case followingCount = "following_count"
         case statusesCount = "statuses_count"
-        case _emojis = "emojis"
-        case moved
-        case fields
-        case bot
-        case source
-    }
-
-    public struct Source: Codable {
-        /// Unformatted biography of user.
-        public let note: String?
-        /// Unformatted metadata fields in the user's profile, if any.
-        public let fields: [VerifiableMetadataField]?
+        case emojis, moved, fields, bot, source
     }
 
     public var avatarURL: URL? {
@@ -105,4 +87,59 @@ public class Account: Codable {
     public var headerStaticURL: URL? {
         return headerStatic.flatMap(URL.init(string:))
     }
+	
+	public init() {
+		
+	}
+	
+	required public init(from decoder: Decoder) throws {
+		do {
+			let values = try decoder.container(keyedBy: CodingKeys.self)
+			id = try values.decode(String.self, forKey: .id)
+			username = try values.decode(String.self, forKey: .username)
+			acct = try values.decode(String.self, forKey: .acct)
+			displayName = try values.decode(String.self, forKey: .displayName)
+			note = try values.decode(String.self, forKey: .note)
+			if let u = try? values.decode(URL.self, forKey: .url) {
+				url = u
+			}
+			if let txt = try? values.decode(String.self, forKey: .avatar) {
+				avatar = txt
+			}
+			if let txt = try? values.decode(String.self, forKey: .avatarStatic) {
+				avatarStatic = txt
+			}
+			if let txt = try? values.decode(String.self, forKey: .header) {
+				header = txt
+			}
+			if let txt = try? values.decode(String.self, forKey: .headerStatic) {
+				headerStatic = txt
+			}
+			if let val = try? values.decode(Bool.self, forKey: .locked) {
+				locked = val
+			}
+			createdAt = try values.decode(Date.self, forKey: .createdAt)
+			followersCount = try values.decode(Int.self, forKey: .followersCount)
+			followingCount = try values.decode(Int.self, forKey: .followingCount)
+			statusesCount = try values.decode(Int.self, forKey: .statusesCount)
+			if let a = try? values.decode(Account.self, forKey: .moved) {
+				moved = a
+			}
+			if let arr = try? values.decode([VerifiableMetadataField].self, forKey: .fields) {
+				fields = arr
+			}
+			if let val = try? values.decode(Bool.self, forKey: .bot) {
+				bot = val
+			}
+			if let arr = try? values.decode([Emoji].self, forKey: .emojis) {
+				emojis = arr
+			}
+			if let s = try? values.decode(Source.self, forKey: .source) {
+				source = s
+			}
+		} catch {
+			NSLog("*** Error decoding Account: \(error)")
+			throw error
+		}
+	}
 }
