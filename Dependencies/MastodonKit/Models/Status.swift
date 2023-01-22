@@ -129,7 +129,8 @@ public class Status: Codable {
 			if let txt = try? values.decode(String.self, forKey: .language) {
 				language = txt
 			}
-			if let r = try? values.decode(Status.self, forKey: .reblog) {
+			// Recursive loading (reblogs are Status values whicn can contain other reblog items) can result in crashes if this is not set up to check if the vlalue is present
+			if let r = try? values.decodeIfPresent(Status.self, forKey: .reblog) {
 				reblog = r
 			}
 			if let val = try? values.decode(Bool.self, forKey: .pinned) {
