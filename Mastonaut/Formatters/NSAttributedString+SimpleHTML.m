@@ -192,7 +192,8 @@
 		// Scan the tag name (such as span, p, a...)
 		[scanner scanUpToCharactersFromSet:htmlTagNameEndCharset intoString:&scannedString];
 		BOOL needsScanToEndOfTag = YES;
-		if ([scannedString isEqualToString:@"br"]) {
+		NSArray *arr = @[@"br", @"br/", @"br /"];
+		if ([arr containsObject: scannedString]) {
 			// BR is a line break, which we convert to a newline char
 			[output appendString:@"\n"];
 //      } else if ([scannedString isEqualToString:@"a"]) && [scanner scanUpToAndIncludingString:@"href=\"" intoString:nil])

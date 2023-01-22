@@ -64,10 +64,7 @@ extension Status {
 	}
 
 	var attributedContent: NSAttributedString {
-		var str = content
-		// Double-line breaks for paragraphs get lost. So fix that
-		str = "<p>" + str.replacingOccurrences(of: "<br/><br/>", with: "</p><p>") + "</p>"
-		return HTMLParsingService.shared.parse(HTML: str, removingTrailingUrl: card?.url, removingInvisibleSpans: true)
+		return HTMLParsingService.shared.parse(HTML: content, removingTrailingUrl: card?.url, removingInvisibleSpans: true)
 	}
 
 	var fullAttributedContent: NSAttributedString {

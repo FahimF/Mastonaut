@@ -33,14 +33,10 @@ class HTMLParsingService {
 		if let cachedParsedString = cache.object(forKey: cacheReference) {
 			return cachedParsedString
 		}
-
-		let parsedString = NSAttributedString(simpleHTML: htmlString,
-		                                      removingTrailingUrl: url,
-		                                      removingInvisibleSpans: removeInvisibles)
-
-		cache.setObject(parsedString, forKey: cacheReference, cost: htmlString.count)
-
-		return parsedString
+		// Convert HTML to attributed string
+		let attrib = NSAttributedString(simpleHTML: htmlString, removingTrailingUrl: url, removingInvisibleSpans: removeInvisibles)
+		cache.setObject(attrib, forKey: cacheReference, cost: htmlString.count)
+		return attrib
 	}
 }
 

@@ -26,9 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSAttributedString *attributedStringRemovingLinks NS_SWIFT_NAME(removingLinks);
 
 + (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString;
-+ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString
-								   removingTrailingUrl:(nullable NSURL *)url
-								removingInvisibleSpans:(BOOL)removeInvisibles;
++ (NSAttributedString *)attributedStringWithSimpleHTML:(NSString *)htmlString removingTrailingUrl:(nullable NSURL *)url removingInvisibleSpans:(BOOL)removeInvisibles;
 
 @end
 
